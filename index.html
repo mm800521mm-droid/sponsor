@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>猫咪大战争机器人 - 赞助与档案</title>
+    <style>
+        /* ========================================================= */
+        /* 🌟 核心修复 1：改用绝对居中，防止布局被撑开 */
+        /* ========================================================= */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            background-color: #0d0914;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(-45deg, #0d0914, #1a0b2e, #000000, #2b1055);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #fff;
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.5s ease;
+        }
+
+        /* 恐怖状态：背景变红 */
+        body.horror-mode {
+            background: linear-gradient(-45deg, #2e0b0b, #1a0000, #000000, #5c0000);
+            animation: gradientBG 5s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 主容器居中 */
+        .wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 1;
+        }
+
+        /* 霓虹背景光晕 */
+        .glow-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 0;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .orb-1 { width: 300px; height: 300px; background: #ff00cc; top: -50px; left: -50px; }
+        .orb-2 { width: 400px; height: 400px; background: #3333ff; bottom: -100px; right: -100px; }
+        .orb-3 { width: 200px; height: 200px; background: #00ffcc; top: 40%; left: 60%; }
+
+        /* 聊天气泡 */
+        .robot-bubble {
+            position: fixed;
+            background: rgba(20, 20, 30, 0.95);
+            border: 1px solid #00c6ff;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            box-shadow: 0 5px 15px rgba(0, 198, 255, 0.4);
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -150%) scale(0);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+            white-space: nowrap;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .robot-bubble.show {
+            transform: translate(-50%, -150%) scale(1);
+        }
+        .robot-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px 6px 0;
+            border-style: solid;
+            border-color: #00c6ff transparent transparent transparent;
+        }
+        .robot-bubble.horror {
+            border-color: #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+            color: #ff4d4d;
+            font-size: 18px;
+        }
+        .robot-bubble.horror::after {
+            border-color: #ff0000 transparent transparent transparent;
+        }
+
+        /* 飞走的动画 */
+        .flying-away {
+            transition: all 0.5s ease-out !important;
+            opacity: 0 !important;
+            transform: translate(100vw, -100vh) rotate(720deg) !important;
+        }
+
+        /* 左侧悬浮时钟 */
+        .left-clock-panel {
+            position: fixed;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(20, 20, 30, 0.6);
+            backdrop-filter: blur(10px);
+            border-left: 3px solid #00c6ff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 198, 255, 0.15);
+            z-index: 10;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            transition: all 0.5s;
+        }
+        .clock-time {
+            font-family: 'Courier New', monospace;
+            font-size: 32px;
+            font-weight: bold;
+            color: #00c6ff;
+            text-shadow: 0 0 10px rgba(0, 198, 255, 0.8);
+            letter-spacing: 2px;
+        }
+        .clock-date {
+            font-family: 'PingFang SC', sans-serif;
+            font-size: 14px;
+            color: #aaa;
+            letter-spacing: 1px;
+        }
+
+        /* 主玻璃拟态卡片 */
+        .container {
+            width: 100%;
+            background: rgba(20, 20, 30, 0.6);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-sizing: border-box;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255,255,255,0.05);
+            transition: all 0.5s;
+        }
+        .container.horror-mode {
+            border-color: rgba(255, 0, 0, 0.5);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(255, 0, 0, 0.2);
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        /* 炫彩标题 */
+        h1 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 32px;
+            background: linear-gradient(to right, #ff6a00, #ee0979, #00c6ff, #0072ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: textShine 3s linear infinite;
+            letter-spacing: 2px;
+        }
+        @keyframes textShine { to { background-position: 200% center; } }
+
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        /* 分割线 */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            margin: 30px 0;
+        }
+
+        /* 功能展示区 */
+        .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .feature-item {
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #ddd;
+            transition: all 0.3s;
+            cursor: pointer;
+            user-select: none;
+        }
+        .feature-item:hover {
+            background: rgba(0, 198, 255, 0.1);
+            border-color: rgba(0, 198, 255, 0.4);
+            color: #fff;
+        }
+        .feature-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        /* 用户名片卡片 */
+        .user-card {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+            border: 1px solid rgba(0, 198, 255, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(0, 198, 255, 0.1);
+            transition: all 0.3s;
+        }
+        .avatar-box {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00c6ff, #0072ff, #ee0979);
+            padding: 3px;
+            flex-shrink: 0;
+            box-shadow: 0 0 15px rgba(0, 114, 255, 0.6);
+            /* 如果是QQ头像加载失败，显示一个默认的渐变圈 */
+            background-color: #1a0b2e; 
+        }
+        .avatar-box img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #1a0b2e;
+        }
+
+        .user-info {
+            margin-left: 20px;
+            text-align: left;
+        }
+        .user-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        .user-qq {
+            font-size: 14px;
+            color: #00c6ff;
+            cursor: pointer;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        .add-friend-btn {
+            display: inline-block;
+            background: rgba(0, 198, 255, 0.15);
+            border: 1px solid #00c6ff;
+            color: #00c6ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        /* ========================================================= */
+        /* 🌟 核心修复 2：赞助者殿堂排版 */
+        /* ========================================================= */
+        .hall-of-fame {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .hall-title {
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+        .sponsor-tags {
+            display: flex;
+            flex-wrap: wrap; /* 允许换行 */
+            justify-content: center;
+            gap: 10px; /* 标签间的间距 */
+        }
+        .sponsor-tag {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #ffd700;
+            text-shadow: 0 0 5px rgba(255,215,0,0.3);
+            white-space: nowrap; /* 标签内文字不换行 */
+        }
+
+        /* 底部信息 */
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+            line-height: 2;
+        }
+        .footer span {
+            color: #00c6ff;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        /* 模态弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: rgba(20, 20, 30, 0.95);
+            border: 1px solid rgba(0, 198, 255, 0.4);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            box-shadow: 0 0 50px rgba(0, 198, 255, 0.2);
+            position: relative;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn {
+            display: block;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .btn-tw { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .btn-jp { background: linear-gradient(135deg, #2193b0, #6dd5ed); }
+        .btn-en { background: linear-gradient(135deg, #8E2DE2, #4A00E0); }
+        .btn-sponsor { background: linear-gradient(135deg, #f12711, #f5af19); }
+
+        /* 移动端适配 */
+        @media screen and (max-width: 768px) {
+            .left-clock-panel { display: none; }
+            .wrapper { padding: 10px; }
+            .container { padding: 20px; border-radius: 16px; }
+            .features { grid-template-columns: 1fr; }
+            .user-card { flex-direction: column; text-align: center; }
+            .user-info { margin-left: 0; margin-top: 15px; }
+            .footer { font-size: 11px; }
+        }
+    </style>
+</head>
+<body id="main-body">
+    <div id="robot-bubble" class="robot-bubble">干嘛？</div>
+
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+
+    <div class="left-clock-panel" id="clock-panel">
+        <div class="clock-time" id="live-clock">00:00:00</div>
+        <!-- 🌟 确保这里有加载中 -->
+        <div class="clock-date" id="live-date">加载中...</div>
+    </div>
+
+    <!-- 🌟 用 wrapper 包裹主容器，保证居中 -->
+    <div class="wrapper">
+        <div class="container" id="main-container">
+            <h1>BATTLE CATS BOT</h1>
+            <div class="subtitle">猫咪大战争魔法学院 · 综合情报终端</div>
+
+            <div class="features">
+                <div class="feature-item" onclick="openModal('noticeModal')">
+                    <span class="feature-icon">🌏</span> 三服卡池查询
+                </div>
+                <div class="feature-item" onclick="openModal('sponsorModal')">
+                    <span class="feature-icon">💖</span> 赞助方式
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🚀</span> 官方公告秒推
+                </div>
+                <div class="feature-item" id="talk-feature">
+                    <span class="feature-icon">🤖</span> 智能交互闲聊
+                </div>
+            </div>
+
+            <div class="user-card">
+                <div class="avatar-box" id="avatar-box">
+                    <!-- 🌟 加了一个 onerror 兜底，如果 QQ 头像挂了就显示一张本地二次元猫猫图 -->
+                    <img src="https://q1.qlogo.cn/g?b=qq&nk=1467583911&s=640" onerror="this.src='https://api.dicebear.com/7.x/adventurer/svg?seed=Felix'" alt="Avatar">
+                </div>
+                <div class="user-info">
+                    <div class="user-name">机器人开发者 / 维护者</div>
+                    <div class="user-qq" onclick="copyQQ('1467583911')">
+                        QQ: 1467583911 <span style="font-size: 10px; opacity: 0.7;">(点击复制)</span>
+                    </div>
+                    <a href="http://wpa.qq.com/msgrd?v=3&uin=1467583911&site=qq&menu=yes" target="_blank" class="add-friend-btn">➕ 加好友反馈</a>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="hall-of-fame">
+                <div class="hall-title">🏆 感谢以下大佬的投喂 🏆</div>
+                <div class="sponsor-tags">
+                    <span class="sponsor-tag">神秘的铲屎官</span>
+                    <span class="sponsor-tag">超激必中</span>
+                    <span class="sponsor-tag">匿名大佬</span>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p>运行状态：<span id="bot-status">🔄 正在连接...</span></p>
+                <p>监测时间：<span id="update-time">--:--:--</span></p>
+                <p>已运行时长：<span id="uptime">--</span></p>
+                <p>项目上线：<span id="create-date">--</span></p>
+                <p style="margin-top: 10px;">© 2026 BATTLE CATS BOT.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗部分 -->
+    <div id="noticeModal" class="modal-overlay" onclick="closeModal(event, 'noticeModal')">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal(event, 'noticeModal')">&times;</span>
+            <h2 style="text-align: center; margin-top: 0; color: #fff;">📢 选择服务器</h2>
+            <div class="btn-group">
+                <a href="https://nyanko-announcement.ponosgames.com/v1/notices?platform=google&clientVersion=101000&countryCode=tw&clearedStageJapan=100&clearedStageFuture=100&clearedUniverse=100&timeDifference=480" target="_blank" class="btn btn-tw">🌐 前往台服官方公告</a>
+                <a href="https://nyanko-announcement.ponosgames.com/v1/notices?platform=google&clientVersion=101000&countryCode=ja&clearedStageJapan=100&clearedStageFuture=100&clearedUniverse=100&timeDifference=540" target="_blank" class="btn btn-jp">🌐 前往日服官方公告</a>
+                <a href="https://nyanko-announcement.ponosgames.com/v1/notices?platform=google&clientVersion=101000&countryCode=en&clearedStageJapan=100&clearedStageFuture=100&clearedUniverse=100&timeDifference=0" target="_blank" class="btn btn-en">🌐 前往美服官方公告</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="sponsorModal" class="modal-overlay" onclick="closeModal(event, 'sponsorModal')">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal(event, 'sponsorModal')">&times;</span>
+            <h2 style="text-align: center; margin-top: 0; color: #fff;">☕ 赞助支持</h2>
+            <div class="btn-group">
+                <a href="https://afdian.net/a/你的用户名" target="_blank" class="btn btn-sponsor">💜 爱发电支持</a>
+                <a href="https://你的微信收款码链接.jpg" target="_blank" class="btn btn-tw">💚 微信赞助</a>
+                <a href="https://你的支付宝收款码链接.jpg" target="_blank" class="btn btn-jp">💙 支付宝赞助</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(0, 198, 255, 0.9); color: #000; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 9999;">QQ号已复制到剪贴板！</div>
+
+    <script>
+        // ==========================================
+        // 🌟 核心修复 3：确保时间更新逻辑完整
+        // ==========================================
+        function updateLiveClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            const clockEl = document.getElementById('live-clock');
+            if (clockEl) clockEl.innerText = `${hours}:${minutes}:${seconds}`;
+            
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const date = String(now.getDate()).padStart(2, '0');
+            const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+            const weekDay = weekDays[now.getDay()];
+            
+            const dateEl = document.getElementById('live-date');
+            // 保证这里一定会替换掉“加载中...”
+            if (dateEl) {
+                dateEl.innerText = `${year}-${month}-${date} 星期${weekDay}`;
+            }
+        }
+        updateLiveClock();
+        setInterval(updateLiveClock, 1000);
+
+        // ==========================================
+        // 互动逻辑：点击气泡与忍耐度系统
+        // ==========================================
+        let clickCount = 0;
+        let resetTimer = null;
+        const bubble = document.getElementById('robot-bubble');
+        const bodyEl = document.getElementById('main-body');
+        const container = document.getElementById('main-container');
+        const clockPanel = document.getElementById('clock-panel');
+        const avatarBox = document.getElementById('avatar-box');
+
+        const normalPhrases = [
+            "干嘛？", "在呢在呢", "别戳我啦", "再点就生气了！", 
+            "哎哟，轻点", "你是不是手痒？", "抽卡出彩了没？", 
+            "找我有事吗？", "戳戳戳，戳坏了你赔啊？"
+        ];
+
+        // 🌟 修复：点击次数限制只绑定第四个框架（智能交互闲聊），其它框架不再触发
+        const talkFeature = document.getElementById('talk-feature');
+        if (talkFeature) talkFeature.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || e.target.closest('.modal-content')) {
+                return;
+            }
+
+            clickCount++;
+            clearTimeout(resetTimer);
+
+            bubble.style.left = e.clientX + 'px';
+            bubble.style.top = e.clientY + 'px';
+            bubble.classList.add('show');
+
+            if (clickCount <= 4) {
+                bubble.classList.remove('horror');
+                const randomPhrase = normalPhrases[Math.floor(Math.random() * normalPhrases.length)];
+                bubble.innerText = randomPhrase;
+            } 
+            else if (clickCount === 5) {
+                bubble.classList.remove('horror');
+                bubble.innerText = "还点？我飞走啦！";
+                
+                container.classList.add('flying-away');
+                clockPanel.classList.add('flying-away');
+                avatarBox.classList.add('flying-away');
+                
+                setTimeout(() => {
+                    container.classList.remove('flying-away');
+                    clockPanel.classList.remove('flying-away');
+                    avatarBox.classList.remove('flying-away');
+                    container.style.opacity = '0.5';
+                }, 600);
+            } 
+            else if (clickCount >= 6) {
+                bubble.classList.add('horror');
+                bubble.innerText = "我说别点了，你尔多龙吗！";
+                
+                bodyEl.classList.add('horror-mode');
+                container.classList.add('horror-mode');
+                clockPanel.classList.add('horror-mode');
+                
+                document.body.style.animation = 'shake 0.5s infinite';
+            }
+
+            resetTimer = setTimeout(() => {
+                clickCount = 0;
+                bubble.classList.remove('show');
+                bubble.classList.remove('horror');
+                
+                bodyEl.classList.remove('horror-mode');
+                container.classList.remove('horror-mode');
+                clockPanel.classList.remove('horror-mode');
+                container.style.opacity = '1';
+                document.body.style.animation = 'none';
+            }, 2000);
+        });
+
+        // ================== 弹窗控制 ==================
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(event, modalId) {
+            if (event.target.id === modalId || event.target.classList.contains('close-btn')) {
+                document.getElementById(modalId).classList.remove('active');
+            }
+        }
+
+        // ================== 状态轮询 ==================
+        const API_URL = 'http://127.0.0.1:3001/status'; 
+
+        async function checkBotStatus() {
+            const statusEl = document.getElementById('bot-status');
+            const timeEl = document.getElementById('update-time');
+            const uptimeEl = document.getElementById('uptime');
+            const createDateEl = document.getElementById('create-date');
+            
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+                
+                const response = await fetch(API_URL, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.status === 'online') {
+                        statusEl.innerHTML = '🟢 在线运行中';
+                        statusEl.style.color = '#38ef7d';
+                        timeEl.innerText = data.server_time;
+                        uptimeEl.innerText = data.uptime;
+                        createDateEl.innerText = data.create_date;
+                    }
+                }
+            } catch (error) {
+                statusEl.innerHTML = '🔴 离线 (无法连接)';
+                statusEl.style.color = '#ff4d4d';
+                timeEl.innerText = '连接中断';
+            }
+        }
+        checkBotStatus();
+        setInterval(checkBotStatus, 1000);
+
+        // ================== 复制 QQ 号 ==================
+        function copyQQ(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast();
+                });
+            }
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(20px)';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
