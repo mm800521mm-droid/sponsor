@@ -2183,6 +2183,9 @@ window.resetProgress = function(){
   charList.forEach(function(c){ ais[c.id] = 0; deathLog[c.id] = 0; });
   chUnlocked = 0;
   chCleared = [];
+  storyNight = 1;
+  sixthNightCleared = false;
+  if(typeof refreshCustomUnlockUI==='function') refreshCustomUnlockUI();
   currentChallenge = null;
   aisBackup = null;
   settings = { effects: true, hints: true };
