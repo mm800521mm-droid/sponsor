@@ -1115,6 +1115,13 @@ body { color:#777 !important; font-family:"Courier New",monospace !important; }
   .cam-btn{font-size:10px;padding:4px;}
 }
 </style>
+<style>
+/* 主菜单左侧四项顺序固定；仅影响按钮列，不触碰右侧主视觉 */
+#menu-screen #main-menu-actions > button:nth-child(1){order:1!important;}
+#menu-screen #main-menu-actions > button:nth-child(2){order:2!important;}
+#menu-screen #main-menu-actions > button:nth-child(3){order:3!important;}
+#menu-screen #main-menu-actions > button:nth-child(4){order:4!important;}
+</style>
 </head>
 <body>
 
