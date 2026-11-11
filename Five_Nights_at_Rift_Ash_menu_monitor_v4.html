@@ -1176,7 +1176,7 @@ body { color:#777 !important; font-family:"Courier New",monospace !important; }
 <!-- ===== 自定义中心：参数、挑战与调试统一收纳 ===== -->
 <div id="custom-menu-screen" style="display:none;position:absolute;inset:0;z-index:10010;background:#050505;color:#ddd;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;overflow:auto;">
   <h2 style="letter-spacing:4px;">自定义</h2>
-  <div id="custom-unlock-note" style="color:#888;font-size:12px;letter-spacing:1px;">通关第五夜并解锁第六夜后开放自定义夜</div>
+  <div id="custom-unlock-note" style="color:#888;font-size:12px;letter-spacing:1px;">通关第六夜后开放自定义页</div>
   <button class="btn" onclick="toggleCustomPanel('ai-grid')">自定义夜 / 监控参数</button>
   <div class="ai-grid" id="ai-grid" style="display:none;width:min(700px,94vw);"></div>
   <button class="btn" onclick="openChallengeScreen()">自定义挑战</button>
@@ -1532,28 +1532,33 @@ charList.forEach(c => {
     </div>`);
 });
 
-/* 主菜单与自定义入口 */
+/* 主菜单与自定义入口：第五夜解锁第六夜；第六夜通关后解锁自定义 */
 let storyNight = 1;
-try { storyNight = Math.max(1, Math.min(6, Number(localStorage.getItem('rift_story_night') || 1))); } catch(e) {}
+let sixthNightCleared = false;
+try {
+  storyNight = Math.max(1, Math.min(6, Number(localStorage.getItem('rift_story_night') || 1)));
+  sixthNightCleared = localStorage.getItem('rift_sixth_night_cleared') === '1';
+} catch(e) {}
 function refreshCustomUnlockUI(){
-  const unlocked = storyNight >= 6;
+  const sixthUnlocked = storyNight >= 6;
+  const customUnlocked = sixthNightCleared;
   const entry=document.getElementById('custom-menu-entry');
   const sixth=document.getElementById('sixth-night-entry');
   const note=document.getElementById('custom-unlock-note');
   const nightBtn=document.querySelector('#custom-menu-screen button[onclick*="toggleCustomPanel"]');
-  if(entry) entry.style.display=unlocked?'':'none';
-  if(sixth) sixth.style.display=unlocked?'':'none';
-  if(note) note.textContent = unlocked ? '第六夜与自定义页已解锁' : '通关第五夜后开放第六夜与自定义页';
-  if(nightBtn){ nightBtn.disabled=!unlocked; nightBtn.style.opacity=unlocked?'1':'.42'; nightBtn.title=unlocked?'':'通关第五夜后解锁'; }
+  if(entry) entry.style.display=customUnlocked?'':'none';
+  if(sixth) sixth.style.display=sixthUnlocked?'':'none';
+  if(note) note.textContent = customUnlocked ? '第六夜已通关，自定义页已解锁' : sixthUnlocked ? '已解锁第六夜；通关第六夜后开放自定义页' : '通关第五夜后开放第六夜';
+  if(nightBtn){ nightBtn.disabled=!customUnlocked; nightBtn.style.opacity=customUnlocked?'1':'.42'; nightBtn.title=customUnlocked?'':'通关第六夜后解锁'; }
 }
 window.openCustomMenu = function(){
-  if(storyNight<6){ fxToast('通关第五夜后解锁自定义页','#f44'); return; }
+  if(!sixthNightCleared){ fxToast('通关第六夜后解锁自定义页','#f44'); return; }
   document.getElementById('menu-screen').style.display='none';
   document.getElementById('custom-menu-screen').style.display='flex';
   refreshCustomUnlockUI();
 };
 window.closeCustomMenu = function(){ document.getElementById('custom-menu-screen').style.display='none'; document.getElementById('menu-screen').style.display='flex'; };
-window.toggleCustomPanel = function(id){ if(storyNight<6){fxToast('通关第五夜后解锁自定义夜','#f44');return;} const el=document.getElementById(id); if(el) el.style.display=(el.style.display==='none' || !el.style.display)?'grid':'none'; };
+window.toggleCustomPanel = function(id){ if(!sixthNightCleared){fxToast('通关第六夜后解锁自定义内容','#f44');return;} const el=document.getElementById(id); if(el) el.style.display=(el.style.display==='none' || !el.style.display)?'grid':'none'; };
 window.openCustomDebug = function(){
   if (typeof playerStats !== 'undefined' && playerStats.sandbox) { fxToast('Debug 模式已开启', '#0f0'); return; }
   const code=prompt('输入 Debug 解锁密码');
@@ -2170,6 +2175,8 @@ window.resetProgress = function(){
     localStorage.removeItem('im_ch_unlocked');
     localStorage.removeItem('im_ch_cleared');
     localStorage.removeItem('im_death_log');
+    localStorage.removeItem('rift_story_night');
+    localStorage.removeItem('rift_sixth_night_cleared');
   } catch (e) {}
 
   ais = {};
@@ -4057,6 +4064,10 @@ window.winGame = function(){
   if (window.__riftStoryMode) {
     const finished = Number(window.__riftStoryNight || 1);
     if (finished < 6) storyNight = Math.max(storyNight, finished + 1);
+    if (finished === 6) {
+      sixthNightCleared = true;
+      try { localStorage.setItem('rift_sixth_night_cleared', '1'); } catch(e) {}
+    }
     try { localStorage.setItem('rift_story_night', String(storyNight)); } catch(e) {}
     if(typeof refreshCustomUnlockUI==='function') refreshCustomUnlockUI();
     window.__riftStoryMode = false;
