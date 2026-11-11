@@ -1534,13 +1534,15 @@ charList.forEach(c => {
 
 /* 主菜单与自定义入口：第五夜解锁第六夜；第六夜通关后解锁自定义 */
 let storyNight = 1;
+let fifthNightCleared = false;
 let sixthNightCleared = false;
 try {
   storyNight = Math.max(1, Math.min(6, Number(localStorage.getItem('rift_story_night') || 1)));
+  fifthNightCleared = localStorage.getItem('rift_fifth_night_cleared') === '1';
   sixthNightCleared = localStorage.getItem('rift_sixth_night_cleared') === '1';
 } catch(e) {}
 function refreshCustomUnlockUI(){
-  const sixthUnlocked = storyNight >= 6;
+  const sixthUnlocked = fifthNightCleared;
   const customUnlocked = sixthNightCleared;
   const entry=document.getElementById('custom-menu-entry');
   const sixth=document.getElementById('sixth-night-entry');
@@ -1576,7 +1578,7 @@ window.startStoryNight = function(isContinue){
   startGame();
 };
 window.startStoryNightSix = function(){
-  if(storyNight<6){ fxToast('通关第五夜后解锁第六夜','#f44'); return; }
+  if(!fifthNightCleared){ fxToast('通关第五夜后解锁第六夜','#f44'); return; }
   storyNight=6;
   window.startStoryNight(true);
 };
@@ -2184,7 +2186,9 @@ window.resetProgress = function(){
   chUnlocked = 0;
   chCleared = [];
   storyNight = 1;
+  fifthNightCleared = false;
   sixthNightCleared = false;
+  try { localStorage.removeItem('rift_fifth_night_cleared'); localStorage.removeItem('rift_sixth_night_cleared'); localStorage.removeItem('rift_story_night'); } catch(e) {}
   if(typeof refreshCustomUnlockUI==='function') refreshCustomUnlockUI();
   currentChallenge = null;
   aisBackup = null;
@@ -4067,6 +4071,10 @@ window.winGame = function(){
   if (window.__riftStoryMode) {
     const finished = Number(window.__riftStoryNight || 1);
     if (finished < 6) storyNight = Math.max(storyNight, finished + 1);
+    if (finished === 5) {
+      fifthNightCleared = true;
+      try { localStorage.setItem('rift_fifth_night_cleared', '1'); } catch(e) {}
+    }
     if (finished === 6) {
       sixthNightCleared = true;
       try { localStorage.setItem('rift_sixth_night_cleared', '1'); } catch(e) {}
