@@ -3227,7 +3227,7 @@ window.resetGame = function(){
   gameLoopId = secLoopId = null;
 
   power = 100; winding = 100; time = 0;
-  isCamOpen = true; isMaskOn = false; currentCam = 'left';
+  isCamOpen = false; isMaskOn = false; currentCam = 'left';
   doors = { left:false, right:false };
 
   mons = {};
@@ -3245,8 +3245,8 @@ window.resetGame = function(){
     b.textContent = (i === 0 ? '关左门 [A]' : '关右门 [D]');
     b.setAttribute('aria-pressed', 'false'); b.classList.remove('active');
   });
-  document.getElementById('office-view').style.display = 'none';
-  document.getElementById('cam-screen').style.display = 'flex';
+  document.getElementById('office-view').style.display = 'flex';
+  document.getElementById('cam-screen').style.display = 'none';
   document.getElementById('cam-screen').className = 'active';
   document.getElementById('cam-entities').innerHTML = '';
   document.getElementById('lunxian-office').innerHTML = SVGS.lunxian;
