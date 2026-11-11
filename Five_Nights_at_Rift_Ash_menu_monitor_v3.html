@@ -1122,6 +1122,31 @@ body { color:#777 !important; font-family:"Courier New",monospace !important; }
 #menu-screen #main-menu-actions > button:nth-child(3){order:3!important;}
 #menu-screen #main-menu-actions > button:nth-child(4){order:4!important;}
 </style>
+<style id="rift-menu-visibility-fix">
+/* 修复主菜单：旧版通用按钮样式的 display:block!important 会覆盖锁定入口的行内 display:none */
+#menu-screen #main-menu-actions {
+  display:flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  z-index:20 !important;
+}
+#menu-screen #main-menu-actions > #sixth-night-entry[style*="display:none"],
+#menu-screen #main-menu-actions > #custom-menu-entry[style*="display:none"] {
+  display:none !important;
+}
+#menu-screen #main-menu-actions > .btn {
+  visibility:visible !important;
+  opacity:1 !important;
+  color:#d0d0d0 !important;
+}
+#menu-screen #main-menu-actions > .btn:hover {
+  color:#fff !important;
+}
+#menu-screen #main-menu-actions > button:nth-child(1){order:1!important;}
+#menu-screen #main-menu-actions > button:nth-child(2){order:2!important;}
+#menu-screen #main-menu-actions > button:nth-child(3){order:3!important;}
+#menu-screen #main-menu-actions > button:nth-child(4){order:4!important;}
+</style>
 </head>
 <body>
 
