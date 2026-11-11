@@ -1104,7 +1104,7 @@ body { color:#777 !important; font-family:"Courier New",monospace !important; }
 @media(min-width:900px){
   #view-area{min-height:0;display:block;position:relative;padding-right:252px;box-sizing:border-box}
   #cam-screen{position:absolute;left:0;top:0;bottom:0;width:100%;height:100%;}
-  #office-view{display:none!important}
+  /* office-view visibility is controlled by resetGame() and toggleCam() inline state */
   #cam-buttons{position:absolute;z-index:60;right:8px;top:8px;bottom:8px;width:228px;height:auto;box-sizing:border-box;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(42px,auto);align-content:center;overflow-y:auto;}
   .cam-btn{white-space:normal;line-height:1.35;padding:5px 4px}
 }
