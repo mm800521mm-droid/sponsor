@@ -46,6 +46,26 @@
     visible.set(id, cam);
   }
 
+  // When Tannin changes rooms, the companions receive independent camera positions.
+  // They are not pinned to Tannin's room and do not use separate hostile AI levels.
+  function randomCamera() { return 1 + Math.floor(Math.random() * 13); }
+  window.addEventListener('rift:tannin-node-change', event => {
+    const detail = event.detail || {};
+    if (detail.character !== 'tannin') return;
+    if (!detail.node) {
+      Object.keys(defs).forEach(hideCharacter);
+      return;
+    }
+    for (const id of Object.keys(defs)) {
+      place({
+        characterId: id,
+        camId: randomCamera(),
+        x: 8 + Math.random() * 72,
+        y: 6 + Math.random() * 24
+      });
+    }
+  });
+
   window.addEventListener('rift:tannin-companion-position', event => place(event.detail || {}));
   window.addEventListener('rift:tannin-companion-hide', event => {
     const id = event.detail && event.detail.characterId;
