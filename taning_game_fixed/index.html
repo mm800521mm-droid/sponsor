@@ -685,135 +685,6 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
   let elevenCameraBlackout = false;
   let highestNight = 1;
 
-  let elevenArrivalSequenceToken = 0;
-
-  function playElevenArrivalAlarm() {
-    try {
-      if (!audioCtx) initAudio();
-      if (!audioCtx) return;
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      const now = audioCtx.currentTime;
-      const duration = 2.8;
-      const carrier = audioCtx.createOscillator();
-      carrier.type = 'sawtooth';
-      carrier.frequency.setValueAtTime(660, now);
-      const lfo = audioCtx.createOscillator();
-      lfo.type = 'square';
-      lfo.frequency.setValueAtTime(2.4, now);
-      const depth = audioCtx.createGain();
-      depth.gain.setValueAtTime(360, now);
-      lfo.connect(depth); depth.connect(carrier.frequency);
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'lowpass'; filter.frequency.setValueAtTime(1800, now);
-      const volume = audioCtx.createGain();
-      volume.gain.setValueAtTime(0.0001, now);
-      volume.gain.linearRampToValueAtTime(0.22, now + 0.08);
-      volume.gain.setValueAtTime(0.22, now + duration - 0.35);
-      volume.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-      carrier.connect(filter); filter.connect(volume); volume.connect(audioCtx.destination);
-      carrier.start(now); lfo.start(now);
-      carrier.stop(now + duration); lfo.stop(now + duration);
-    } catch (e) { console.warn('[Rift Ash] Eleven arrival alarm unavailable:', e); }
-  }
-
-  function showElevenArrivalSequence() {
-    const token = ++elevenArrivalSequenceToken;
-    const deskScreen = document.querySelector('#btnCam .screen');
-    if (!deskScreen) return;
-    deskScreen.classList.remove('eleven-message', 'eleven-face');
-    deskScreen.innerHTML = '';
-
-    // Keep Eleven's message and face on the desk monitor; do not show a full-screen alert.
-    window.setTimeout(() => {
-      if (token !== elevenArrivalSequenceToken) return;
-      deskScreen.classList.add('eleven-message');
-      deskScreen.innerHTML = '<div class="eleven-monitor-text">我想和你玩玩</div>';
-    }, 2800);
-    window.setTimeout(() => {
-      if (token !== elevenArrivalSequenceToken) return;
-      deskScreen.classList.remove('eleven-message');
-      deskScreen.classList.add('eleven-face');
-      deskScreen.innerHTML = '<div class="eleven-monitor-face"><div class="eleven-monitor-ears"></div><div class="eleven-monitor-head"><i class="eye left"></i><i class="eye right"></i><div class="muzzle"></div></div></div>';
-    }, 5200);
-  }
-
-  if (!document.getElementById('eleven-arrival-sequence-style')) {
-    const arrivalStyle = document.createElement('style');
-    arrivalStyle.id = 'eleven-arrival-sequence-style';
-    arrivalStyle.textContent = `
-      #eleven-arrival-sequence{position:fixed;inset:0;z-index:1000000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.96);color:#f4eeee;font-family:"Courier New",monospace;text-align:center;overflow:hidden}
-      #eleven-arrival-sequence.active{display:flex}
-      #eleven-arrival-sequence:before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px);opacity:.5}
-      .eleven-arrival-alert,.eleven-arrival-story{position:absolute;inset:0;width:100%;min-height:100%;padding:8vh 7vw;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transform:none;transition:opacity .2s}
-      .eleven-arrival-alert{border:0;background:transparent;box-shadow:none;animation:elevenAlertFlash .42s steps(2,end) 6}
-      #eleven-arrival-sequence:not(.show-story) .eleven-arrival-alert{opacity:1;transform:scale(1)}
-      .eleven-arrival-kicker{font-size:clamp(10px,1.5vw,14px);letter-spacing:.28em;color:#c99b9b;margin-bottom:22px}
-      .eleven-arrival-warning{font-size:clamp(42px,8vw,100px);font-weight:900;color:#ff333b;text-shadow:0 0 24px #f00,0 0 60px rgba(255,0,0,.55);margin-bottom:28px;letter-spacing:.12em}
-      .eleven-arrival-main{font-size:clamp(34px,7vw,82px);font-weight:900;letter-spacing:.1em;text-shadow:0 0 22px rgba(255,0,0,.5)}
-      .eleven-arrival-sub{font-size:clamp(10px,1.5vw,15px);letter-spacing:.25em;color:#b7a5a5;margin-top:20px}
-      .eleven-arrival-scan{height:3px;background:#d21c26;margin:30px auto 0;max-width:90%;box-shadow:0 0 12px #f00;animation:elevenScan 1s ease-in-out infinite alternate}
-      #eleven-arrival-sequence.show-story .eleven-arrival-alert{opacity:0;transform:scale(1.04)}
-      #eleven-arrival-sequence.show-story .eleven-arrival-story{opacity:1;transform:scale(1)}
-      .eleven-arrival-story{border:0;background:transparent;box-shadow:none}
-      .eleven-arrival-title{font-family:serif;font-size:clamp(64px,13vw,150px);font-weight:900;letter-spacing:.14em;color:#d5ad68;text-shadow:0 0 22px rgba(196,37,25,.65),0 0 55px rgba(196,37,25,.35);margin:8px 0 34px}
-      .eleven-arrival-copy{font-family:serif;font-size:clamp(25px,4vw,44px);line-height:1.8;color:#f0e6d8;text-shadow:0 2px 12px #000}
-      .eleven-arrival-foot{font-size:12px;letter-spacing:.35em;color:#a84b42;margin-top:28px}
-      #eleven-arrival-sequence.fade-out{opacity:0;transition:opacity .7s}
-      @keyframes elevenAlertFlash{0%,100%{filter:brightness(1)}50%{filter:brightness(1.8)}}
-      @keyframes elevenScan{from{transform:scaleX(.35);opacity:.45}to{transform:scaleX(1);opacity:1}}
-      #eleven-arrival-sequence .eleven-arrival-story{display:none!important}
-      #btnCam .screen{isolation:isolate}
-      #btnCam .screen.eleven-message{display:flex;align-items:center;justify-content:center;background:#080000;box-shadow:inset 0 0 20px #000,0 0 12px rgba(255,0,0,.35)}
-      #btnCam .screen.eleven-message:before,#btnCam .screen.eleven-message:after{opacity:.2}
-      .eleven-monitor-text{position:relative;z-index:3;padding:4px;color:#f3dddd;font:bold clamp(8px,1.1vw,15px) "Courier New",monospace;text-align:center;text-shadow:0 0 7px #f00;letter-spacing:.04em;animation:elevenMonitorFlicker .16s steps(2,end) infinite}
-      #btnCam .screen.eleven-face{background:#030303;box-shadow:inset 0 0 24px #000,0 0 15px rgba(255,0,0,.45)}
-      .eleven-monitor-face{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse,rgba(91,0,0,.28),#030303 72%);overflow:hidden}
-      .eleven-monitor-ears{position:absolute;top:5%;left:19%;width:62%;height:42%;background:linear-gradient(90deg,#392a18,#a08043 45%,#21180e);clip-path:polygon(0 0,31% 8%,40% 100%,60% 100%,69% 8%,100% 0,86% 100%,14% 100%);filter:drop-shadow(0 2px 3px #000)}
-      .eleven-monitor-head{position:relative;width:62%;height:74%;margin-top:14%;border:3px solid #59482b;border-radius:43% 43% 35% 35%;background:linear-gradient(110deg,#211b12 0%,#9a783d 28%,#4d3b20 54%,#17130e 100%);box-shadow:inset 0 0 0 3px #21190e,0 0 14px #000}
-      .eleven-monitor-face .eye{position:absolute;top:40%;width:17%;height:8%;background:#ffdc72;box-shadow:0 0 7px 3px #e5a52b,0 0 14px #f00}
-      .eleven-monitor-face .eye.left{left:18%}.eleven-monitor-face .eye.right{right:18%}
-      .eleven-monitor-face .muzzle{position:absolute;left:30%;bottom:8%;width:40%;height:27%;border-radius:45%;background:linear-gradient(#b39a68,#43331d);border:2px solid #21180e}
-      .eleven-monitor-face .muzzle:after{content:"";position:absolute;left:42%;top:28%;width:16%;height:18%;background:#130e09;border-radius:50%}
-      @keyframes elevenMonitorFlicker{0%,100%{opacity:1}50%{opacity:.55}}
-      @media(max-width:600px){.eleven-arrival-story,.eleven-arrival-alert{padding:7vh 6vw}.eleven-arrival-title{letter-spacing:.08em}}
-    `;
-    document.head.appendChild(arrivalStyle);
-  }
-  let systemAlertSubtitleToken = 0;
-  async function showSystemAlertSubtitle(alertText) {
-    if (!alertText) return;
-    const token = ++systemAlertSubtitleToken;
-    let subtitle = document.getElementById('system-alert-subtitle');
-    if (!subtitle) {
-      subtitle = document.createElement('div');
-      subtitle.id = 'system-alert-subtitle';
-      document.getElementById('game').appendChild(subtitle);
-    }
-    subtitle.replaceChildren();
-    subtitle.classList.add('show');
-    const commandPattern = /\\[(red|glitch)\\]/g;
-    const parts = String(alertText).split(commandPattern);
-    let effects = [];
-    for (const part of parts) {
-      if (part === 'red' || part === 'glitch') {
-        if (!effects.includes(part)) effects.push(part);
-        continue;
-      }
-      for (const char of Array.from(part)) {
-        if (token !== systemAlertSubtitleToken) return;
-        const span = document.createElement('span');
-        span.textContent = char;
-        span.className = effects.map(effect => 'tape-' + effect).join(' ');
-        subtitle.appendChild(span);
-        await new Promise(resolve => setTimeout(resolve, 24));
-      }
-    }
-    window.setTimeout(() => {
-      if (token !== systemAlertSubtitleToken) return;
-      subtitle.classList.remove('show');
-    }, 4800);
-  }
-
   function setElevenCameraBlackout(enabled) {
     elevenCameraBlackout = !!enabled;
     if (elevenCameraBlackout) {
@@ -835,16 +706,10 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
     }
   }
 
-  window.addEventListener('rift:night-special-time', (event) => {
-    const detail = event.detail || {};
-    if (Number(detail.night) !== 6) return;
-    if (detail.id === 'eleven-awakens') {
-      setElevenCameraBlackout(true);
-      showElevenArrivalSequence();
-      const systemAlert = window.NIGHT_DATA && window.NIGHT_DATA[6] && window.NIGHT_DATA[6].systemAlert;
-      showSystemAlertSubtitle(systemAlert);
-    }
-  });
+  // 第六夜演出模块通过此接口控制监控；保安室状态仍由主页面管理。
+  window.RIFT_NIGHT6_API = {
+    blackoutCameras: (enabled) => setElevenCameraBlackout(enabled)
+  };
   let currentTapePlayId = 0;
   let currentCamId = 1;
 
