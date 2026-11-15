@@ -31,27 +31,27 @@
   window.NIGHT_SETTINGS = {
     1: makeNight({
       gildedEleven: 0, flux: 0, noka: 0, tannin: 0, lobe: 0, gu: 0,
-      chillo: 0, cosmo: 0, transfer: 4
+      chillo: 0, cosmo: 0, transfer: 0
     }),
     2: makeNight({
       gildedEleven: 0, flux: 0, noka: 0, tannin: 0, lobe: 0, gu: 4,
-      chillo: 0, cosmo: 0, transfer: 5
+      chillo: 0, cosmo: 0, transfer: 0
     }),
     3: makeNight({
       gildedEleven: 0, flux: 4, noka: 0, tannin: 5, lobe: 0, gu: 5,
-      chillo: 4, cosmo: 4, transfer: 6
+      chillo: 4, cosmo: 0, transfer: 0
     }),
     4: makeNight({
       gildedEleven: 0, flux: 6, noka: 0, tannin: 7, lobe: 0, gu: 6,
-      chillo: 5, cosmo: 6, transfer: 8
+      chillo: 5, cosmo: 0, transfer: 0
     }),
     5: makeNight({
       gildedEleven: 0, flux: 8, noka: 0, tannin: 10, lobe: 0, gu: 8,
-      chillo: 7, cosmo: 8, transfer: 11
+      chillo: 7, cosmo: 0, transfer: 0
     }),
     6: makeNight({
       gildedEleven: 0, flux: 10, noka: 0, tannin: 12, lobe: 0, gu: 10,
-      chillo: 9, cosmo: 10, transfer: 13
+      chillo: 9, cosmo: 0, transfer: 0
     }, window.RIFT_NIGHT6_SPECIAL_TIMES || [], ['noka'])
   };
 
