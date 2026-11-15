@@ -205,6 +205,25 @@ class GildedElevenAI {
     if (this.specialAwakened) this.hideAll(ctx);
     if (this.debugVisible) {
       this.showNode('behind', ctx);
+      const behind = this.getVisualElement('behind', ctx);
+      if (behind) behind.classList.add('gilded-eleven-moving');
+      // 调试显示模式下也运行身后阶段计时；回头观察时冻结动作，但不清空已完成阶段。
+      if (ctx.isLookingBack()) {
+        this.timer = this.config.timings.stage;
+        return;
+      }
+      this.timer -= dt;
+      if (this.timer <= 0) {
+        this.stage += 1;
+        this.timer = this.config.timings.stage;
+        this.updateStageStatus('behind');
+        if (this.stage >= this.config.maxStages) {
+          this.state = 'ATTACKED';
+          this.debugVisible = false;
+          this.hideAll(ctx);
+          ctx.triggerJumpscare(this.name, this.quote);
+        }
+      }
       return;
     }
     if (this.state === 'DORMANT' || this.state === 'ATTACKED') {
@@ -215,9 +234,10 @@ class GildedElevenAI {
 
     if (this.phase === 'BEHIND') {
       this.showNode('behind', ctx);
-      // 玩家回头观察时，十一立即回到静止起点。
+      const behind = this.getVisualElement('behind', ctx);
+      if (behind) behind.classList.add('gilded-eleven-moving');
+      // 玩家回头观察时，十一停止动作；已完成的阶段保留。
       if (ctx.isLookingBack()) {
-        this.stage = 0;
         this.timer = this.config.timings.stage;
         return;
       }
@@ -228,6 +248,7 @@ class GildedElevenAI {
           return;
         }
         this.stage += 1;
+        this.updateStageStatus('behind');
         this.timer = this.config.timings.stage;
         if (this.stage >= this.config.maxStages) {
           this.state = 'ATTACKED';
