@@ -13,7 +13,7 @@
   };
   const $ = id => document.getElementById(id);
   const emit = (name, detail={}) => window.dispatchEvent(new CustomEvent(name,{detail}));
-  const aiFor = id => Math.max(0,Math.min(20,Number((((window.NIGHT_SETTINGS||{})[state.night]||{}).characters||{})[id])||0));
+  const aiFor = id => Math.max(0,Math.min(20,Number((window.RIFT_CURRENT_AI_LEVELS||{})[id] ?? ((((window.NIGHT_SETTINGS||{})[state.night]||{}).characters||{})[id]))||0));
   const chance = id => typeof window.riftCanCharacterMove==='function' ? window.riftCanCharacterMove(aiFor(id)) : Math.random()*100 < aiFor(id)*5;
   const makeActor = (id, cam, interval) => ({id,cam,home:cam,interval,timer:interval,phase:'idle',threat:0,look:0,deadline:0,clearWord:'',words:[],el:null});
   function actorList(){
@@ -91,6 +91,13 @@
   }
   function handleDoor(){
     for(const a of Object.values(state.actors)){
+      if(a.phase==='door' && ((a.id==='gu'&&state.leftClosed)||(a.id==='chillo'&&state.rightClosed)||(a.id==='flux'&&(state.leftClosed||state.rightClosed)))){
+        returnActor(a);
+        emit('rift:shared-defense',{method:'door',side:a.id==='gu'?'left':a.id==='chillo'?'right':'either',source:a.id});
+        emit('rift:character-status',{characterId:a.id,status:'repelled'});
+      }
+    }
+    for(const a of Object.values(state.actors)){
       if(a.phase!=='door')continue;
       const safe=a.id==='gu'?state.leftClosed:a.id==='chillo'?state.rightClosed:false;
       if(a.id==='flux'){
@@ -158,6 +165,7 @@
   }
   function onMonitor(e){
     const d=e.detail||{};state.camOpen=!!d.open;state.camId=Number(d.camId)||state.camId;
+    if(state.camOpen) for(const actor of Object.values(state.actors)) if(actor.phase!=='idle') render(actor);
     const flux=state.actors.flux;
     if(flux && !state.camOpen && flux.phase==='moving' && flux.look>0){
       if(flux.choiceEl){clearChoice(flux);flux.threat++;flux.phase=flux.threat>=2?'door':'approach';flux.deadline=Date.now()+(flux.phase==='door'?9000:12000);}
@@ -221,5 +229,5 @@
     emit('rift:night-six-time-rollback',{hours,characterId:'lobe'});
   });
   window.RIFT_SHARED_CHARACTER_AI=Object.freeze({getState:()=>({night:state.night,actors:Object.fromEntries(Object.entries(state.actors).map(([id,a])=>[id,{phase:a.phase,cam:a.cam,threat:a.threat}]))})});
-  window.addEventListener('rift:night-start',()=>{});
+  window.addEventListener('rift:night-ai-levels-changed',()=>{ for(const actor of Object.values(state.actors)) if(actor.phase!=='idle') render(actor); });
 })();
