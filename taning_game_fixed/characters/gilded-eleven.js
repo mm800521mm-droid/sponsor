@@ -219,6 +219,19 @@ class GildedElevenAI {
     if (ctx && typeof ctx.triggerJumpscare === 'function') ctx.triggerJumpscare(this.name, this.quote);
   }
 
+  updateBehindShake(el) {
+    if (!el) return;
+    const max = Math.max(1, Number(this.config.maxStages) || 4);
+    const progress = Math.max(0, Math.min(1, (Number(this.stage) || 0) / max));
+    // 越接近跳杀，抖动幅度越大、频率越快。
+    const pixels = 1.5 + progress * 10.5;
+    const degrees = 1.5 + progress * 10.5;
+    const duration = 1.1 - progress * 0.82;
+    el.style.setProperty('--eleven-shake-px', pixels.toFixed(2) + 'px');
+    el.style.setProperty('--eleven-shake-deg', degrees.toFixed(2) + 'deg');
+    el.style.setProperty('--eleven-shake-duration', duration.toFixed(2) + 's');
+  }
+
   retreatOneStage(ctx) {
     this.stage = Math.max(0, this.stage - 1);
     this.timer = this.config.timings.stage;
@@ -236,6 +249,7 @@ class GildedElevenAI {
     if (this.debugVisible && !this.specialAwakened) {
       this.showNode('behind', ctx);
       const behind = this.getVisualElement('behind', ctx);
+      this.updateBehindShake(behind);
       if (ctx.isLookingBack()) {
         if (!this.wasLookingBack) this.retreatOneStage(ctx);
         this.wasLookingBack = true;
@@ -267,6 +281,7 @@ class GildedElevenAI {
     if (this.phase === 'BEHIND') {
       this.showNode('behind', ctx);
       const behind = this.getVisualElement('behind', ctx);
+      this.updateBehindShake(behind);
       if (behind) behind.classList.add('gilded-eleven-moving');
       // 回头看见十一时，阶段提示保持可见，并且每次回头只击退一个阶段。
       if (ctx.isLookingBack()) {
