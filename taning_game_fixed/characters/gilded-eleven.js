@@ -219,6 +219,23 @@ class GildedElevenAI {
     if (ctx && typeof ctx.triggerJumpscare === 'function') ctx.triggerJumpscare(this.name, this.quote);
   }
 
+  setDebugStage(delta, ctx) {
+    if (!ctx || !ctx.isGameRunning() || this.specialAwakened) return;
+    const max = Math.max(1, Number(this.config.maxStages) || 4);
+    this.debugVisible = true;
+    this.phase = 'BEHIND';
+    this.stage = Math.max(0, Math.min(max, (Number(this.stage) || 0) + Number(delta || 0)));
+    this.timer = this.config.timings.stage;
+    if (this.stage >= max) {
+      this.triggerAttack(ctx, 'behind');
+      return;
+    }
+    this.state = 'ACTIVE';
+    this.showNode('behind', ctx);
+    this.updateBehindShake(this.getVisualElement('behind', ctx));
+    this.updateStageStatus('behind');
+  }
+
   updateBehindShake(el) {
     if (!el) return;
     const max = Math.max(1, Number(this.config.maxStages) || 4);
