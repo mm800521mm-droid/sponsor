@@ -970,6 +970,7 @@
           }
           document.getElementById('tape-ui').style.display = 'none';
           document.getElementById('tape-sub').style.opacity = '0';
+          document.getElementById('clear-title').innerText = (S.hour === 0 ? '12' : S.hour) + ' AM';
           clearSubtitle.innerText = 'POWER OUT';
           clearOverlay.classList.add('show');
         }
@@ -1003,7 +1004,8 @@
     document.getElementById('tape-sub').style.opacity = '0';
     document.getElementById('tape-sub').textContent = '';
     
-    clearOverlay.classList.remove('show');
+    clearOverlay.classList.remove('show', 'rift-clock-flip', 'rift-night-clear');
+    document.getElementById('clear-title').innerText = '8 AM';
     backView.classList.remove('show', 'warning');
     jumpscareOverlay.classList.remove('show');
     isLookingBack = false;
