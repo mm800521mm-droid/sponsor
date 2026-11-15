@@ -63,6 +63,7 @@ class GildedElevenAI {
     this.wasLookingBack = false;
     this.lookBackDuration = 0;
     this.lookBackTimerReset = false;
+    this.lookBackStageRetreat = false;
     this.longLookBackReset = false;
     this.crashTriggered = false;
     this.state = 'DORMANT';
@@ -276,25 +277,34 @@ class GildedElevenAI {
 
   handleLookBack(dt, ctx, behind) {
     this.lookBackDuration += dt;
-    if (this.lookBackDuration >= 3 && !this.lookBackTimerReset) {
+
+    // 回头立即冻结阶段推进；1 秒后重置当前阶段计时。
+    if (this.lookBackDuration >= 1 && !this.lookBackTimerReset) {
       this.timer = this.stageDuration;
       this.lookBackTimerReset = true;
+      this.updateStageStatus('behind');
     }
-    if (this.lookBackDuration >= 5 && !this.lookBackStageRetreat) {
+
+    // 持续回头 2 秒才倒退一级，每次回头只触发一次。
+    if (this.lookBackDuration >= 2 && !this.lookBackStageRetreat) {
       this.stage = Math.max(0, this.stage - 1);
       this.timer = this.stageDuration;
       this.lookBackStageRetreat = true;
       this.updateStageStatus('behind');
       this.updateBehindShake(behind);
     }
-    if (this.lookBackDuration >= 8 && !this.longLookBackReset) {
+
+    // 持续回头 4 秒，直接清空十一的接近阶段。
+    if (this.lookBackDuration >= 4 && !this.longLookBackReset) {
       this.stage = 0;
       this.timer = this.stageDuration;
       this.longLookBackReset = true;
       this.updateStageStatus('behind');
       this.updateBehindShake(behind);
     }
-    if (this.lookBackDuration >= 10 && !this.crashTriggered) {
+
+    // 持续回头 6 秒触发系统崩溃。
+    if (this.lookBackDuration >= 6 && !this.crashTriggered) {
       this.crashTriggered = true;
       if (ctx && typeof ctx.triggerSystemCrash === 'function') ctx.triggerSystemCrash();
       return true;
