@@ -46,6 +46,7 @@
       });
     }
   }
+  function nokaActionCheck(){return typeof window.riftCanCharacterMove==='function'?window.riftCanCharacterMove(nokaAI):Math.random()*100<nokaAI*5;}
   function renderCrank(){
     const label=$('rift-n6-crank-count'), bar=$('rift-n6-crank-meter');
     if(label)label.textContent='发条：'+crank+' / 5';
@@ -184,10 +185,9 @@
       else {
         nokaThreatTimer+=Math.min(.1,Math.max(0,Number(frame.dt)||0));
         if(nokaThreatTimer>=nokaMoveTick+3.5 && nokaThreatTimer<12){
-          nokaMoveTick+=3.5;let next=1+Math.floor(Math.random()*12);if(next===nokaCam)next=next===12?1:next+1;nokaCam=next;renderSprites();
-          window.dispatchEvent(new CustomEvent('rift:noka-enter-room',{detail:{camId:nokaCam,night:6}}));
+          nokaMoveTick+=3.5;if(nokaActionCheck()){let next=1+Math.floor(Math.random()*12);if(next===nokaCam)next=next===12?1:next+1;nokaCam=next;renderSprites();window.dispatchEvent(new CustomEvent('rift:noka-enter-room',{detail:{camId:nokaCam,night}}));}
         }
-        if(nokaThreatTimer>=12){nokaThreatTimer=0;window.dispatchEvent(new CustomEvent('rift:character-jumpscare',{detail:{characterId:'noka',name:'诺卡',reason:'music-box-unwound'}}));}
+        if(nokaThreatTimer>=12){nokaThreatTimer=0;nokaMoveTick=0;if(nokaActionCheck())window.dispatchEvent(new CustomEvent('rift:character-jumpscare',{detail:{characterId:'noka',name:'诺卡',reason:'music-box-unwound'}}));}
       }
     }
     // Flux is handled by character-ai-system.js on every night.
