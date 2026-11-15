@@ -389,6 +389,13 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
   <button class="debug-btn" data-night="5" style="background:#f00;color:#fff;border:none;padding:5px 10px;cursor:pointer;">5</button>
   <button class="debug-btn" data-night="6" style="background:#f00;color:#fff;border:none;padding:5px 10px;cursor:pointer;">6</button>
 </div>
+<div id="rift-test-controls" style="position:fixed;top:44px;left:50%;transform:translateX(-50%);z-index:100000;display:flex;align-items:center;gap:6px;padding:6px;background:rgba(0,0,0,.88);border:1px solid #806b45;color:#f0dfbd;font:12px 'Courier New',monospace;">
+  <button id="test-behind" type="button" style="padding:5px 8px;">显示/隐藏十一</button>
+  <button id="test-pause" type="button" style="padding:5px 8px;">暂停</button>
+  <input id="test-time" type="time" value="05:40" step="60" style="padding:4px;width:92px;">
+  <button id="test-jump" type="button" style="padding:5px 8px;">跳到时间</button>
+  <button id="test-resume" type="button" style="padding:5px 8px;">继续</button>
+</div>
 
 <div id="game">
   <div class="side-arrow left" id="clickLeft">&lt;</div>
@@ -1103,6 +1110,33 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
   }
 
   btnLookBack.addEventListener('click', (e) => { e.stopPropagation(); toggleLookBack(); });
+
+  // 测试工具：不改变正式夜晚配置，只提供手动显示、暂停和时间跳转。
+  const testBehindBtn = document.getElementById('test-behind');
+  const testPauseBtn = document.getElementById('test-pause');
+  const testJumpBtn = document.getElementById('test-jump');
+  const testResumeBtn = document.getElementById('test-resume');
+  const testTimeInput = document.getElementById('test-time');
+  let testPaused = false;
+  testBehindBtn.addEventListener('click', () => {
+    if (!S.running) return;
+    const enable = !gildedEleven.debugVisible;
+    gildedEleven.setDebugBehind(enable, GameContext);
+    if (enable && !isLookingBack) toggleLookBack();
+  });
+  testPauseBtn.addEventListener('click', () => { testPaused = true; });
+  testResumeBtn.addEventListener('click', () => { testPaused = false; });
+  testJumpBtn.addEventListener('click', () => {
+    if (!S.running || !testTimeInput.value) return;
+    const [hh, mm] = testTimeInput.value.split(':').map(Number);
+    const totalMinutes = Math.max(0, Math.min(480, hh * 60 + mm));
+    S.elapsed = (totalMinutes / 60) * HOUR_MS;
+    S.hour = Math.min(8, Math.floor(totalMinutes / 60));
+    processedNightEvents = new Set();
+    if (typeof gildedEleven !== 'undefined') gildedEleven.startNight(S.night, activeNightSettings, GameContext);
+    dispatchNightSpecialTimes();
+    updateUI();
+  });
   backView.addEventListener('click', () => { if (isLookingBack) toggleLookBack(); });
 
   window.onkeydown = function(e) {
@@ -1180,7 +1214,7 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
     lastTime = now;
     if (dt > 0.1) dt = 0.1;
 
-    if (S.running) {
+    if (S.running && !testPaused) {
       S.elapsed += dt * 1000;
       dispatchNightSpecialTimes();
       let currentHour = Math.min(8, Math.floor(S.elapsed / HOUR_MS));
@@ -1227,8 +1261,8 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
         if (typeof taning !== 'undefined') {
           try { taning.update(dt, GameContext); } catch (e) { console.error('Taning AI update failed:', e); }
         }
-        if (window.gildedEleven) {
-          try { window.gildedEleven.update(dt, GameContext); } catch (e) { console.error('Gilded Eleven AI update failed:', e); }
+        if (typeof gildedEleven !== 'undefined') {
+          try { gildedEleven.update(dt, GameContext); } catch (e) { console.error('Gilded Eleven AI update failed:', e); }
         }
       }
       updateUI();
