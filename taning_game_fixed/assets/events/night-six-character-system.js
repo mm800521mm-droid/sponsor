@@ -185,7 +185,8 @@
   }
   function onDoor(e){
     const d=e.detail||{};
-    if(!active&&!fluxAtDoor)return;
+    if(!active&&!fluxAtDoor&&!(nokaAI>0&&nokaThreatTimer>0))return;
+    if(nokaAI>0&&nokaThreatTimer>0&&d.elevenEventActive&&(d.rightClosed||frame.rightClosed)){nokaThreatTimer=0;crank=Math.max(1,crank);renderCrank();announce('十一的异常期间，右门暂时挡住了诺卡');}
     if(fluxAtDoor&&(d.leftClosed||d.rightClosed||frame.leftClosed||frame.rightClosed)){fluxAtDoor=false;fluxThreat=0;fluxDelay=0;announce('闪流被门挡住，暂时退开');renderFlux();}
     if(active==='gu'&&(d.leftClosed||frame.leftClosed))finishAttack(true,'left-door');
     else if(active==='chillo'&&(d.rightClosed||frame.rightClosed))finishAttack(true,'right-door');
