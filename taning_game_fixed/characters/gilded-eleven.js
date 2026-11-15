@@ -188,6 +188,7 @@ class GildedElevenAI {
   onSpecialTime(event, ctx) {
     if (!event || event.id !== 'eleven-awakens' || Number(event.night) !== 6) return;
     this.specialAwakened = true;
+    this.debugVisible = false;
     this.state = 'ACTIVE';
     this.phase = 'ROAMING';
     this.stage = 0;
