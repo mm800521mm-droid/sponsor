@@ -15,13 +15,13 @@
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050505}
 body{height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 #game{display:block;width:100%;height:100%;height:100dvh;border:0;background:#050505}
-#install{position:fixed;z-index:20;right:12px;top:calc(env(safe-area-inset-top) + 12px);border:1px solid #98734c;border-radius:4px;background:#17110d;color:#f1dfc2;padding:9px 12px;font:12px Georgia,serif;letter-spacing:.08em;box-shadow:0 2px 12px #0008}
+#author-credit{position:fixed;z-index:30;left:14px;top:calc(env(safe-area-inset-top) + 12px);padding:7px 10px;background:#090807d9;border:1px solid #806b45;color:#e3cfad;font:11px "Courier New",monospace;letter-spacing:.18em;pointer-events:none;text-shadow:0 0 8px #8b1c1c}\n#install{position:fixed;z-index:20;right:12px;top:calc(env(safe-area-inset-top) + 12px);border:1px solid #98734c;border-radius:4px;background:#17110d;color:#f1dfc2;padding:9px 12px;font:12px Georgia,serif;letter-spacing:.08em;box-shadow:0 2px 12px #0008}
 #hint{position:fixed;z-index:10;left:50%;bottom:calc(env(safe-area-inset-bottom) + 10px);transform:translateX(-50%);padding:7px 11px;background:#090807d9;border:1px solid #5e4933;color:#c9b89c;font:11px 'Courier New',monospace;pointer-events:none;white-space:nowrap;opacity:1;transition:opacity 1s}
 #hint.hide{opacity:0}
 </style>
 </head>
 <body>
-<iframe id="game" src="../index.html" title="裂隙余烬游戏" allow="fullscreen; autoplay"></iframe>
+<div id="author-credit">作者：十一</div>\n<iframe id="game" src="../index.html" title="裂隙余烬游戏" allow="fullscreen; autoplay"></iframe>
 <button id="install" hidden>安装到主屏幕</button>
 <div id="hint">RIFT ASH // MOBILE ENTRY</div>
 <script>
