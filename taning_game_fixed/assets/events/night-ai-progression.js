@@ -13,8 +13,8 @@
     const current = window.RIFT_CURRENT_AI_LEVELS || {};
     Object.assign(current, values);
     window.RIFT_CURRENT_AI_LEVELS = current;
-    if (window.taning && typeof window.taning.setAILevel === 'function') window.taning.setAILevel(Number(current.tannin) || 0);
-    if (window.gildedEleven && typeof window.gildedEleven.setAILevel === 'function') window.gildedEleven.setAILevel(Number(current.gildedEleven) || 0);
+    if (typeof taning !== 'undefined' && typeof taning.setAILevel === 'function') taning.setAILevel(Number(current.tannin) || 0);
+    if (typeof gildedEleven !== 'undefined' && typeof gildedEleven.setAILevel === 'function') gildedEleven.setAILevel(Number(current.gildedEleven) || 0);
     window.dispatchEvent(new CustomEvent('rift:night-ai-levels-changed', { detail: { night, at, values: { ...current } } }));
   }
   window.addEventListener('rift:night-start', event => {
