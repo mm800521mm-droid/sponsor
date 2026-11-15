@@ -220,7 +220,9 @@ class TaningAI {
           this.footstepTimer = 0.42;
         }
 
-        const defended = ctx.isDoorClosed(this.dir) ||
+        const otherDoor = this.dir === 'L' ? 'R' : 'L';
+        // Both office doors share the same door-defense method for Tannin.
+        const defended = ctx.isDoorClosed(this.dir) || ctx.isDoorClosed(otherDoor) ||
           (ctx.isPlayerLookingAt(this.dir) && ctx.isLightOn(this.dir));
         if (defended) {
           if (flash) flash.style.opacity = '0';
