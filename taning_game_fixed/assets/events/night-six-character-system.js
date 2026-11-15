@@ -11,11 +11,10 @@
     lobe: { name: '耳机', cam: 10, glyph: '▤', kind: 'headphones' },
     gu: { name: '孤', cam: 4, glyph: '▥', kind: 'report' },
     chillo: { name: '寒零', cam: 6, glyph: '❄', kind: 'cold' },
-    cosmo: { name: '小宇宙', cam: 11, glyph: '✦', kind: 'cosmic' },
     transfer: { name: '移交', cam: 1, glyph: '⌁', kind: 'transfer' }
   };
-  const mutationOrder = ['tannin','lobe','gu','chillo','cosmo','transfer'];
-  const routes = { tannin:[5,4,1], lobe:[10,9,1], gu:[4,5,1], chillo:[6,3,1], cosmo:[11,2,1], transfer:[1] };
+  const mutationOrder = ['tannin','lobe','gu','chillo','transfer'];
+  const routes = { tannin:[5,4,1], lobe:[10,9,1], gu:[4,5,1], chillo:[6,3,1], transfer:[1] };
   let activeCam = 1, routeIndex = 0, routeClock = 0, attackClock = 0;
   let night = 0, locked = false, active = null, activeId = '', defended = new Set();
   let frame = { running:false, camOpen:false, camId:1, leftClosed:false, rightClosed:false };
@@ -130,12 +129,6 @@
       transfer:'移交突变：不要点击他，也不要让鼠标停留在他身上。'
     };
     announce(tips[active]);
-    if(active==='cosmo'){
-      cosmoLockUntil=Date.now()+4200;
-      const panel=$('camera-panel');if(panel)panel.classList.add('rift-cosmo-lock');
-      setTimeout(()=>{if(Date.now()>=cosmoLockUntil){const p=$('camera-panel');if(p)p.classList.remove('rift-cosmo-lock');}},4300);
-      setTimeout(()=>{if(active==='cosmo')finishAttack(true,'cosmo-control-ended');},4300);
-    }
     if(active==='transfer')showTransfer();
     if((active==='gu'&&frame.leftClosed)||(active==='chillo'&&frame.rightClosed)||(active==='tannin'&&(frame.leftClosed||frame.rightClosed)))finishAttack(true,'door-already-closed');
     if(active==='noka')onCrank();
@@ -162,7 +155,7 @@
       if(routeClock>=2.2 && routeIndex<route.length-1){
         routeClock=0;routeIndex++;activeCam=route[routeIndex];renderActiveAtCam();
       }
-      if(active!=='cosmo' && active!=='transfer' && attackClock>=8.5){
+      if(active!=='transfer' && attackClock>=8.5){
         if(active==='lobe'){
           window.dispatchEvent(new CustomEvent('rift:night-six-time-rollback',{detail:{hours:1,characterId:'lobe'}}));
           finishAttack(true,'lobe-time-rollback');
