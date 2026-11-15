@@ -62,6 +62,7 @@
     Object.entries(defs).forEach(([id,d])=>{
       const cam=id==='noka'?nokaCam:d.cam;
       const feed=$('feed-'+cam);if(!feed)return;
+      if(id==='noka')document.querySelectorAll('[data-rift-character="noka"]').forEach(oldEl=>{if(oldEl.parentElement!==feed)oldEl.style.display='none';});
       let el=feed.querySelector('[data-rift-character="'+id+'"]');
       if(!el){el=document.createElement('div');el.className='rift-n6-sprite';el.dataset.riftCharacter=id;el.innerHTML='<div class="figure"></div><div class="tag"></div>';feed.appendChild(el);}
       const visible=night===6 && ((id==='noka') || (id==='lobe') || (active===id) || defended.has(id));
