@@ -90,6 +90,30 @@ class TaningAI {
     }
   }
 
+  skipCurrentRoom(camId, ctx) {
+    const nodeToCam = { cam5:5, cam4:4, cam3:3 };
+    const currentNode = this.state === 'WANDER' ? 'cam5' : this.path[this.currentNodeIndex];
+    if (nodeToCam[currentNode] !== Number(camId) || !ctx) return false;
+    if (this.state === 'WANDER') {
+      this.dir = Math.random() < 0.5 ? 'L' : 'R';
+      this.path = this.config.routes[this.dir].slice();
+      this.currentNodeIndex = 1;
+      this.state = 'MOVE_HALL';
+      this.timer = this.config.timings.moveHall;
+    } else if (this.state === 'MOVE_HALL') {
+      this.currentNodeIndex += 1;
+      const next = this.path[this.currentNodeIndex];
+      if (!next) { this.state = 'COOLDOWN'; this.timer = this.config.timings.cooldown; }
+      else if (next === 'doorL' || next === 'doorR') { this.state = 'AT_DOOR'; this.timer = this.config.timings.doorWait; }
+      else { this.timer = this.config.timings.moveHall; }
+    } else return false;
+    this.hideAll(ctx);
+    const nextNode = this.state === 'WANDER' ? 'cam5' : this.path[this.currentNodeIndex];
+    if (nextNode) this.showNode(nextNode, ctx);
+    ctx.playFootstep('distant');
+    return true;
+  }
+
   update(dt, ctx) {
     if (!ctx || !ctx.isGameRunning()) return;
     if (this.aiLevel === 0) {
