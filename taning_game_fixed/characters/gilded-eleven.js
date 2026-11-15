@@ -357,7 +357,6 @@ class GildedElevenAI {
       if (behind) behind.classList.add('gilded-eleven-moving', 'gilded-eleven-shaking');
       // 回头时阶段提示保持可见；持续 5 秒才击退一个阶段。
       if (ctx.isLookingBack()) {
-        if (!this.wasLookingBack) this.retreatOneStage(ctx);
         this.wasLookingBack = true;
         if (behind) {
           behind.classList.remove('gilded-eleven-moving');
@@ -371,6 +370,7 @@ class GildedElevenAI {
         this.wasLookingBack = false;
         this.lookBackDuration = 0;
         this.lookBackTimerReset = false;
+        this.lookBackStageRetreat = false;
         this.longLookBackReset = false;
       }
       this.timer -= dt;
