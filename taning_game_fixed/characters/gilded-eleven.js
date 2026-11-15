@@ -9,6 +9,7 @@ class GildedElevenAI {
     this.wasLookingBack = false;
     this.lookBackDuration = 0;
     this.lookBackTimerReset = false;
+    this.lookBackStageRetreat = false;
     this.longLookBackReset = false;
     this.crashTriggered = false;
     this.stageDuration = 20;
@@ -279,6 +280,13 @@ class GildedElevenAI {
       this.timer = this.stageDuration;
       this.lookBackTimerReset = true;
     }
+    if (this.lookBackDuration >= 5 && !this.lookBackStageRetreat) {
+      this.stage = Math.max(0, this.stage - 1);
+      this.timer = this.stageDuration;
+      this.lookBackStageRetreat = true;
+      this.updateStageStatus('behind');
+      this.updateBehindShake(behind);
+    }
     if (this.lookBackDuration >= 8 && !this.longLookBackReset) {
       this.stage = 0;
       this.timer = this.stageDuration;
@@ -307,7 +315,6 @@ class GildedElevenAI {
       const behind = this.getVisualElement('behind', ctx);
       this.updateBehindShake(behind);
       if (ctx.isLookingBack()) {
-        if (!this.wasLookingBack) this.retreatOneStage(ctx);
         this.wasLookingBack = true;
         if (behind) {
           behind.classList.remove('gilded-eleven-moving');
@@ -321,6 +328,7 @@ class GildedElevenAI {
         this.wasLookingBack = false;
         this.lookBackDuration = 0;
         this.lookBackTimerReset = false;
+        this.lookBackStageRetreat = false;
         this.longLookBackReset = false;
       }
       if (behind) { behind.classList.add('gilded-eleven-moving', 'gilded-eleven-shaking'); }
@@ -347,7 +355,7 @@ class GildedElevenAI {
       const behind = this.getVisualElement('behind', ctx);
       this.updateBehindShake(behind);
       if (behind) behind.classList.add('gilded-eleven-moving', 'gilded-eleven-shaking');
-      // 回头看见十一时，阶段提示保持可见，并且每次回头只击退一个阶段。
+      // 回头时阶段提示保持可见；持续 5 秒才击退一个阶段。
       if (ctx.isLookingBack()) {
         if (!this.wasLookingBack) this.retreatOneStage(ctx);
         this.wasLookingBack = true;
