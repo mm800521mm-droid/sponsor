@@ -5,6 +5,7 @@ class GildedElevenAI {
     this.quote = config.quote;
     this.aiLevel = 0;
     this.specialAwakened = false;
+    this.debugVisible = false;
     this.reset(null);
   }
 
@@ -23,7 +24,22 @@ class GildedElevenAI {
     return Math.random() * 100 < chances[level];
   }
 
+  setDebugBehind(enabled, ctx) {
+    this.debugVisible = !!enabled;
+    if (this.debugVisible) {
+      this.state = 'ACTIVE';
+      this.phase = 'BEHIND';
+      this.stage = 0;
+      this.timer = this.config.timings.stage;
+      this.showNode('behind', ctx);
+    } else if (!this.specialAwakened && this.aiLevel <= 0) {
+      this.state = 'DORMANT';
+      this.hideAll(ctx);
+    }
+  }
+
   reset(ctx) {
+    this.debugVisible = false;
     this.state = 'DORMANT';
     this.phase = 'BEHIND';
     this.timer = this.config.timings.stage;
@@ -127,6 +143,10 @@ class GildedElevenAI {
   update(dt, ctx) {
     if (!ctx || !ctx.isGameRunning()) return;
     this.ensureVisualNodes(ctx);
+    if (this.debugVisible) {
+      this.showNode('behind', ctx);
+      return;
+    }
     if (this.state === 'DORMANT' || this.state === 'ATTACKED') {
       if (!this.specialAwakened) this.hideAll(ctx);
       return;
