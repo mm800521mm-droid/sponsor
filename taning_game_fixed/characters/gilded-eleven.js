@@ -61,7 +61,12 @@ class GildedElevenAI {
     const host = document.getElementById('stage') || document.getElementById('game');
     if (!host) return;
     for (const [node, id] of Object.entries(this.config.visualMap)) {
-      if (document.getElementById(id)) continue;
+      // 防止重复初始化/重复脚本执行留下多个同 ID 的可视节点。
+      const matches = document.querySelectorAll('[id="' + id + '"]');
+      if (matches.length) {
+        for (let i = 1; i < matches.length; i++) matches[i].remove();
+        continue;
+      }
       const el = document.createElement('div');
       el.id = id;
       el.className = 'gilded-eleven-node';
@@ -87,6 +92,16 @@ class GildedElevenAI {
   showNode(node, ctx) {
     const el = this.getVisualElement(node, ctx);
     if (!el) return;
+    // 每个时刻只允许一个十一节点显示，其他区域节点一律隐藏。
+    for (const otherNode of Object.keys(this.config.visualMap)) {
+      if (otherNode === node) continue;
+      const other = this.getVisualElement(otherNode, ctx);
+      if (other) {
+        other.style.display = 'none';
+        other.style.opacity = '0';
+        other.classList.remove('show', 'gilded-eleven-moving');
+      }
+    }
     el.style.display = 'block';
     el.style.visibility = 'visible';
     el.style.opacity = '1';
