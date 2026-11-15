@@ -85,7 +85,7 @@
       const feed=$('feed-'+d.cam);if(!feed)return;
       let el=feed.querySelector('[data-rift-character="'+id+'"]');
       if(!el){el=document.createElement('div');el.className='rift-n6-sprite';el.dataset.riftCharacter=id;el.innerHTML='<div class="figure"></div><div class="tag"></div>';feed.appendChild(el);}
-      const visible=night===6 && (!locked || id==='noka') && (id==='noka'||id==='lobe'||active===id);
+      const visible=night===6 && (!locked || id==='noka') && (id==='noka'||id==='lobe'||active===id||defended.has(id));
       el.style.display=visible?'flex':'none';
       el.classList.toggle('active',active===id);
       el.querySelector('.figure').textContent=d.glyph;
