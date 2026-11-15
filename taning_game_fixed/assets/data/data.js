@@ -283,15 +283,6 @@ window.NIGHT_DATA = {
         ]
       },
       {
-        id: "cosmo-orbit-break", characterId: "cosmo", name: "小宇宙", title: "偏离轨道", glitch: true,
-        lines: [
-          "监控画面里出现了不属于任何摄像头的星点。",
-          "小宇宙独自出现在走廊中央，周围的影像像被拉向它。",
-          "它突然改变方向，向保安室发动了一次突袭。",
-          "星点散开。画面恢复正常，但它已经不在那里了。"
-        ]
-      },
-      {
         id: "transfer-collective-rage", characterId: "transfer", name: "移交", title: "怨念汇流", glitch: true,
         lines: [
           "所有监控同时传来重叠的人声。",
