@@ -943,7 +943,14 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
     isDoorClosed: (dir) => dir === 'L' ? dL : dR,
     isWatchingCam: (camId) => isCamOpen && currentCamId === camId,
     playFootstep: playFootstepSound,
-    triggerJumpscare: triggerJumpscare,
+    // 只有十一可以触发真正的跳杀；其他人偶的门口冲刺只作为假象表现。
+    triggerJumpscare: (name, quote) => {
+      if (/十一|Gilded Eleven/i.test(String(name || ''))) {
+        triggerJumpscare(name, quote);
+      } else {
+        console.info('Non-Eleven door rush resolved as a harmless feint:', name);
+      }
+    },
     triggerSystemCrash: triggerElevenSystemCrash,
     dom: {
       taningCam5: document.getElementById('taning-cam5'),
