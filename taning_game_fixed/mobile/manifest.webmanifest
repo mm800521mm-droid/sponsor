@@ -1,0 +1,13 @@
+{
+  "id": "./",
+  "name": "Five Nights at Rift Ash｜裂隙余烬",
+  "short_name": "裂隙余烬",
+  "description": "裂隙余烬手机端游戏入口",
+  "lang": "zh-CN",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#050505",
+  "theme_color": "#090807"
+}
