@@ -188,6 +188,18 @@
       }
     }
   }
+  function onNokaEnter(event){
+    const cam=Number(event.detail&&event.detail.camId);
+    if(!Number.isInteger(cam))return;
+    for(const a of Object.values(state.actors)){
+      if(a.id==='flux'||a.phase==='idle'||a.cam!==cam)continue;
+      if(a.id==='gu'){a.cam=a.cam===4?5:1;a.phase=a.cam===1?'door':'moving';a.timer=0;a.deadline=Date.now()+8000;}
+      else if(a.id==='chillo'){a.cam=a.cam===6?3:1;a.phase=a.cam===1?'door':'moving';a.timer=0;a.deadline=Date.now()+8000;}
+      else if(a.id==='lobe'){returnActor(a);continue;}
+      render(a);
+      emit('rift:character-skipped-by-noka',{characterId:a.id,camId:cam,nextCamId:a.cam});
+    }
+  }
   function reset(e){
     state.night=Number(e.detail&&e.detail.night)||0;
     state.running=false;state.camOpen=false;state.camId=1;state.leftClosed=false;state.rightClosed=false;
@@ -202,6 +214,7 @@
   window.addEventListener('rift:night-six-door-change',onDoorChange);
   window.addEventListener('rift:night-six-crank',onCrank);
   window.addEventListener('rift:noka-music',onCrank);
+  window.addEventListener('rift:noka-enter-room',onNokaEnter);
   window.addEventListener('rift:character-time-rollback',e=>{
     if(state.night===6)return;
     const hours=Math.max(1,Number(e.detail&&e.detail.hours)||1);
