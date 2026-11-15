@@ -18,7 +18,7 @@
   let night = 0, locked = false, active = null, activeId = '', defended = new Set();
   let frame = { running:false, camOpen:false, camId:1, leftClosed:false, rightClosed:false };
   let crank = 0, transferHeat = 0, transferInside = false, transferTimer = 0;
-  let cosmoLockUntil = 0, nokaLastTick = 0;
+  let cosmoLockUntil = 0, nokaLastTick = 0, fluxCam = 2, fluxLookSince = 0, fluxTextShown = false, fluxDelay = 0;
   const $ = (id) => document.getElementById(id);
 
   const style = document.createElement('style');
@@ -119,6 +119,7 @@
       setTimeout(()=>{if(active==='cosmo')finishAttack(true,'cosmo-control-ended');},4300);
     }
     if(active==='transfer')showTransfer();
+    if(active==='noka')onCrank();
   }
   function showTransfer(){
     let el=$('rift-n6-transfer');
@@ -132,6 +133,7 @@
     el.classList.add('show');
   }
   function hideTransfer(){const el=$('rift-n6-transfer');if(el)el.classList.remove('show');transferInside=false;}
+  function showTransferScare(){let el=$('rift-n6-transfer-scare');if(!el){el=document.createElement('div');el.id='rift-n6-transfer-scare';el.textContent='TRANSFER // SIGNAL OVERRUN';el.style.cssText='position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:#050303;color:#f2ddd0;font:bold clamp(24px,7vw,72px) Courier New,monospace;text-shadow:0 0 18px #b00;letter-spacing:.12em;pointer-events:none;';document.body.appendChild(el);}el.style.display='flex';setTimeout(()=>{el.style.display='none';},1100);}
   function onFrame(e){
     frame={...frame,...(e.detail||{})};
     if(active==='transfer'){
@@ -140,9 +142,10 @@
       const bar=$('rift-n6-transfer-bar'),label=$('rift-n6-transfer-stage');
       if(bar)bar.style.width=(transferHeat/3*100)+'%';
       if(label)label.textContent='阶段 '+Math.min(3,Math.floor(transferHeat+0.01))+' / 3';
-      if(transferHeat>=3){hideTransfer();finishAttack(false,'transfer-stage-three-jumpscare');announce('移交的三阶段已满！');}
+      if(transferHeat>=3){hideTransfer();showTransferScare();finishAttack(false,'transfer-stage-three-jumpscare');announce('移交的三阶段已满！');}
     }
-    if(active==='noka'&&frame.camOpen&&Number(frame.camId)===13&&Date.now()-nokaLastTick>10000){crank=Math.max(0,crank-1);nokaLastTick=Date.now();renderCrank();}
+    if(night===6 && frame.running && Date.now()-nokaLastTick>12000){crank=Math.max(0,crank-1);nokaLastTick=Date.now();renderCrank();window.dispatchEvent(new CustomEvent('rift:night-six-noka-wind-level',{detail:{value:crank,max:5,calm:crank>0}}));}
+    if(active==='noka'&&crank>=5)finishAttack(true,'music-box-wound');
   }
   function onDoor(e){
     const d=e.detail||{};
@@ -162,7 +165,7 @@
   }
   function resetNight(e){
     night=Number(e.detail&&e.detail.night)||0;locked=false;active=null;activeId='';defended.clear();
-    crank=0;transferHeat=0;transferInside=false;cosmoLockUntil=0;renderCrank();hideTransfer();
+    crank=0;transferHeat=0;transferInside=false;cosmoLockUntil=0;fluxCam=2+Math.floor(Math.random()*10);if(fluxCam===10||fluxCam===13)fluxCam=9;fluxLookSince=0;fluxTextShown=false;fluxDelay=0;nokaLastTick=Date.now();renderCrank();hideTransfer();
     const p=$('camera-panel');if(p)p.classList.remove('rift-cosmo-lock');
     renderSprites();if(night===6)ensureDevices();
   }
