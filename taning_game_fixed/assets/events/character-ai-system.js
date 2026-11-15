@@ -9,7 +9,7 @@
   const state = {
     night:0, running:false, camOpen:false, camId:1,
     leftClosed:false, rightClosed:false, elapsed:0,
-    actors:{}, lastFrame:0, crank:5, nokaTimer:0
+    actors:{}, lastFrame:0, crank:5, nokaTimer:0, noka:{cam:13,wind:5,decay:0,threat:0,moveTick:0,el:null}
   };
   const $ = id => document.getElementById(id);
   const emit = (name, detail={}) => window.dispatchEvent(new CustomEvent(name,{detail}));
@@ -45,6 +45,19 @@
     a.el.querySelector('.figure').textContent=glyph;
     a.el.querySelector('.tag').textContent=names[a.id]+' // CAM '+String(cam).padStart(2,'0');
     a.el.style.display=state.night>0&&a.phase!=='idle'?'flex':'none';
+  }
+  function renderNoka(){
+    const n=state.noka;
+    if(state.night===6||aiFor('noka')<=0){if(n.el){n.el.remove();n.el=null;}return;}
+    const feed=$('feed-'+n.cam);if(!feed)return;
+    if(n.el&&n.el.parentElement!==feed){n.el.remove();n.el=null;}
+    if(!n.el){n.el=document.createElement('div');n.el.className='rift-shared-character rift-shared-noka';n.el.innerHTML='<div class="figure">♫</div><div class="tag"></div>';feed.appendChild(n.el);}
+    n.el.querySelector('.tag').textContent='诺卡 // CAM '+String(n.cam).padStart(2,'0');
+    n.el.style.display='flex';
+  }
+  function moveNoka(){
+    const cams=[1,2,3,4,5,6,7,8,9,10,11,12];let next=cams[Math.floor(Math.random()*cams.length)];if(next===state.noka.cam)next=next===12?1:next+1;
+    state.noka.cam=next;renderNoka();emit('rift:noka-enter-room',{camId:next,night:state.night});
   }
   function showFluxChoice(a){
     if(a.choiceEl || !state.camOpen || state.camId!==a.cam)return;
@@ -106,6 +119,13 @@
     state.leftClosed=!!d.leftClosed;state.rightClosed=!!d.rightClosed;
     if(!state.running)return;
     const dt=Math.min(.1,Math.max(0,Number(d.dt)||0));
+    if(state.night!==6 && aiFor('noka')>0){
+      const n=state.noka;
+      if(n.wind>0){n.decay+=dt;if(n.decay>=12){n.wind=Math.max(0,n.wind-1);n.decay=0;}}
+      if(n.wind===0){n.threat+=dt;if(n.threat>=n.moveTick+3.5&&n.threat<12){n.moveTick+=3.5;moveNoka();}if(n.threat>=12){emit('rift:character-jumpscare',{characterId:'noka',name:'诺卡',reason:'music-box-unwound'});n.threat=0;}}
+      else{n.threat=0;n.moveTick=0;}
+      renderNoka();
+    }
     for(const a of Object.values(state.actors)){
       if(state.night===6 && a.id!=='flux')continue;
       if(aiFor(a.id)<=0)continue;
@@ -177,6 +197,7 @@
   function onCrank(e){
     const d=e.detail||{};
     state.crank=Math.max(0,Math.min(5,Number(d.value)||0));
+    if(state.night!==6 && aiFor('noka')>0){state.noka.wind=state.crank;state.noka.decay=0;state.noka.threat=0;state.noka.moveTick=0;state.noka.cam=13;renderNoka();}
     // Noka's music skips other active characters out of the same camera.
     const room=Number(d.camId)||13;
     for(const a of Object.values(state.actors)){
@@ -205,7 +226,7 @@
     state.running=false;state.camOpen=false;state.camId=1;state.leftClosed=false;state.rightClosed=false;
     state.actors=actorList();
     Object.values(state.actors).forEach(a=>{removeActorVisual(a);a.timer=a.interval;});
-    state.crank=5;state.nokaTimer=0;
+    state.crank=5;state.nokaTimer=0;state.noka={cam:13,wind:5,decay:0,threat:0,moveTick:0,el:null};renderNoka();
   }
   window.addEventListener('rift:night-start',reset);
   window.addEventListener('rift:game-frame',onFrame);
