@@ -738,24 +738,24 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
       #eleven-arrival-sequence{position:fixed;inset:0;z-index:1000000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.96);color:#f4eeee;font-family:"Courier New",monospace;text-align:center;overflow:hidden}
       #eleven-arrival-sequence.active{display:flex}
       #eleven-arrival-sequence:before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px);opacity:.5}
-      .eleven-arrival-alert,.eleven-arrival-story{position:absolute;width:min(900px,90vw);padding:clamp(24px,5vw,58px);box-sizing:border-box;opacity:0;transform:scale(.94);transition:opacity .35s,transform .35s}
-      .eleven-arrival-alert{border:3px solid #c51d25;background:radial-gradient(ellipse,rgba(90,0,0,.42),rgba(0,0,0,.97) 72%);box-shadow:0 0 35px rgba(255,0,0,.28),inset 0 0 35px rgba(255,0,0,.12);animation:elevenAlertFlash .42s steps(2,end) 6}
+      .eleven-arrival-alert,.eleven-arrival-story{position:absolute;inset:0;width:100%;min-height:100%;padding:8vh 7vw;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transform:none;transition:opacity .2s}
+      .eleven-arrival-alert{border:0;background:transparent;box-shadow:none;animation:elevenAlertFlash .42s steps(2,end) 6}
       #eleven-arrival-sequence:not(.show-story) .eleven-arrival-alert{opacity:1;transform:scale(1)}
       .eleven-arrival-kicker{font-size:clamp(10px,1.5vw,14px);letter-spacing:.28em;color:#c99b9b;margin-bottom:22px}
-      .eleven-arrival-warning{font-size:clamp(25px,5vw,52px);font-weight:900;color:#ff333b;text-shadow:0 0 18px #f00;margin-bottom:18px}
-      .eleven-arrival-main{font-size:clamp(22px,4.3vw,46px);font-weight:900;letter-spacing:.08em}
+      .eleven-arrival-warning{font-size:clamp(42px,8vw,100px);font-weight:900;color:#ff333b;text-shadow:0 0 24px #f00,0 0 60px rgba(255,0,0,.55);margin-bottom:28px;letter-spacing:.12em}
+      .eleven-arrival-main{font-size:clamp(34px,7vw,82px);font-weight:900;letter-spacing:.1em;text-shadow:0 0 22px rgba(255,0,0,.5)}
       .eleven-arrival-sub{font-size:clamp(10px,1.5vw,15px);letter-spacing:.25em;color:#b7a5a5;margin-top:20px}
       .eleven-arrival-scan{height:3px;background:#d21c26;margin:30px auto 0;max-width:90%;box-shadow:0 0 12px #f00;animation:elevenScan 1s ease-in-out infinite alternate}
       #eleven-arrival-sequence.show-story .eleven-arrival-alert{opacity:0;transform:scale(1.04)}
       #eleven-arrival-sequence.show-story .eleven-arrival-story{opacity:1;transform:scale(1)}
-      .eleven-arrival-story{border-top:1px solid #80623b;border-bottom:1px solid #80623b;background:radial-gradient(ellipse,rgba(65,42,20,.3),rgba(0,0,0,.96) 75%)}
-      .eleven-arrival-title{font-family:serif;font-size:clamp(48px,10vw,100px);font-weight:900;letter-spacing:.18em;color:#d5ad68;text-shadow:0 0 22px rgba(196,37,25,.65);margin:8px 0 28px}
-      .eleven-arrival-copy{font-family:serif;font-size:clamp(19px,3vw,30px);line-height:1.9;color:#f0e6d8}
+      .eleven-arrival-story{border:0;background:transparent;box-shadow:none}
+      .eleven-arrival-title{font-family:serif;font-size:clamp(64px,13vw,150px);font-weight:900;letter-spacing:.14em;color:#d5ad68;text-shadow:0 0 22px rgba(196,37,25,.65),0 0 55px rgba(196,37,25,.35);margin:8px 0 34px}
+      .eleven-arrival-copy{font-family:serif;font-size:clamp(25px,4vw,44px);line-height:1.8;color:#f0e6d8;text-shadow:0 2px 12px #000}
       .eleven-arrival-foot{font-size:12px;letter-spacing:.35em;color:#a84b42;margin-top:28px}
       #eleven-arrival-sequence.fade-out{opacity:0;transition:opacity .7s}
       @keyframes elevenAlertFlash{0%,100%{filter:brightness(1)}50%{filter:brightness(1.8)}}
       @keyframes elevenScan{from{transform:scaleX(.35);opacity:.45}to{transform:scaleX(1);opacity:1}}
-      @media(max-width:600px){.eleven-arrival-story,.eleven-arrival-alert{padding:24px 16px}.eleven-arrival-title{letter-spacing:.1em}}
+      @media(max-width:600px){.eleven-arrival-story,.eleven-arrival-alert{padding:7vh 6vw}.eleven-arrival-title{letter-spacing:.08em}}
     `;
     document.head.appendChild(arrivalStyle);
   }
