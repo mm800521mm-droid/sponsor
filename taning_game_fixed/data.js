@@ -156,6 +156,7 @@ window.NIGHT_DATA = {
     nightName: "NIGHT 6",
     audioFile: "audio/Night_Video_6.mp3",
     isHidden: true,
+    systemAlert: "[red][glitch]SYSTEM ALERT: SURVEILLANCE NETWORK COMPROMISED. ALL SECURITY CAMERAS OFFLINE.",
     tape: [
       "(电话突然接通，背景传来急促的脚步声）",
       "喂？午安？",
@@ -203,7 +204,6 @@ window.NIGHT_DATA = {
       "我不知道它是什么。它现在正朝走廊另一头走。",
       "你那边监控怎么样？",
       "什么？全黑了？",
-      "[red][glitch]SYSTEM ALERT: SURVEILLANCE NETWORK COMPROMISED. ALL SECURITY CAMERAS OFFLINE.",
       "我这里也看不见了。所有画面都黑了。",
       "先别管监控了。你待在保安室，能用的防御设施都留意一下。",
       "我会继续看着它。至少我现在还能看见它。",
