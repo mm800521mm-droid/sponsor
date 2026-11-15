@@ -683,6 +683,82 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
   let elevenCameraBlackout = false;
   let highestNight = 1;
 
+  let elevenArrivalSequenceToken = 0;
+
+  function playElevenArrivalAlarm() {
+    try {
+      if (!audioCtx) initAudio();
+      if (!audioCtx) return;
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const now = audioCtx.currentTime;
+      const duration = 2.8;
+      const carrier = audioCtx.createOscillator();
+      carrier.type = 'sawtooth';
+      carrier.frequency.setValueAtTime(660, now);
+      const lfo = audioCtx.createOscillator();
+      lfo.type = 'square';
+      lfo.frequency.setValueAtTime(2.4, now);
+      const depth = audioCtx.createGain();
+      depth.gain.setValueAtTime(360, now);
+      lfo.connect(depth); depth.connect(carrier.frequency);
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass'; filter.frequency.setValueAtTime(1800, now);
+      const volume = audioCtx.createGain();
+      volume.gain.setValueAtTime(0.0001, now);
+      volume.gain.linearRampToValueAtTime(0.22, now + 0.08);
+      volume.gain.setValueAtTime(0.22, now + duration - 0.35);
+      volume.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      carrier.connect(filter); filter.connect(volume); volume.connect(audioCtx.destination);
+      carrier.start(now); lfo.start(now);
+      carrier.stop(now + duration); lfo.stop(now + duration);
+    } catch (e) { console.warn('[Rift Ash] Eleven arrival alarm unavailable:', e); }
+  }
+
+  function showElevenArrivalSequence() {
+    const token = ++elevenArrivalSequenceToken;
+    let overlay = document.getElementById('eleven-arrival-sequence');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'eleven-arrival-sequence';
+      overlay.innerHTML = '<div class="eleven-arrival-alert"><div class="eleven-arrival-kicker">RIFT ASH // EMERGENCY BROADCAST</div><div class="eleven-arrival-warning">⚠ 系统警报 ⚠</div><div class="eleven-arrival-main">监控网络遭到破坏</div><div class="eleven-arrival-sub">ALL SECURITY CAMERAS OFFLINE</div><div class="eleven-arrival-scan"></div></div><div class="eleven-arrival-story"><div class="eleven-arrival-kicker">UNKNOWN PRESENCE DETECTED</div><div class="eleven-arrival-title">十一降临</div><div class="eleven-arrival-copy">他摧毁了你所有的监控。<br>现在，他想和午安单独玩玩。</div><div class="eleven-arrival-foot">DON\'T LOOK AWAY.</div></div>';
+      document.body.appendChild(overlay);
+    }
+    overlay.classList.remove('show-story', 'fade-out');
+    overlay.classList.add('active');
+    playElevenArrivalAlarm();
+    window.setTimeout(() => { if (token === elevenArrivalSequenceToken) overlay.classList.add('show-story'); }, 2800);
+    window.setTimeout(() => { if (token === elevenArrivalSequenceToken) overlay.classList.add('fade-out'); }, 7200);
+    window.setTimeout(() => { if (token === elevenArrivalSequenceToken) overlay.classList.remove('active', 'show-story', 'fade-out'); }, 7900);
+  }
+
+  if (!document.getElementById('eleven-arrival-sequence-style')) {
+    const arrivalStyle = document.createElement('style');
+    arrivalStyle.id = 'eleven-arrival-sequence-style';
+    arrivalStyle.textContent = `
+      #eleven-arrival-sequence{position:fixed;inset:0;z-index:1000000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.96);color:#f4eeee;font-family:"Courier New",monospace;text-align:center;overflow:hidden}
+      #eleven-arrival-sequence.active{display:flex}
+      #eleven-arrival-sequence:before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px);opacity:.5}
+      .eleven-arrival-alert,.eleven-arrival-story{position:absolute;width:min(900px,90vw);padding:clamp(24px,5vw,58px);box-sizing:border-box;opacity:0;transform:scale(.94);transition:opacity .35s,transform .35s}
+      .eleven-arrival-alert{border:3px solid #c51d25;background:radial-gradient(ellipse,rgba(90,0,0,.42),rgba(0,0,0,.97) 72%);box-shadow:0 0 35px rgba(255,0,0,.28),inset 0 0 35px rgba(255,0,0,.12);animation:elevenAlertFlash .42s steps(2,end) 6}
+      #eleven-arrival-sequence:not(.show-story) .eleven-arrival-alert{opacity:1;transform:scale(1)}
+      .eleven-arrival-kicker{font-size:clamp(10px,1.5vw,14px);letter-spacing:.28em;color:#c99b9b;margin-bottom:22px}
+      .eleven-arrival-warning{font-size:clamp(25px,5vw,52px);font-weight:900;color:#ff333b;text-shadow:0 0 18px #f00;margin-bottom:18px}
+      .eleven-arrival-main{font-size:clamp(22px,4.3vw,46px);font-weight:900;letter-spacing:.08em}
+      .eleven-arrival-sub{font-size:clamp(10px,1.5vw,15px);letter-spacing:.25em;color:#b7a5a5;margin-top:20px}
+      .eleven-arrival-scan{height:3px;background:#d21c26;margin:30px auto 0;max-width:90%;box-shadow:0 0 12px #f00;animation:elevenScan 1s ease-in-out infinite alternate}
+      #eleven-arrival-sequence.show-story .eleven-arrival-alert{opacity:0;transform:scale(1.04)}
+      #eleven-arrival-sequence.show-story .eleven-arrival-story{opacity:1;transform:scale(1)}
+      .eleven-arrival-story{border-top:1px solid #80623b;border-bottom:1px solid #80623b;background:radial-gradient(ellipse,rgba(65,42,20,.3),rgba(0,0,0,.96) 75%)}
+      .eleven-arrival-title{font-family:serif;font-size:clamp(48px,10vw,100px);font-weight:900;letter-spacing:.18em;color:#d5ad68;text-shadow:0 0 22px rgba(196,37,25,.65);margin:8px 0 28px}
+      .eleven-arrival-copy{font-family:serif;font-size:clamp(19px,3vw,30px);line-height:1.9;color:#f0e6d8}
+      .eleven-arrival-foot{font-size:12px;letter-spacing:.35em;color:#a84b42;margin-top:28px}
+      #eleven-arrival-sequence.fade-out{opacity:0;transition:opacity .7s}
+      @keyframes elevenAlertFlash{0%,100%{filter:brightness(1)}50%{filter:brightness(1.8)}}
+      @keyframes elevenScan{from{transform:scaleX(.35);opacity:.45}to{transform:scaleX(1);opacity:1}}
+      @media(max-width:600px){.eleven-arrival-story,.eleven-arrival-alert{padding:24px 16px}.eleven-arrival-title{letter-spacing:.1em}}
+    `;
+    document.head.appendChild(arrivalStyle);
+  }
   function setElevenCameraBlackout(enabled) {
     elevenCameraBlackout = !!enabled;
     if (elevenCameraBlackout) {
@@ -707,7 +783,10 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
   window.addEventListener('rift:night-special-time', (event) => {
     const detail = event.detail || {};
     if (Number(detail.night) !== 6) return;
-    if (detail.id === 'eleven-awakens') setElevenCameraBlackout(true);
+    if (detail.id === 'eleven-awakens') {
+      setElevenCameraBlackout(true);
+      showElevenArrivalSequence();
+    }
   });
   let currentTapePlayId = 0;
   let currentCamId = 1;
