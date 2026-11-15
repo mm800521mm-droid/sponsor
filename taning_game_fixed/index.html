@@ -525,6 +525,42 @@
     } catch(e) {}
   }
 
+  function drawRiftCharacterJumpscareFace(canvas, name) {
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h); ctx.fillStyle='#050505'; ctx.fillRect(0,0,w,h);
+    const key=String(name||'');
+    ctx.imageSmoothingEnabled=false;
+    if (/闪流|Flux/.test(key)) {
+      ctx.fillStyle='#15191b';ctx.fillRect(w*.12,h*.16,w*.76,h*.58);
+      ctx.strokeStyle='#9bdce8';ctx.lineWidth=Math.max(4,w*.025);ctx.strokeRect(w*.12,h*.16,w*.76,h*.58);
+      for(let y=h*.22;y<h*.68;y+=Math.max(5,h*.025)){ctx.fillStyle=Math.random()>.5?'rgba(220,240,240,.18)':'rgba(30,80,90,.45)';ctx.fillRect(w*.16,y,w*.68,Math.max(2,h*.008));}
+      ctx.fillStyle='#ff3434';ctx.shadowColor='#f00';ctx.shadowBlur=24;ctx.fillRect(w*.28,h*.39,w*.12,h*.045);ctx.fillRect(w*.60,h*.39,w*.12,h*.045);ctx.shadowBlur=0;
+    } else if (/诺卡|Noka/.test(key)) {
+      ctx.strokeStyle='#a98545';ctx.lineWidth=Math.max(5,w*.035);ctx.strokeRect(w*.18,h*.22,w*.64,h*.52);
+      ctx.fillStyle='#23190f';ctx.fillRect(w*.22,h*.26,w*.56,h*.44);
+      for(let n=0;n<3;n++){ctx.beginPath();ctx.arc(w*(.34+n*.16),h*.48,w*.075,0,Math.PI*2);ctx.strokeStyle='#c49a54';ctx.lineWidth=5;ctx.stroke();}
+      ctx.fillStyle='#f5d58b';ctx.shadowColor='#e6a83b';ctx.shadowBlur=22;ctx.fillRect(w*.34,h*.40,w*.07,h*.035);ctx.fillRect(w*.59,h*.40,w*.07,h*.035);ctx.shadowBlur=0;
+    } else if (/耳机|Lobe/.test(key)) {
+      ctx.fillStyle='#171717';ctx.fillRect(w*.22,h*.30,w*.56,h*.46);
+      ctx.strokeStyle='#aaa';ctx.lineWidth=Math.max(9,w*.055);ctx.beginPath();ctx.arc(w*.5,h*.40,w*.28,Math.PI,Math.PI*2);ctx.stroke();
+      ctx.fillStyle='#d7d0c6';ctx.fillRect(w*.18,h*.38,w*.13,h*.22);ctx.fillRect(w*.69,h*.38,w*.13,h*.22);
+      ctx.fillStyle='#f33';ctx.shadowColor='#f00';ctx.shadowBlur=20;ctx.fillRect(w*.36,h*.48,w*.08,h*.04);ctx.fillRect(w*.56,h*.48,w*.08,h*.04);ctx.shadowBlur=0;
+    } else if (/孤|Gu/.test(key)) {
+      ctx.fillStyle='#b9b3a8';ctx.fillRect(w*.18,h*.18,w*.64,h*.66);
+      ctx.fillStyle='#24211e';ctx.fillRect(w*.26,h*.28,w*.48,h*.44);
+      ctx.strokeStyle='#e1d9c9';ctx.lineWidth=3;for(let y=h*.34;y<h*.65;y+=h*.08){ctx.beginPath();ctx.moveTo(w*.31,y);ctx.lineTo(w*.68,y);ctx.stroke();}
+      ctx.fillStyle='#f33';ctx.fillRect(w*.37,h*.43,w*.08,h*.04);ctx.fillRect(w*.55,h*.43,w*.08,h*.04);
+    } else if (/寒零|Chillo/.test(key)) {
+      ctx.fillStyle='#18252a';ctx.beginPath();ctx.moveTo(w*.5,h*.12);ctx.lineTo(w*.82,h*.38);ctx.lineTo(w*.72,h*.82);ctx.lineTo(w*.28,h*.82);ctx.lineTo(w*.18,h*.38);ctx.closePath();ctx.fill();
+      ctx.strokeStyle='#b7edf5';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(w*.25,h*.25);ctx.lineTo(w*.75,h*.7);ctx.moveTo(w*.75,h*.25);ctx.lineTo(w*.25,h*.7);ctx.stroke();
+      ctx.fillStyle='#d9fbff';ctx.shadowColor='#7eeaff';ctx.shadowBlur=20;ctx.fillRect(w*.34,h*.43,w*.09,h*.035);ctx.fillRect(w*.57,h*.43,w*.09,h*.035);ctx.shadowBlur=0;
+    } else {
+      ctx.fillStyle='#33231d';ctx.fillRect(w*.2,h*.18,w*.6,h*.64);ctx.fillStyle='#f33';ctx.fillRect(w*.34,h*.42,w*.1,h*.05);ctx.fillRect(w*.56,h*.42,w*.1,h*.05);
+    }
+  }
+
   function triggerJumpscare(name, quote) {
     if (S.ended) return;
     S.ended = true;
@@ -539,8 +575,10 @@
     if (faceCanvas) {
       if (isEleven && window.drawGildedElevenJumpscareFace) {
         window.drawGildedElevenJumpscareFace(faceCanvas);
-      } else if (window.drawTanninJumpscareFace) {
+      } else if (/塔宁|Tannin/i.test(String(name || '')) && window.drawTanninJumpscareFace) {
         window.drawTanninJumpscareFace(faceCanvas, true);
+      } else {
+        drawRiftCharacterJumpscareFace(faceCanvas, name);
       }
     }
     jumpscareOverlay.classList.remove('gameover');
