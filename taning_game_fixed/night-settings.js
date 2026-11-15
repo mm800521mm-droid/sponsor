@@ -2,7 +2,7 @@
  * Rift Ash - Night settings
  * 每个夜晚都完整列出全部角色；0 = 本夜不出场、不行动，1-20 = 本夜 AI 等级。
  * AI 数字只影响每次行动检查的成功概率；行动检查间隔由角色自身 timings 决定。
- * specialTimes 与该夜角色表放在同一个夜晚对象中。
+ * 第六夜特殊时间表由 night-six-special-times.js 独立提供。
  */
 (function () {
   const MAX_AI = 20;
@@ -51,13 +51,7 @@
     6: makeNight({
       gildedEleven: 0, flux: 10, noka: 0, tannin: 12, lobe: 0, gu: 10,
       chillo: 9, cosmo: 10, transfer: 13, deadin: 0, split: 0, yu: 0, guard: 0
-    }, [
-      { id: 'all-return', at: '05:30', type: 'all_except_eleven_return_to_start' },
-      { id: 'eleven-awakens', at: '05:40', type: 'eleven_activates' },
-      { id: 'eleven-turns', at: '07:30', type: 'eleven_changes_direction_toward_deadin' },
-      { id: 'line-impact', at: '07:45', type: 'nearby_line_impact' },
-      { id: 'call-cut', at: '07:56', type: 'deadin_call_disconnects' }
-    ])
+    }, window.RIFT_NIGHT6_SPECIAL_TIMES || [])
   };
 
   // 自定义行动概率曲线：AI 1-11 每级 +5%；AI 12 起进入高概率区。
