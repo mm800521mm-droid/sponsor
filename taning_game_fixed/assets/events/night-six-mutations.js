@@ -79,6 +79,47 @@
     }));
   }
 
+  const extraTestSubtitles = {
+    gildedEleven: { id: 'test-eleven', characterId: 'gildedEleven', name: '十一', title: '觉醒测试', glitch: true, lines: ['监控画面突然全部熄灭。', '其他人偶已经回到各自的初始位置。', '走廊深处，只有十一仍在移动。', '它抬起头，设施里的灯光逐盏熄灭。'] },
+    flux: { id: 'test-flux', characterId: 'flux', name: '闪流', title: '新导演', glitch: true, lines: ['后台广播响起一段陌生的开场音乐。', '监控画面像舞台幕布一样缓缓拉开。', '闪流的声音从所有扬声器同时传来。', '“演出现在才正式开始。”'] }
+  };
+
+  async function playOneCharacterSubtitle(characterId) {
+    const data = window.NIGHT_DATA && window.NIGHT_DATA[6];
+    const items = data && data.nightSixMutations;
+    const item = (Array.isArray(items) ? items.find(entry => entry.characterId === characterId) : null)
+      || extraTestSubtitles[characterId];
+    if (!item) return false;
+    const runToken = ++testRunToken;
+    activeNight = 6;
+    locked = false;
+    hideOverlay();
+    await showSequence(item);
+    return runToken === testRunToken;
+  }
+
+  async function testAllCharacterSubtitles() {
+    const data = window.NIGHT_DATA && window.NIGHT_DATA[6];
+    const items = data && Array.isArray(data.nightSixMutations) ? data.nightSixMutations.slice() : [];
+    const all = [
+      extraTestSubtitles.gildedEleven,
+      extraTestSubtitles.flux,
+      ...items
+    ];
+    const runToken = ++testRunToken;
+    activeNight = 6;
+    locked = false;
+    triggered.clear();
+    hideOverlay();
+    for (const item of all) {
+      if (runToken !== testRunToken) break;
+      await showSequence(item);
+      if (runToken !== testRunToken) break;
+      await new Promise(resolve => window.setTimeout(resolve, item.lines.length * 1150 + 1900));
+    }
+    return true;
+  }
+
   async function testAllSubtitles() {
     const runToken = ++testRunToken;
     activeNight = 6;
@@ -98,7 +139,7 @@
   }
 
   window.RIFT_NIGHT6_MUTATION_TEST = Object.freeze({
-    playAllSubtitles: testAllSubtitles,
+    playAllSubtitles: testAllSubtitles,\n    playAllCharacterSubtitles: testAllCharacterSubtitles,\n    playCharacterSubtitle: playOneCharacterSubtitle,
     stop: () => { testRunToken++; hideOverlay(); }
   });
 
