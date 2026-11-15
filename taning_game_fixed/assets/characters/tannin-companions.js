@@ -1,50 +1,72 @@
 /*
  * Rift Ash — Tannin companion presentation.
- * Companions mirror Tannin's current CCTV room; they do not run independent AI.
+ * Cosmo and Transfer are auxiliary characters. Their CCTV locations are
+ * supplied independently; this module does not force them into Tannin's room.
  */
 (() => {
   'use strict';
-  const companionDefs = [
-    { id: 'cosmo', name: '小宇宙', glyph: '✦', className: 'rift-tannin-companion-cosmo' },
-    { id: 'transfer', name: '移交／一脚', glyph: '⌁', className: 'rift-tannin-companion-transfer' }
-  ];
-  const feeds = ['feed-3','feed-4','feed-5'];
-  let currentNode = null;
+  const defs = {
+    cosmo: { name: '小宇宙', glyph: '✦', className: 'rift-tannin-companion-cosmo' },
+    transfer: { name: '移交／一脚', glyph: '⌁', className: 'rift-tannin-companion-transfer' }
+  };
+  const visible = new Map();
 
-  function hideAll() {
-    feeds.forEach(id => {
-      const feed = document.getElementById(id);
-      if (!feed) return;
-      feed.querySelectorAll('[data-tannin-companion]').forEach(el => { el.style.display = 'none'; });
+  function hideCharacter(id) {
+    document.querySelectorAll('[data-tannin-companion="' + id + '"]').forEach(el => {
+      el.style.display = 'none';
     });
+    visible.delete(id);
   }
 
-  function render(detail) {
-    currentNode = detail && detail.node || null;
-    hideAll();
-    const cam = currentNode === 'cam3' ? 3 : currentNode === 'cam4' ? 4 : currentNode === 'cam5' ? 5 : 0;
-    if (!cam) return;
+  function place(detail) {
+    if (!detail || !Object.prototype.hasOwnProperty.call(defs, detail.characterId)) return;
+    const id = detail.characterId;
+    const cam = Number(detail.camId);
+    if (!Number.isInteger(cam) || cam < 1 || cam > 13) {
+      hideCharacter(id);
+      return;
+    }
+    hideCharacter(id);
     const feed = document.getElementById('feed-' + cam);
     if (!feed) return;
-    companionDefs.forEach(def => {
-      let el = feed.querySelector('[data-tannin-companion="' + def.id + '"]');
-      if (!el) {
-        el = document.createElement('div');
-        el.className = 'rift-tannin-companion ' + def.className;
-        el.dataset.tanninCompanion = def.id;
-        el.innerHTML = '<span class="glyph"></span><span class="name"></span>';
-        feed.appendChild(el);
-      }
-      el.querySelector('.glyph').textContent = def.glyph;
-      el.querySelector('.name').textContent = def.name + ' // 随行';
-      el.style.display = 'flex';
-    });
+    const def = defs[id];
+    let el = feed.querySelector('[data-tannin-companion="' + id + '"]');
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'rift-tannin-companion ' + def.className;
+      el.dataset.tanninCompanion = id;
+      el.innerHTML = '<span class="glyph"></span><span class="name"></span>';
+      feed.appendChild(el);
+    }
+    el.querySelector('.glyph').textContent = def.glyph;
+    el.querySelector('.name').textContent = def.name + ' // 塔宁辅助';
+    if (Number.isFinite(detail.x)) el.style.left = Math.max(0, Math.min(90, detail.x)) + '%';
+    if (Number.isFinite(detail.y)) { el.style.bottom = Math.max(0, Math.min(90, detail.y)) + '%'; }
+    el.style.display = 'flex';
+    visible.set(id, cam);
   }
 
-  window.addEventListener('rift:tannin-node-change', event => render(event.detail || {}));
-  window.addEventListener('rift:night-start', () => { currentNode = null; hideAll(); });
-  window.addEventListener('rift:night-six-others-return', () => { currentNode = null; hideAll(); });
+  window.addEventListener('rift:tannin-companion-position', event => place(event.detail || {}));
+  window.addEventListener('rift:tannin-companion-hide', event => {
+    const id = event.detail && event.detail.characterId;
+    if (id && defs[id]) hideCharacter(id);
+    else Object.keys(defs).forEach(hideCharacter);
+  });
+  window.addEventListener('rift:night-start', () => Object.keys(defs).forEach(hideCharacter));
+  window.addEventListener('rift:night-six-others-return', () => Object.keys(defs).forEach(hideCharacter));
+
   window.RIFT_TANNIN_COMPANIONS = Object.freeze({
-    getState: () => ({ leader: 'tannin', node: currentNode, companions: ['cosmo', 'transfer'], aliases: { transfer: ['移交', '一脚'] } })
+    getState: () => ({
+      leader: 'tannin',
+      companions: ['cosmo', 'transfer'],
+      aliases: { transfer: ['移交', '一脚'] },
+      positions: Object.fromEntries(visible)
+    }),
+    setPosition: (characterId, camId, x, y) => window.dispatchEvent(new CustomEvent('rift:tannin-companion-position', {
+      detail: { characterId, camId, x, y }
+    })),
+    hide: characterId => window.dispatchEvent(new CustomEvent('rift:tannin-companion-hide', {
+      detail: { characterId }
+    }))
   });
 })();
