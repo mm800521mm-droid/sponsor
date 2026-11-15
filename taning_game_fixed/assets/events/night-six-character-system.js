@@ -178,7 +178,7 @@
   }
   function onDoor(e){
     const d=e.detail||{};
-    if(!active)return;
+    if(!active&&!fluxAtDoor)return;
     if(fluxAtDoor&&(d.leftClosed||d.rightClosed||frame.leftClosed||frame.rightClosed)){fluxAtDoor=false;fluxThreat=0;fluxDelay=0;announce('闪流被门挡住，暂时退开');renderFlux();}
     if(active==='gu'&&(d.leftClosed||frame.leftClosed))finishAttack(true,'left-door');
     else if(active==='chillo'&&(d.rightClosed||frame.rightClosed))finishAttack(true,'right-door');
