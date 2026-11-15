@@ -9,6 +9,7 @@
   let sequenceToken = 0;
   let locked = false;
   const triggered = new Set();
+  let testRunToken = 0;
 
   function ensureOverlay() {
     let el = document.getElementById('night-six-mutation-text');
@@ -79,6 +80,7 @@
   }
 
   async function testAllSubtitles() {
+    const runToken = ++testRunToken;
     activeNight = 6;
     locked = false;
     triggered.clear();
@@ -87,16 +89,17 @@
     const mutations = data && data.nightSixMutations;
     if (!Array.isArray(mutations) || !mutations.length) return false;
     for (const item of mutations) {
-      if (activeNight !== 6) break;
+      if (runToken !== testRunToken || activeNight !== 6) break;
       await showSequence(item);
       await new Promise(resolve => window.setTimeout(resolve, item.lines.length * 1150 + 2100));
+      if (runToken !== testRunToken) break;
     }
     return true;
   }
 
   window.RIFT_NIGHT6_MUTATION_TEST = Object.freeze({
     playAllSubtitles: testAllSubtitles,
-    stop: () => { hideOverlay(); }
+    stop: () => { testRunToken++; hideOverlay(); }
   });
 
   window.addEventListener('rift:night-start', event => {
