@@ -63,7 +63,7 @@ class GildedElevenAI {
       panel = document.createElement('div');
       panel.id = 'rift-eleven-stage-status';
       panel.style.cssText = 'position:absolute;left:18px;top:72px;z-index:85;display:none;width:min(310px,42vw);padding:12px 14px;background:rgba(5,5,5,.92);border:1px solid #8e713e;box-shadow:0 0 18px #000, inset 0 0 18px rgba(180,130,55,.12);color:#e7d3a8;font: bold 13px/1.5 Courier New,monospace;letter-spacing:1px;pointer-events:none;';
-      panel.innerHTML = '<div style="color:#c69b53;font-size:11px;letter-spacing:3px;">RIFT ASH // ENTITY TRACKER</div><div id="rift-eleven-stage-name" style="font-size:19px;color:#fff;margin:3px 0 2px;">十一：待机</div><div id="rift-eleven-stage-place">位置：未知</div><div id="rift-eleven-stage-count">阶段：0 / 4</div><div style="height:5px;background:#292117;margin-top:8px;"><div id="rift-eleven-stage-bar" style="height:100%;width:0;background:#c69b53;box-shadow:0 0 8px #c69b53;"></div></div>';
+      panel.innerHTML = '<div style="color:#c69b53;font-size:11px;letter-spacing:3px;">RIFT ASH // NIGHT STATUS</div><div id="rift-eleven-stage-name" style="font-size:19px;color:#fff;margin:3px 0 2px;">十一：待机</div><div id="rift-eleven-stage-place">位置：未知</div><div id="rift-eleven-stage-count">阶段：0 / 4</div><div style="height:5px;background:#292117;margin-top:8px;"><div id="rift-eleven-stage-bar" style="height:100%;width:0;background:#c69b53;box-shadow:0 0 8px #c69b53;"></div></div>';
       (document.getElementById('game') || document.body).appendChild(panel);
     }
     return panel;
@@ -172,22 +172,37 @@ class GildedElevenAI {
     }
   }
 
+  updateNightSixStageStatus() {
+    const panel = this.ensureStageStatus();
+    const name = panel.querySelector('#rift-eleven-stage-name');
+    const place = panel.querySelector('#rift-eleven-stage-place');
+    const count = panel.querySelector('#rift-eleven-stage-count');
+    const bar = panel.querySelector('#rift-eleven-stage-bar');
+    if (name) name.textContent = '第六夜：设施异常阶段';
+    if (place) place.textContent = '活动位置：无法确认';
+    if (count) count.textContent = '阶段进度：' + Math.min(this.stage || 0, this.config.maxStages) + ' / ' + this.config.maxStages;
+    if (bar) bar.style.width = (Math.min(this.stage || 0, this.config.maxStages) / this.config.maxStages * 100) + '%';
+    panel.style.display = 'block';
+  }
+
   onSpecialTime(event, ctx) {
     if (!event || event.id !== 'eleven-awakens' || Number(event.night) !== 6) return;
     this.specialAwakened = true;
+    this.debugVisible = false;
     this.state = 'ACTIVE';
     this.phase = 'ROAMING';
     this.stage = 0;
     this.currentNodeIndex = 1;
     this.timer = this.config.timings.roam;
+    // 第六夜只在设施内部活动，不把实体渲染到保安视角或场景中。
     this.hideAll(ctx);
-    this.showNode('stage', ctx);
-    this.updateStageStatus('stage');
+    this.updateNightSixStageStatus();
   }
 
   update(dt, ctx) {
     if (!ctx || !ctx.isGameRunning()) return;
     this.ensureVisualNodes(ctx);
+    if (this.specialAwakened) this.hideAll(ctx);
     if (this.debugVisible) {
       this.showNode('behind', ctx);
       return;
@@ -224,8 +239,10 @@ class GildedElevenAI {
     }
 
     if (this.phase === 'ROAMING') {
-      const node = this.path[this.currentNodeIndex] || 'mainHall';
-      this.showNode(node, ctx);
+      if (!this.specialAwakened) {
+        const node = this.path[this.currentNodeIndex] || 'mainHall';
+        this.showNode(node, ctx);
+      }
       this.timer -= dt;
       if (this.timer <= 0) {
         if (!this.canTakeAction()) {
@@ -235,7 +252,14 @@ class GildedElevenAI {
         this.stage += 1;
         this.currentNodeIndex = Math.min(this.currentNodeIndex + 1, this.path.length - 1);
         this.timer = this.config.timings.roam;
-        if (this.stage >= this.config.maxStages) {
+        if (this.specialAwakened) {
+          this.updateNightSixStageStatus();
+          if (this.stage >= this.config.maxStages) {
+            this.state = 'ATTACKED';
+            this.hideAll(ctx);
+            ctx.triggerJumpscare(this.name, this.quote);
+          }
+        } else if (this.stage >= this.config.maxStages) {
           this.state = 'ATTACKED';
           this.hideAll(ctx);
           ctx.triggerJumpscare(this.name, this.quote);
