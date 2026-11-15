@@ -100,6 +100,12 @@
     }
   });
 
+  window.addEventListener('rift:noka-enter-room', event => {
+    const cam = Number(event.detail && event.detail.camId);
+    for (const id of Object.keys(defs)) {
+      if (visible.get(id) === cam) { hideCharacter(id); schedule[id].visible=0; scheduleNext(id); }
+    }
+  });
   window.addEventListener('rift:tannin-companion-position', event => place(event.detail || {}));
   window.addEventListener('rift:tannin-companion-hide', event => {
     const id = event.detail && event.detail.characterId;
