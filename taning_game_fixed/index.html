@@ -241,7 +241,8 @@
 <script src="./assets/config/night-settings.js?v=2"></script>
 <script src="./assets/events/night-six-events.js?v=1"></script>\n<script src="./assets/events/night-transition.js?v=1"></script>
 <script src="./assets/data/data.js?v=5" onerror="console.error('data.js 加载失败：请确认 data.js 与 index.html 在同一目录')"></script>
-<script src="./assets/events/night-six-mutations.js?v=3"></script>
+<script src="./assets/events/night-six-mutations.js?v=4"></script>
+<script src="./assets/events/night-six-character-system.js?v=1"></script>
 <!-- Night 6 subtitle test loader temporarily disabled for public play. Restore this script to re-enable test controls. -->
 <script src="assets/characters/taning.js"></script>
 <script src="assets/characters/taning_fight_load.js"></script>
@@ -332,7 +333,7 @@
   let currentCamId = 1;
 
   const NIGHT_MS = 8 * 60 * 1000;
-  const HOUR_MS = NIGHT_MS / 8;
+  const HOUR_MS = 60 * 1000;
   
   const S = { night: 1, elapsed: 0, hour: 0, power: 100, running: false, ended: false };
   let processedNightEvents = new Set();
@@ -782,6 +783,7 @@
     if (!S.running || elevenCameraBlackout) return;
     if (isLookingBack) return; 
     isCamOpen = !isCamOpen;
+    window.dispatchEvent(new CustomEvent('rift:monitor-toggle',{detail:{open:isCamOpen,camId:currentCamId}}));
     playMonitorSound(isCamOpen);
     if (isCamOpen) {
       cameraPanel.classList.add('show');
@@ -878,8 +880,8 @@
   
   let dL = false, dR = false;
 
-  btnLdoor.onclick = function(e) { e.stopPropagation(); if (isLookingBack) return; dL = !dL; this.classList.toggle('on', dL); doorwayL.classList.toggle('closed', dL); playDoorSound(); };
-  btnRdoor.onclick = function(e) { e.stopPropagation(); if (isLookingBack) return; dR = !dR; this.classList.toggle('on', dR); doorwayR.classList.toggle('closed', dR); playDoorSound(); };
+  btnLdoor.onclick = function(e) { e.stopPropagation(); if (isLookingBack) return; dL = !dL; this.classList.toggle('on', dL); doorwayL.classList.toggle('closed', dL); playDoorSound(); window.dispatchEvent(new CustomEvent('rift:night-six-door-change',{detail:{leftClosed:dL,rightClosed:dR,elevenEventActive:S.night===6&&S.elapsed>=340000&&S.elapsed<450000}})); };
+  btnRdoor.onclick = function(e) { e.stopPropagation(); if (isLookingBack) return; dR = !dR; this.classList.toggle('on', dR); doorwayR.classList.toggle('closed', dR); playDoorSound(); window.dispatchEvent(new CustomEvent('rift:night-six-door-change',{detail:{leftClosed:dL,rightClosed:dR,elevenEventActive:S.night===6&&S.elapsed>=340000&&S.elapsed<450000}})); };
 
   function turnOnLight(button, doorway, e) {
     if (e) e.preventDefault();
@@ -937,9 +939,9 @@
       S.elapsed += dt * 1000;
       dispatchNightSpecialTimes();
       let currentHour = Math.min(8, Math.floor(S.elapsed / HOUR_MS));
-      if (currentHour !== S.hour) {
+      if (currentHour !== S.hour || (S.night === 6 && S.elapsed >= 9.25 * HOUR_MS)) {
         S.hour = currentHour;
-        if (S.hour === 8) {
+        if (S.elapsed >= (S.night === 6 ? 9.25 : 8) * HOUR_MS) {
           S.running = false;
           releaseAllLights();
           playWinSound();
@@ -981,6 +983,7 @@
       }
 
       if (S.running) {
+        window.dispatchEvent(new CustomEvent('rift:game-frame',{detail:{night:S.night,elapsed:S.elapsed,dt,running:S.running,camOpen:isCamOpen,camId:currentCamId,leftClosed:dL,rightClosed:dR}}));
         if (isLookingBack) {
           lookBackTimer -= dt;
           if (lookBackTimer <= 0 && !backView.classList.contains('warning')) backView.classList.add('warning');
