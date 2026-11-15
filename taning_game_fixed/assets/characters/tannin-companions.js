@@ -46,23 +46,33 @@
     visible.set(id, cam);
   }
 
-  // When Tannin changes rooms, the companions receive independent camera positions.
-  // They are not pinned to Tannin's room and do not use separate hostile AI levels.
+  // Companions have their own harmless, independent CCTV appearances.
+  // Their schedule is presentation-only and is deliberately unrelated to AI levels.
+  const schedule = {
+    cosmo: { wait: 0, visible: 0 },
+    transfer: { wait: 0, visible: 0 }
+  };
+  let locked = false;
   function randomCamera() { return 1 + Math.floor(Math.random() * 13); }
-  window.addEventListener('rift:tannin-node-change', event => {
-    const detail = event.detail || {};
-    if (detail.character !== 'tannin') return;
-    if (!detail.node) {
-      Object.keys(defs).forEach(hideCharacter);
-      return;
-    }
-    for (const id of Object.keys(defs)) {
-      place({
-        characterId: id,
-        camId: randomCamera(),
-        x: 8 + Math.random() * 72,
-        y: 6 + Math.random() * 24
-      });
+  function scheduleNext(id) { schedule[id].wait = 14 + Math.random() * 18; }
+  function appear(id) {
+    const camId = randomCamera();
+    place({characterId:id,camId,x:8+Math.random()*72,y:6+Math.random()*24});
+    schedule[id].visible = 5 + Math.random() * 7;
+  }
+  window.addEventListener('rift:game-frame', event => {
+    const d = event.detail || {};
+    if (locked || !d.running) return;
+    const dt = Math.min(.1, Math.max(0, Number(d.dt) || 0));
+    for (const id of Object.keys(schedule)) {
+      const item = schedule[id];
+      if (item.visible > 0) {
+        item.visible -= dt;
+        if (item.visible <= 0) { hideCharacter(id); scheduleNext(id); }
+      } else {
+        item.wait -= dt;
+        if (item.wait <= 0) appear(id);
+      }
     }
   });
 
@@ -72,8 +82,8 @@
     if (id && defs[id]) hideCharacter(id);
     else Object.keys(defs).forEach(hideCharacter);
   });
-  window.addEventListener('rift:night-start', () => Object.keys(defs).forEach(hideCharacter));
-  window.addEventListener('rift:night-six-others-return', () => Object.keys(defs).forEach(hideCharacter));
+  window.addEventListener('rift:night-start', () => { locked=false; Object.keys(defs).forEach(id=>{hideCharacter(id);scheduleNext(id);schedule[id].visible=0;}); });
+  window.addEventListener('rift:night-six-others-return', () => { locked=true; Object.keys(defs).forEach(id=>{hideCharacter(id);schedule[id].visible=0;}); });
 
   window.RIFT_TANNIN_COMPANIONS = Object.freeze({
     getState: () => ({
