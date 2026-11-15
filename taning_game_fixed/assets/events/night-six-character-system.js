@@ -65,7 +65,7 @@
       if(id==='noka')document.querySelectorAll('[data-rift-character="noka"]').forEach(oldEl=>{if(oldEl.parentElement!==feed)oldEl.style.display='none';});
       let el=feed.querySelector('[data-rift-character="'+id+'"]');
       if(!el){el=document.createElement('div');el.className='rift-n6-sprite';el.dataset.riftCharacter=id;el.innerHTML='<div class="figure"></div><div class="tag"></div>';feed.appendChild(el);}
-      const visible=night===6 && ((id==='noka') || (id==='lobe') || (active===id) || defended.has(id));
+      const visible=(id==='noka' && (night===6 || nokaAI>0)) || (night===6 && (id==='lobe' || active===id || defended.has(id)));
       el.style.display=(visible && (id==='noka'||id==='lobe'?true:(active===id?Number(d.cam)===activeCam:defended.has(id))))?'flex':'none';
       el.classList.toggle('active',active===id);
       el.querySelector('.figure').textContent=d.glyph;
@@ -178,8 +178,8 @@
       if(label)label.textContent='阶段 '+Math.min(3,Math.floor(transferHeat+0.01))+' / 3';
       if(transferHeat>=3){hideTransfer();showTransferScare();finishAttack(false,'transfer-stage-three-jumpscare');announce('移交的三阶段已满！');}
     }
-    if(night===6 && frame.running && Date.now()-nokaLastTick>12000){crank=Math.max(0,crank-1);nokaLastTick=Date.now();renderCrank();window.dispatchEvent(new CustomEvent('rift:night-six-noka-wind-level',{detail:{value:crank,max:5,calm:crank>0}}));}
-    if(night===6 && frame.running && nokaAI>0){
+    if(frame.running && (night===6 || nokaAI>0) && Date.now()-nokaLastTick>12000){crank=Math.max(0,crank-1);nokaLastTick=Date.now();renderCrank();window.dispatchEvent(new CustomEvent('rift:night-six-noka-wind-level',{detail:{value:crank,max:5,calm:crank>0}}));}
+    if(night>0 && frame.running && nokaAI>0){
       if(crank>0){nokaThreatTimer=0;nokaMoveTick=0;}
       else {
         nokaThreatTimer+=Math.min(.1,Math.max(0,Number(frame.dt)||0));
