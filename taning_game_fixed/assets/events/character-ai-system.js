@@ -222,6 +222,7 @@
     }
   }
   function reset(e){
+    if(state.noka&&state.noka.el)state.noka.el.remove();document.querySelectorAll('.rift-shared-noka').forEach(el=>el.remove());
     state.night=Number(e.detail&&e.detail.night)||0;
     state.running=false;state.camOpen=false;state.camId=1;state.leftClosed=false;state.rightClosed=false;
     state.actors=actorList();
