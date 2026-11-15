@@ -1,0 +1,112 @@
+/* Mobile layout pass for Five Nights at Rift Ash.
+   Kept separate from game.css so desktop styling remains the source of truth. */
+:root { color-scheme: dark; }
+html, body {
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  overscroll-behavior: none;
+}
+body { touch-action: manipulation; }
+#game, #camera-panel, #main-menu, #night-clear-overlay, #jumpscare-overlay, #back-view {
+  width: 100%;
+  width: 100vw;
+  height: 100%;
+  height: 100dvh;
+  max-width: 100vw;
+  overflow: hidden;
+}
+#debug-skip-bar, #rift-test-controls { display: none !important; }
+#night-six-mutation-text {
+  top: max(58px, env(safe-area-inset-top) + 48px);
+  left: 4vw;
+  right: 4vw;
+  max-height: 26dvh;
+  overflow: hidden;
+  padding: 8px 10px;
+  font-size: clamp(12px, 3.2vw, 16px);
+  line-height: 1.4;
+}
+#tape-sub, #system-alert-subtitle {
+  left: 5vw;
+  right: 5vw;
+  bottom: max(12vh, env(safe-area-inset-bottom) + 72px);
+  font-size: clamp(13px, 3.4vw, 17px);
+  line-height: 1.45;
+  letter-spacing: .04em;
+  overflow-wrap: anywhere;
+}
+#hud { padding-top: env(safe-area-inset-top); }
+#nightLabel { top: max(12px, env(safe-area-inset-top)); right: 4vw; font-size: 12px; }
+#clock { top: max(34px, env(safe-area-inset-top) + 24px); right: 4vw; font-size: 22px; }
+#powerBox { left: 4vw; bottom: max(14vh, env(safe-area-inset-bottom) + 76px); font-size: 11px; }
+#usageLabel { font-size: 9px; }
+#usageBars { gap: 3px; }
+#usageBars i { width: 9px; height: 13px; min-height: 13px; }
+.side-arrow { width: 13vw; min-width: 42px; height: 26vh; font-size: 34px; }
+.look-back-btn {
+  bottom: max(8px, env(safe-area-inset-bottom));
+  min-height: 42px;
+  padding: 12px 22px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+#camera-panel { padding-bottom: env(safe-area-inset-bottom); }
+#cam-title {
+  top: max(12px, env(safe-area-inset-top));
+  left: 4vw;
+  right: 18vw;
+  font-size: clamp(12px, 3.4vw, 17px);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+#btnCamClose {
+  top: max(10px, env(safe-area-inset-top));
+  right: 3vw;
+  bottom: auto;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 14px;
+  font-size: 16px;
+}
+#cam-map {
+  width: min(46vw, 190px);
+  height: min(46vw, 190px);
+  right: 3vw;
+  bottom: max(12vh, env(safe-area-inset-bottom) + 62px);
+}
+.cam-btn { min-width: 24px; min-height: 24px; font-size: 10px; }
+#clear-title { font-size: clamp(54px, 18vw, 100px); }
+#clear-subtitle { max-width: 90vw; font-size: clamp(15px, 4.5vw, 22px); letter-spacing: .18em; text-align: center; }
+#btnReturnMenu { min-height: 46px; padding: 12px 22px; font-size: 12px; letter-spacing: .12em; }
+#main-menu { padding: max(9vh, env(safe-area-inset-top) + 30px) 8vw 8vh; }
+.title-block h1 { font-size: clamp(48px, 14vw, 76px); margin-bottom: 7vh; }
+.menu-items { gap: 22px; }
+.menu-item { min-height: 42px; font-size: clamp(18px, 5vw, 24px); display: flex; align-items: center; }
+#tape-ui { top: max(10px, env(safe-area-inset-top)); left: 4vw; font-size: 10px; gap: 7px; }
+.tape-reel { width: 15px; height: 15px; }
+.final-door { width: 68vw; height: 66dvh; border-width: 5vw; }
+.back-hint { bottom: max(18px, env(safe-area-inset-bottom)); font-size: 11px; letter-spacing: .12em; }
+
+@media (max-width: 600px) and (orientation: portrait) {
+  .wall-panel { width: 25vw; height: 26vh; }
+  .front-window { width: 42vw; height: 22vh; }
+  .monitor { width: 22vw; height: 15vh; }
+  .fan { width: 18vmin; height: 22vmin; }
+  #cam-map { width: min(48vw, 176px); height: min(48vw, 176px); bottom: max(11vh, env(safe-area-inset-bottom) + 58px); }
+  #powerBox { bottom: max(13vh, env(safe-area-inset-bottom) + 68px); }
+  #tape-sub, #system-alert-subtitle { bottom: max(11vh, env(safe-area-inset-bottom) + 62px); }
+}
+@media (max-height: 430px) and (orientation: landscape) {
+  #cam-map { width: min(34vh, 180px); height: min(34vh, 180px); bottom: 10vh; }
+  #powerBox { bottom: 8vh; }
+  #tape-sub, #system-alert-subtitle { bottom: 8vh; }
+  #night-six-mutation-text { max-height: 30vh; }
+  .side-arrow { height: 45vh; }
+}
+@media (pointer: coarse) {
+  .side-arrow, .look-back-btn, #btnCamClose, .cam-btn, #btnReturnMenu, .menu-item {
+    touch-action: manipulation;
+  }
+  .side-arrow { background: rgba(0,0,0,.08); }
+}
