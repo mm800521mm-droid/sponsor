@@ -4,6 +4,7 @@ class TaningAI {
     this.name = config.name;
     this.quote = config.quote;
     this.footstepTimer = 0;
+    this.lastReportedNode = null;
     this.aiLevel = 0;
     this.reset(null);
   }
@@ -30,6 +31,8 @@ class TaningAI {
     this.path = [];
     this.currentNodeIndex = 0;
     this.footstepTimer = 0;
+    this.lastReportedNode = null;
+    window.dispatchEvent(new CustomEvent('rift:tannin-node-change', { detail: { node: null, state: 'WANDER', character: 'tannin' } }));
     if (ctx) {
       this.hideAll(ctx);
     }
@@ -59,6 +62,12 @@ class TaningAI {
   }
 
   showNode(node, ctx) {
+    if (this.lastReportedNode !== node) {
+      this.lastReportedNode = node;
+      window.dispatchEvent(new CustomEvent('rift:tannin-node-change', {
+        detail: { node, state: this.state, character: 'tannin' }
+      }));
+    }
     const el = this.getVisualElement(node, ctx);
     if (el) {
       el.style.setProperty('display', 'block', 'important');
