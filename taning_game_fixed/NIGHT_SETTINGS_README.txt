@@ -55,3 +55,8 @@ call-cut：07:56，死入的电话通讯中断。
 - 第六夜 05:40 收到 eleven-awakens 事件后，切换为全区域游走阶段，活动区域包含彩排舞台、人偶存放舱、维修车间、道具仓库和主通道，不再使用身后区域。
 - 第六夜特殊唤醒不受该夜 gildedEleven: 0 的普通出场开关限制；特殊阶段使用确定性行动判定，普通阶段仍由角色 AI 数值控制。
 - 目前阶段推进到阈值后会触发 jumpscare；第六夜游走阶段的具体玩家防御手段尚未由设定明确，因此当前实现没有擅自绑定门、灯或摄像头作为防御方式。
+
+七、十一文件结构
+- characters/gilded-eleven.js：十一角色 AI 类，按 characters/taning.js 的结构组织，包含 setAILevel、canTakeAction、reset、getVisualElement、hideAll、showNode、startNight、update 等方法。
+- characters/gilded-eleven-fight-load.js：十一独立路径与 timing 配置文件，结构参照 characters/taning_fight_load.js，使用 routes、visualMap、timings 和 maxStages。
+- index.html 按塔宁的方式分别加载角色类与路径配置，并在 startNight 初始化 AI；05:40 特殊事件通过统一事件分发进入十一的特殊游走阶段。
