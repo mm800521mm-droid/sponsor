@@ -622,6 +622,12 @@
     if (id === 'transfer') return; // Transfer has its own non-standard scare, not a normal death.
     if (names[id]) triggerJumpscare(names[id], '……');
   });
+  window.addEventListener('rift:noka-enter-room', (event) => {
+    const camId = Number(event.detail && event.detail.camId);
+    if (typeof taning !== 'undefined' && typeof taning.skipCurrentRoom === 'function') {
+      try { taning.skipCurrentRoom(camId, GameContext); } catch (e) { console.error('Noka music room-skip failed:', e); }
+    }
+  });
   window.addEventListener('rift:character-jumpscare', (event) => {
     const detail = event.detail || {};
     if (!S.ended) triggerJumpscare(detail.name || '未知角色', '……');
