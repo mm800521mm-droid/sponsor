@@ -920,6 +920,19 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
     setTimeout(() => location.reload(), 6500);
   }
 
+  function triggerElevenSystemCrash() {
+    if (S.ended) return;
+    S.ended = true; S.running = false; releaseAllLights();
+    if (isCamOpen) { isCamOpen = false; cameraPanel.classList.remove('show'); }
+    const crash = document.createElement('div');
+    crash.id = 'eleven-system-crash';
+    crash.innerHTML = '<div class="crash-doc"><div class="crash-icon">:(</div><h1>DOCUMENT CORRUPTED</h1><p>系统遇到无法恢复的错误，文件内容已损坏。</p><p>STOP CODE: RIFT_0x11</p><p>MEMORY DUMP: 11% COMPLETE</p><pre>\n十一_阶段记录.docx\nERR: LOOKBACK_TIMEOUT\nERR: STAGE_INDEX_OVERFLOW\n0x00000011 0x00000540\n\n正在收集错误信息...</pre><small>系统将在数秒后重新启动</small></div>';
+    const style = document.createElement('style');
+    style.textContent = '#eleven-system-crash{position:fixed;inset:0;z-index:2147483647;background:#0756a8;color:#fff;font:16px Consolas,monospace;display:flex;align-items:center;justify-content:center;padding:5vw;animation:riftBlueFlicker .12s steps(2,end) 5}.crash-doc{width:min(760px,92vw);line-height:1.8}.crash-icon{font-size:76px;margin-bottom:24px}.crash-doc h1{font-size:clamp(24px,4vw,42px);font-weight:400;margin-bottom:18px}.crash-doc p{margin:10px 0}.crash-doc pre{white-space:pre-wrap;border-left:3px solid #fff8;padding:12px 18px;margin:22px 0;background:#003c7b88;font-size:13px}.crash-doc small{opacity:.8}@keyframes riftBlueFlicker{0%,100%{filter:none}50%{filter:brightness(1.8) contrast(1.4);transform:translate(2px,-1px)}}';
+    document.head.appendChild(style); document.body.appendChild(crash);
+    setTimeout(() => location.reload(), 5200);
+  }
+
   const GameContext = {
     getNight: () => S.night,
     isGameRunning: () => S.running && !S.ended,
@@ -930,6 +943,7 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
     isWatchingCam: (camId) => isCamOpen && currentCamId === camId,
     playFootstep: playFootstepSound,
     triggerJumpscare: triggerJumpscare,
+    triggerSystemCrash: triggerElevenSystemCrash,
     dom: {
       taningCam5: document.getElementById('taning-cam5'),
       taningCam4: document.getElementById('taning-cam4'),
