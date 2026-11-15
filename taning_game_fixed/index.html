@@ -587,6 +587,17 @@
     }
   };
 
+  window.addEventListener('rift:night-six-others-return', () => {
+    if (typeof taning !== 'undefined') {
+      try { taning.reset(GameContext); } catch (e) { console.error('Night 6 return reset failed:', e); }
+    }
+  });
+  window.addEventListener('rift:night-six-mutation-defended', (event) => {
+    if (event.detail && event.detail.characterId === 'tannin' && typeof taning !== 'undefined') {
+      try { taning.reset(GameContext); } catch (e) { console.error('Tannin mutation reset failed:', e); }
+    }
+  });
+
   window.addEventListener('rift:night-special-time', (event) => {
     if (typeof gildedEleven !== 'undefined') {
       try { gildedEleven.onSpecialTime({ ...event.detail, night: S.night }, GameContext); }
