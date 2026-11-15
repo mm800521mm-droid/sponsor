@@ -1,0 +1,11 @@
+#night-clear-overlay.rift-clock-flip #clear-title{display:inline-block;transform-origin:50% 100%;animation:riftClockFlip .95s cubic-bezier(.2,.8,.25,1) both;text-shadow:0 0 18px #ffffff59;}
+#night-clear-overlay.rift-night-clear #clear-subtitle{animation:riftCompleteReveal .8s ease both;}
+@keyframes riftClockFlip{0%{transform:rotateX(88deg) translateY(18px);opacity:0;filter:blur(5px)}45%{transform:rotateX(-18deg);opacity:1;filter:blur(0)}72%{transform:rotateX(8deg)}100%{transform:rotateX(0);opacity:1}}
+@keyframes riftCompleteReveal{from{opacity:0;letter-spacing:.65em;transform:translateY(12px)}to{opacity:1;letter-spacing:.18em;transform:translateY(0)}}
+#rift-next-night-card{position:fixed;inset:0;z-index:1000000;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;opacity:0;visibility:hidden;pointer-events:none;font-family:"Courier New",monospace;}
+#rift-next-night-card.active{visibility:visible;animation:riftNightCardIn .7s ease forwards;}
+#rift-next-night-card .rift-next-night-kicker{font-size:clamp(12px,1.5vw,20px);letter-spacing:.65em;color:#888;margin-bottom:24px;animation:riftNightCardText 1s .2s both;}
+#rift-next-night-card .rift-next-night-number{font-size:clamp(44px,9vw,120px);font-weight:bold;letter-spacing:.12em;text-shadow:0 0 22px #ffffff24;animation:riftNightCardText 1s .35s both;}
+@keyframes riftNightCardIn{to{opacity:1}}
+@keyframes riftNightCardText{from{opacity:0;transform:translateY(18px);filter:blur(5px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+@media(prefers-reduced-motion:reduce){#night-clear-overlay.rift-clock-flip #clear-title,#night-clear-overlay.rift-night-clear #clear-subtitle,#rift-next-night-card.active,#rift-next-night-card .rift-next-night-kicker,#rift-next-night-card .rift-next-night-number{animation-duration:.01ms!important;animation-delay:0ms!important}}
