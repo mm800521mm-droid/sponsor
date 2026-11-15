@@ -19,7 +19,7 @@
   let night = 0, locked = false, active = null, activeId = '', defended = new Set();
   let frame = { running:false, camOpen:false, camId:1, leftClosed:false, rightClosed:false };
   let crank = 0, transferHeat = 0, transferInside = false, transferTimer = 0;
-  let nokaLastTick = 0, fluxCam = 2, fluxLookSince = 0, fluxTextShown = false, fluxDelay = 0, fluxThreat = 0, fluxAtDoor = false;
+  let nokaLastTick = 0, nokaAI = 0, nokaThreatTimer = 0, fluxCam = 2, fluxLookSince = 0, fluxTextShown = false, fluxDelay = 0, fluxThreat = 0, fluxAtDoor = false;
   const $ = (id) => document.getElementById(id);
 
   function ensureStatus(){
@@ -33,7 +33,7 @@
       const box=document.createElement('div');box.className='rift-n6-device';box.dataset.device='crank';
       box.innerHTML='<div>CAM 13 // MUSIC BOX</div><div id="rift-n6-crank-count">发条：0 / 5</div><div class="rift-n6-meter"><i id="rift-n6-crank-meter"></i></div><button type="button" id="rift-n6-crank-btn">上发条</button>';
       f13.appendChild(box);
-      box.querySelector('button').addEventListener('click',()=>{if(night!==6||!frame.running)return;crank=Math.min(5,crank+1);renderCrank();window.dispatchEvent(new CustomEvent('rift:night-six-crank',{detail:{value:crank,max:5}}));});
+      box.querySelector('button').addEventListener('click',()=>{if(!frame.running||!frame.camOpen||Number(frame.camId)!==13)return;crank=Math.min(5,crank+1);nokaThreatTimer=0;renderCrank();window.dispatchEvent(new CustomEvent('rift:night-six-crank',{detail:{value:crank,max:5,camId:13}}));window.dispatchEvent(new CustomEvent('rift:noka-music',{detail:{value:crank,max:5,camId:13}}));});
     }
     if(f10&&!f10.querySelector('[data-device="flash"]')){
       const box=document.createElement('div');box.className='rift-n6-device';box.dataset.device='flash';
@@ -52,6 +52,7 @@
     if(bar)bar.style.width=(crank/5*100)+'%';
   }
   function renderFlux(){
+    return; // Flux is rendered and controlled by the shared character AI module.
     const feed=$('feed-'+fluxCam);if(!feed)return;
     let el=feed.querySelector('[data-rift-character="flux"]');
     if(!el){el=document.createElement('div');el.className='rift-n6-sprite rift-flux-tv';el.dataset.riftCharacter='flux';el.innerHTML='<div class="figure">▣</div><div class="tag">闪流 // TV DIRECTOR</div>';feed.appendChild(el);}
@@ -176,11 +177,11 @@
       if(transferHeat>=3){hideTransfer();showTransferScare();finishAttack(false,'transfer-stage-three-jumpscare');announce('移交的三阶段已满！');}
     }
     if(night===6 && frame.running && Date.now()-nokaLastTick>12000){crank=Math.max(0,crank-1);nokaLastTick=Date.now();renderCrank();window.dispatchEvent(new CustomEvent('rift:night-six-noka-wind-level',{detail:{value:crank,max:5,calm:crank>0}}));}
-    if(night===6&&!locked&&!fluxAtDoor){
-      if(frame.camOpen&&Number(frame.camId)===fluxCam){if(!fluxLookSince)fluxLookSince=Date.now();if(Date.now()-fluxLookSince>1250)showFluxChoices();}
-      else{fluxLookSince=0;const choice=$('rift-flux-choice');if(choice){choice.remove();fluxTextShown=false;}}
-      if(fluxDelay&&Date.now()>fluxDelay){fluxDelay=0;fluxAtDoor=true;announce('闪流已经来到门口，必须关门');renderFlux();}
+    if(night===6 && frame.running && nokaAI>0){
+      if(crank>0)nokaThreatTimer=0;
+      else {nokaThreatTimer+=Math.min(.1,Math.max(0,Number(frame.dt)||0));if(nokaThreatTimer>=10){nokaThreatTimer=0;window.dispatchEvent(new CustomEvent('rift:character-jumpscare',{detail:{characterId:'noka',name:'诺卡',reason:'music-box-unwound'}}));}}
     }
+    // Flux is handled by character-ai-system.js on every night.
   }
   function onDoor(e){
     const d=e.detail||{};
@@ -190,7 +191,7 @@
     else if(active==='chillo'&&(d.rightClosed||frame.rightClosed))finishAttack(true,'right-door');
     else if(active==='tannin'&&(d.leftClosed||d.rightClosed))finishAttack(true,'door');
   }
-  function onCrank(){ /* Noka is handled by the independent music-box rule. */ }
+  function onCrank(e){const d=e&&e.detail||{};crank=Math.max(0,Math.min(5,Number(d.value)||0));nokaThreatTimer=0;renderCrank();}
   function onFlash(){if(active==='lobe'&&frame.camOpen&&Number(frame.camId)===10)finishAttack(true,'cam10-flash');}
   function onMonitor(e){
     const d=e.detail||{};
@@ -198,7 +199,7 @@
   }
   function resetNight(e){
     night=Number(e.detail&&e.detail.night)||0;locked=false;active=null;activeId='';defended.clear();activeCam=1;routeIndex=0;routeClock=0;attackClock=0;
-    crank=0;transferHeat=0;transferInside=false;fluxCam=2+Math.floor(Math.random()*10);if(fluxCam===10||fluxCam===13)fluxCam=9;fluxLookSince=0;fluxTextShown=false;fluxDelay=0;fluxThreat=0;fluxAtDoor=false;nokaLastTick=Date.now();renderCrank();hideTransfer();
+    crank=5;nokaAI=Math.max(0,Number((((window.NIGHT_SETTINGS||{})[night]||{}).characters||{}).noka)||0);nokaThreatTimer=0;transferHeat=0;transferInside=false;fluxCam=2+Math.floor(Math.random()*10);if(fluxCam===10||fluxCam===13)fluxCam=9;fluxLookSince=0;fluxTextShown=false;fluxDelay=0;fluxThreat=0;fluxAtDoor=false;nokaLastTick=Date.now();renderCrank();hideTransfer();
     renderSprites();ensureDevices();
   }
   window.addEventListener('rift:night-start',resetNight);
