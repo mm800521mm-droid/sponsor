@@ -63,6 +63,11 @@
     return Math.random() * 100 < AI_CHANCES[level];
   };
 
+  // Auxiliary companions follow Tannin; they are not independent hostile AI entries.
+  window.RIFT_CHARACTER_GROUPS = Object.freeze({
+    tannin: Object.freeze({ role: 'leader', companions: Object.freeze(['cosmo', 'yijiao']) })
+  });
+
   window.RIFT_CHARACTER_ROSTER = roster.slice();
   window.RIFT_MAX_AI_LEVEL = MAX_AI;
 })();
