@@ -57,7 +57,7 @@
       if(i===correct)button.classList.add('clear');
       button.addEventListener('click',()=>{
         if(i===correct){
-          a.threat=0;a.phase='delay';a.deadline=Date.now()+22000;a.timer=0;
+          a.threat=0;a.phase='delay';a.deadline=Date.now()+22000;a.timer=0;a.look=0;
           emit('rift:character-status',{characterId:'flux',status:'delayed'});
           const close=$('btnCamClose');if(close)close.click();
         }else{
@@ -197,10 +197,6 @@
     if(state.night===6)return;
     const hours=Math.max(1,Number(e.detail&&e.detail.hours)||1);
     emit('rift:night-six-time-rollback',{hours,characterId:'lobe'});
-  });
-  window.addEventListener('rift:character-jumpscare',e=>{
-    const d=e.detail||{};
-    const a=state.actors[d.characterId];if(a)fail(a,d.reason||'attack-failed');
   });
   window.RIFT_SHARED_CHARACTER_AI=Object.freeze({getState:()=>({night:state.night,actors:Object.fromEntries(Object.entries(state.actors).map(([id,a])=>[id,{phase:a.phase,cam:a.cam,threat:a.threat}]))})});
   window.addEventListener('rift:night-start',()=>{});
