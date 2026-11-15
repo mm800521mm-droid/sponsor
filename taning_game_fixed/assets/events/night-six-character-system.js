@@ -61,13 +61,13 @@
   }
   function renderSprites(){
     Object.entries(defs).forEach(([id,d])=>{
-      const cam=id==='noka'?nokaCam:d.cam;
+      const cam=id==='noka'?nokaCam:(active===id?activeCam:d.cam);
       const feed=$('feed-'+cam);if(!feed)return;
-      if(id==='noka')document.querySelectorAll('[data-rift-character="noka"]').forEach(oldEl=>{if(oldEl.parentElement!==feed)oldEl.style.display='none';});
+      if(id==='noka'||active===id)document.querySelectorAll('[data-rift-character="'+id+'"]').forEach(oldEl=>{if(oldEl.parentElement!==feed)oldEl.style.display='none';});
       let el=feed.querySelector('[data-rift-character="'+id+'"]');
       if(!el){el=document.createElement('div');el.className='rift-n6-sprite';el.dataset.riftCharacter=id;el.innerHTML='<div class="figure"></div><div class="tag"></div>';feed.appendChild(el);}
       const visible=(id==='noka' && (night===6 || nokaAI>0)) || (night===6 && (id==='lobe' || active===id || defended.has(id)));
-      el.style.display=(visible && (id==='noka'||id==='lobe'?true:(active===id?Number(d.cam)===activeCam:defended.has(id))))?'flex':'none';
+      el.style.display=(visible && (id==='noka'||id==='lobe'?true:(active===id?Number(cam)===activeCam:defended.has(id))))?'flex':'none';
       el.classList.toggle('active',active===id);
       el.querySelector('.figure').textContent=d.glyph;
       el.querySelector('.tag').textContent=d.name+' // CAM '+String(cam).padStart(2,'0');
