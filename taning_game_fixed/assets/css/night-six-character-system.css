@@ -38,3 +38,12 @@
 .rift-tannin-companion .glyph{font-size:20px;color:#d9b77d}
 .rift-tannin-companion-transfer .glyph{color:#c98b83}
 .rift-tannin-companion .name{white-space:nowrap}
+
+/* Transfer companion interaction meter and non-lethal signal scare. */
+.rift-tannin-companion-transfer{pointer-events:auto;cursor:default;touch-action:pan-y;}
+.rift-tannin-companion-transfer .transfer-meter{display:block;width:44px;height:4px;background:#211817;overflow:hidden;}
+.rift-tannin-companion-transfer .transfer-meter i{display:block;width:0;height:100%;background:#c45a52;box-shadow:0 0 7px #c45a52;}
+.rift-tannin-companion-transfer .transfer-stage{font-size:9px;color:#d7aaa0;white-space:nowrap;}
+#rift-transfer-companion-scare{position:fixed;inset:0;z-index:2147482000;display:none;align-items:center;justify-content:center;background:rgba(5,3,3,.94);color:#f2ddd0;font:bold clamp(24px,7vw,72px) Courier New,monospace;text-shadow:0 0 18px #b00;letter-spacing:.12em;pointer-events:none;}
+#rift-transfer-companion-scare.show{display:flex;animation:riftTransferPulse .16s steps(2,end) infinite;}
+@keyframes riftTransferPulse{0%,100%{opacity:1}50%{opacity:.72;transform:translateX(2px)}}
