@@ -988,7 +988,7 @@
           lookBackTimer -= dt;
           if (lookBackTimer <= 0 && !backView.classList.contains('warning')) backView.classList.add('warning');
         }
-        if (typeof taning !== 'undefined') {
+        if (typeof taning !== 'undefined' && !(S.night === 6 && S.elapsed >= 330000)) {
           try { taning.update(dt, GameContext); } catch (e) { console.error('Taning AI update failed:', e); }
         }
         if (typeof gildedEleven !== 'undefined') {
