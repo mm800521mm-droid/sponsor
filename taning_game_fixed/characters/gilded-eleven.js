@@ -7,12 +7,23 @@ class GildedElevenAI {
     this.specialAwakened = false;
     this.debugVisible = false;
     this.wasLookingBack = false;
+    this.lookBackDuration = 0;
+    this.lookBackTimerReset = false;
+    this.longLookBackReset = false;
+    this.crashTriggered = false;
+    this.stageDuration = 20;
     this.reset(null);
   }
 
   setAILevel(level) {
     this.aiLevel = Math.max(0, Math.min(20, Math.floor(Number(level) || 0)));
-    // AI 只控制行动判定概率；行动间隔由 timings 独立控制。
+    this.stageDuration = this.getStageDuration();
+    if (this.stage === 0) this.timer = this.stageDuration;
+  }
+
+  getStageDuration() {
+    const level = this.specialAwakened ? 20 : this.aiLevel;
+    return level <= 0 ? 20 : 20 - (level / 20) * 13.5;
   }
 
   canTakeAction() {
@@ -38,7 +49,7 @@ class GildedElevenAI {
       this.state = 'ACTIVE';
       this.phase = 'BEHIND';
       this.stage = 0;
-      this.timer = this.config.timings.stage;
+      this.timer = this.stageDuration;
       this.showNode('behind', ctx);
     } else if (!this.specialAwakened && this.aiLevel <= 0) {
       this.state = 'DORMANT';
@@ -49,6 +60,10 @@ class GildedElevenAI {
   reset(ctx) {
     this.debugVisible = false;
     this.wasLookingBack = false;
+    this.lookBackDuration = 0;
+    this.lookBackTimerReset = false;
+    this.longLookBackReset = false;
+    this.crashTriggered = false;
     this.state = 'DORMANT';
     this.phase = 'BEHIND';
     this.timer = this.config.timings.stage;
@@ -199,6 +214,7 @@ class GildedElevenAI {
   onSpecialTime(event, ctx) {
     if (!event || event.id !== 'eleven-awakens' || Number(event.night) !== 6) return;
     this.specialAwakened = true;
+    this.stageDuration = this.getStageDuration();
     this.debugVisible = false;
     this.state = 'ACTIVE';
     this.phase = 'ROAMING';
@@ -251,13 +267,35 @@ class GildedElevenAI {
 
   retreatOneStage(ctx) {
     this.stage = Math.max(0, this.stage - 1);
-    this.timer = this.config.timings.stage;
+    this.timer = this.stageDuration;
     if (this.specialAwakened) this.updateNightSixStageStatus();
     else this.updateStageStatus('behind');
   }
 
+  handleLookBack(dt, ctx, behind) {
+    this.lookBackDuration += dt;
+    if (this.lookBackDuration >= 3 && !this.lookBackTimerReset) {
+      this.timer = this.stageDuration;
+      this.lookBackTimerReset = true;
+    }
+    if (this.lookBackDuration >= 8 && !this.longLookBackReset) {
+      this.stage = 0;
+      this.timer = this.stageDuration;
+      this.longLookBackReset = true;
+      this.updateStageStatus('behind');
+      this.updateBehindShake(behind);
+    }
+    if (this.lookBackDuration >= 10 && !this.crashTriggered) {
+      this.crashTriggered = true;
+      if (ctx && typeof ctx.triggerSystemCrash === 'function') ctx.triggerSystemCrash();
+      return true;
+    }
+    return false;
+  }
+
   update(dt, ctx) {
     if (!ctx || !ctx.isGameRunning()) return;
+    dt = Math.max(0, Math.min(Number(dt) || 0, 0.1));
     this.ensureVisualNodes(ctx);
     if (this.specialAwakened) {
       this.debugVisible = false;
@@ -268,23 +306,29 @@ class GildedElevenAI {
       const behind = this.getVisualElement('behind', ctx);
       this.updateBehindShake(behind);
       if (ctx.isLookingBack()) {
-        if (!this.wasLookingBack) this.retreatOneStage(ctx);
         this.wasLookingBack = true;
         if (behind) behind.classList.remove('gilded-eleven-moving');
+        if (this.handleLookBack(dt, ctx, behind)) return;
         this.updateStageStatus('behind');
         return;
       }
-      this.wasLookingBack = false;
+      if (this.wasLookingBack) {
+        this.wasLookingBack = false;
+        this.lookBackDuration = 0;
+        this.lookBackTimerReset = false;
+        this.longLookBackReset = false;
+      }
       if (behind) behind.classList.add('gilded-eleven-moving');
-      // 调试显示模式与正式模式使用相同的回头退阶段规则。
-      this.timer -= dt;
-      if (this.timer <= 0) {
-        this.stage += 1;
-        this.timer = this.config.timings.stage;
-        this.updateStageStatus('behind');
-        if (this.stage >= this.config.maxStages) {
-          this.debugVisible = false;
-          this.triggerAttack(ctx, 'behind');
+      if (this.aiLevel > 0) {
+        this.timer -= dt;
+        if (this.timer <= 0) {
+          this.stage += 1;
+          this.timer = this.stageDuration;
+          this.updateStageStatus('behind');
+          if (this.stage >= this.config.maxStages) {
+            this.debugVisible = false;
+            this.triggerAttack(ctx, 'behind');
+          }
         }
       }
       return;
@@ -293,8 +337,6 @@ class GildedElevenAI {
       if (!this.specialAwakened) this.hideAll(ctx);
       return;
     }
-    dt = Math.max(0, Math.min(Number(dt) || 0, 0.1));
-
     if (this.phase === 'BEHIND') {
       this.showNode('behind', ctx);
       const behind = this.getVisualElement('behind', ctx);
@@ -302,25 +344,24 @@ class GildedElevenAI {
       if (behind) behind.classList.add('gilded-eleven-moving');
       // 回头看见十一时，阶段提示保持可见，并且每次回头只击退一个阶段。
       if (ctx.isLookingBack()) {
-        if (!this.wasLookingBack) this.retreatOneStage(ctx);
         this.wasLookingBack = true;
         if (behind) behind.classList.remove('gilded-eleven-moving');
+        if (this.handleLookBack(dt, ctx, behind)) return;
         this.updateStageStatus('behind');
         return;
       }
-      this.wasLookingBack = false;
+      if (this.wasLookingBack) {
+        this.wasLookingBack = false;
+        this.lookBackDuration = 0;
+        this.lookBackTimerReset = false;
+        this.longLookBackReset = false;
+      }
       this.timer -= dt;
       if (this.timer <= 0) {
-        if (!this.canTakeAction()) {
-          this.timer = this.config.timings.stage;
-          return;
-        }
         this.stage += 1;
         this.updateStageStatus('behind');
-        this.timer = this.config.timings.stage;
-        if (this.stage >= this.config.maxStages) {
-          this.triggerAttack(ctx, 'behind');
-        }
+        this.timer = this.stageDuration;
+        if (this.stage >= this.config.maxStages) this.triggerAttack(ctx, 'behind');
       }
       return;
     }
