@@ -11,7 +11,7 @@
     'chillo', 'cosmo', 'transfer'
   ];
 
-  function makeNight(characters, specialTimes = []) {
+  function makeNight(characters, specialTimes = [], alwaysPresent = []) {
     const missing = roster.filter(id => !Object.prototype.hasOwnProperty.call(characters, id));
     if (missing.length) throw new Error('Night settings missing character IDs: ' + missing.join(', '));
 
@@ -23,7 +23,8 @@
     }
     return {
       characters: Object.fromEntries(roster.map(id => [id, Number(characters[id])])),
-      specialTimes
+      specialTimes,
+      alwaysPresent: alwaysPresent.slice()
     };
   }
 
@@ -51,7 +52,7 @@
     6: makeNight({
       gildedEleven: 0, flux: 10, noka: 0, tannin: 12, lobe: 0, gu: 10,
       chillo: 9, cosmo: 10, transfer: 13
-    }, window.RIFT_NIGHT6_SPECIAL_TIMES || [])
+    }, window.RIFT_NIGHT6_SPECIAL_TIMES || [], ['noka'])
   };
 
   // 自定义行动概率曲线：AI 1-11 每级 +5%；AI 12 起进入高概率区。
