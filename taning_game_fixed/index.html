@@ -600,7 +600,7 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
 </div>
 
 <div id="night-clear-overlay">
-  <h1 id="clear-title">6 AM</h1>
+  <h1 id="clear-title">8 AM</h1>
   <h2 id="clear-subtitle">NIGHT 1 COMPLETE</h2>
   <button id="btnReturnMenu">RETURN TO MENU</button>
 </div>
@@ -623,16 +623,16 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
   </div>
 </div>
 
-<link rel="stylesheet" href="./night-six-events.css?v=1">
-<script src="./night-six-special-times.js?v=1"></script>
-<script src="./night-settings.js?v=2"></script>
-<script src="./night-six-events.js?v=1"></script>
-<script src="./data.js?v=4" onerror="console.error('data.js 加载失败：请确认 data.js 与 index.html 在同一目录')"></script>
-<script src="characters/taning.js"></script>
-<script src="characters/taning_fight_load.js"></script>
-<script src="characters/tannin_pixel.js"></script>
-<script src="characters/gilded-eleven.js"></script>
-<script src="characters/gilded-eleven-fight-load.js"></script>
+<link rel="stylesheet" href="./assets/css/night-six-events.css?v=1">\n<link rel="stylesheet" href="./assets/css/night-transition.css?v=1">
+<script src="./assets/config/night-six-special-times.js?v=1"></script>
+<script src="./assets/config/night-settings.js?v=2"></script>
+<script src="./assets/events/night-six-events.js?v=1"></script>\n<script src="./assets/events/night-transition.js?v=1"></script>
+<script src="./assets/data/data.js?v=4" onerror="console.error('data.js 加载失败：请确认 data.js 与 index.html 在同一目录')"></script>
+<script src="assets/characters/taning.js"></script>
+<script src="assets/characters/taning_fight_load.js"></script>
+<script src="assets/characters/tannin_pixel.js"></script>
+<script src="assets/characters/gilded-eleven.js"></script>
+<script src="assets/characters/gilded-eleven-fight-load.js"></script>
 
 <script>
 (function () {
@@ -686,7 +686,7 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
   let currentView = 0, targetView = 0;
   let isCamOpen = false;
   let elevenCameraBlackout = false;
-  let highestNight = 1;
+  let highestNight = (window.RIFT_NIGHT_TRANSITIONS && window.RIFT_NIGHT_TRANSITIONS.getHighestNight()) || 1;
 
   function setElevenCameraBlackout(enabled) {
     elevenCameraBlackout = !!enabled;
@@ -1328,9 +1328,16 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
           S.running = false;
           releaseAllLights();
           playWinSound();
-          if (S.night >= highestNight) highestNight = S.night + 1;
-          clearSubtitle.innerText = `NIGHT ${S.night} COMPLETE`;
-          clearOverlay.classList.add('show');
+          highestNight = Math.max(highestNight, S.night + 1);
+          if (window.RIFT_NIGHT_TRANSITIONS) {
+            window.RIFT_NIGHT_TRANSITIONS.completeNight({
+              night: S.night,
+              startNight: startNight
+            });
+          } else {
+            clearSubtitle.innerText = `NIGHT ${S.night} COMPLETE`;
+            clearOverlay.classList.add('show');
+          }
         }
       }
 
@@ -1456,6 +1463,7 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
   }
 
   btnReturnMenu.onclick = function() { location.reload(); };
+  window.addEventListener('rift:return-to-menu', () => location.reload());
 
   if (highestNight > 1) {
     menuCont.classList.remove('disabled');
