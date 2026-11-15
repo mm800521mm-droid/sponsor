@@ -111,13 +111,16 @@
     window.dispatchEvent(new CustomEvent(success?'rift:night-six-mutation-defended':'rift:night-six-mutation-resolved',{
       detail:{night:6,characterId:id,success:!!success,reason:reason||'',returnToStart:!!success,stopForNight:!!success}
     }));
-    active=null;activeId='';
+    active=null;activeId='';routeClock=0;attackClock=0;routeIndex=0;
     renderSprites();
     if(success)announce(defs[id].name+' 已被防御，返回初始位置并停止行动');
   }
   function beginAttack(detail){
     if(night!==6||locked||!detail||!mutationOrder.includes(detail.characterId)||defended.has(detail.characterId))return;
+    // 每个突变事件都必须从独立的路线和计时状态开始，不能继承上一名角色的进度。
+    routeIndex=0;routeClock=0;attackClock=0;
     active=detail.characterId;activeId=detail.mutationId||'';
+    activeCam=(routes[active]&&routes[active][0])||defs[active].cam;
     renderSprites();
     const tips={
       noka:'诺卡突变：立即查看13号监控并持续上发条。十一事件期间可额外尝试关闭右门。',
