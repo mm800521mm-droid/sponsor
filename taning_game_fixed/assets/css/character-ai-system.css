@@ -26,3 +26,8 @@
 .rift-n6-device button{margin-top:4px;padding:4px 6px;font-size:9px;}
 .rift-n6-meter{height:3px;margin-top:4px;}
 @media(max-width:700px){.rift-n6-device{right:2%;top:2%;width:88px;min-width:0;padding:4px;font-size:8px}.rift-n6-device button{padding:4px;font-size:8px}}
+
+/* CCTV character layers must render above the static/noise overlay. */
+.cam-scene .rift-shared-character,.cam-scene .rift-n6-sprite,.cam-scene .rift-tannin-companion{z-index:130!important;visibility:visible!important;}
+.cam-scene .rift-shared-character{display:flex;}
+.cam-scene .rift-n6-sprite{display:flex;}
