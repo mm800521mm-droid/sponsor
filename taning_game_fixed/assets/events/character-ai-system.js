@@ -119,6 +119,10 @@
         continue;
       }
       if(a.id==='flux'){
+        if(a.phase==='moving'){
+          a.timer-=dt;
+          if(a.timer<=0){a.phase='approach';a.deadline=Date.now()+16000;}
+        }
         if(a.phase==='moving' && state.camOpen && state.camId===a.cam){
           a.look+=dt;
           if(a.look>=1.25)showFluxChoice(a);
@@ -155,7 +159,10 @@
   function onMonitor(e){
     const d=e.detail||{};state.camOpen=!!d.open;state.camId=Number(d.camId)||state.camId;
     const flux=state.actors.flux;
-    if(flux && flux.choiceEl && !state.camOpen)clearChoice(flux);
+    if(flux && !state.camOpen && flux.phase==='moving' && flux.look>0){
+      if(flux.choiceEl){clearChoice(flux);flux.threat++;flux.phase=flux.threat>=2?'door':'approach';flux.deadline=Date.now()+(flux.phase==='door'?9000:12000);}
+      else{flux.look=0;flux.phase='delay';flux.deadline=Date.now()+20000;}
+    }
   }
   function onFlash(e){
     const d=e.detail||{};
