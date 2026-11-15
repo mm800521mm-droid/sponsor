@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090807">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="裂隙余烬">
+<link rel="manifest" href="./manifest.webmanifest">
+<title>Five Nights at Rift Ash｜裂隙余烬</title>
+<style>
+:root{color-scheme:dark;background:#050505;font-family:system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050505}
+body{height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+#game{display:block;width:100%;height:100%;height:100dvh;border:0;background:#050505}
+#install{position:fixed;z-index:20;right:12px;top:calc(env(safe-area-inset-top) + 12px);border:1px solid #98734c;border-radius:4px;background:#17110d;color:#f1dfc2;padding:9px 12px;font:12px Georgia,serif;letter-spacing:.08em;box-shadow:0 2px 12px #0008}
+#hint{position:fixed;z-index:10;left:50%;bottom:calc(env(safe-area-inset-bottom) + 10px);transform:translateX(-50%);padding:7px 11px;background:#090807d9;border:1px solid #5e4933;color:#c9b89c;font:11px 'Courier New',monospace;pointer-events:none;white-space:nowrap;opacity:1;transition:opacity 1s}
+#hint.hide{opacity:0}
+</style>
+</head>
+<body>
+<iframe id="game" src="../index.html" title="裂隙余烬游戏" allow="fullscreen; autoplay"></iframe>
+<button id="install" hidden>安装到主屏幕</button>
+<div id="hint">RIFT ASH // MOBILE ENTRY</div>
+<script>
+let installPrompt=null;
+const installButton=document.getElementById('install');
+window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;installButton.hidden=false;});
+installButton.addEventListener('click',async()=>{if(!installPrompt)return;installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;installButton.hidden=true;});
+setTimeout(()=>document.getElementById('hint').classList.add('hide'),2600);
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(error=>console.warn('PWA worker registration failed',error)));}
+</script>
+</body>
+</html>
