@@ -161,8 +161,21 @@
     const detail = event.detail || {};
     if (activeNight !== 6 || Number(detail.night) !== 6) return;
 
-    if (detail.id === 'all-return' || detail.id === 'eleven-awakens') {
+    if (detail.id === 'all-return') {
       lockOtherCharacters(detail.id);
+      return;
+    }
+    if (detail.id === 'eleven-awakens') {
+      locked = false;
+      window.RIFT_NIGHT6_MUTATION_STATE = {
+        night: 6,
+        locked: false,
+        triggered: Array.from(triggered),
+        elevenAwakened: true
+      };
+      window.dispatchEvent(new CustomEvent('rift:night-six-eleven-awakened', {
+        detail: { night: 6, mutationsBeginAfterSeconds: 30 }
+      }));
       return;
     }
 
