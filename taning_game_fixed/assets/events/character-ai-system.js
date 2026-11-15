@@ -104,9 +104,10 @@
     const d=event.detail||{};
     state.running=!!d.running;state.camOpen=!!d.camOpen;state.camId=Number(d.camId)||1;
     state.leftClosed=!!d.leftClosed;state.rightClosed=!!d.rightClosed;
-    if(state.night===6||!state.running)return;
+    if(!state.running)return;
     const dt=Math.min(.1,Math.max(0,Number(d.dt)||0));
     for(const a of Object.values(state.actors)){
+      if(state.night===6 && a.id!=='flux')continue;
       if(aiFor(a.id)<=0)continue;
       if(a.phase==='idle'){
         a.timer-=dt;
@@ -193,6 +194,7 @@
   window.addEventListener('rift:night-six-flash',onFlash);
   window.addEventListener('rift:night-six-door-change',onDoorChange);
   window.addEventListener('rift:night-six-crank',onCrank);
+  window.addEventListener('rift:noka-music',onCrank);
   window.addEventListener('rift:character-time-rollback',e=>{
     if(state.night===6)return;
     const hours=Math.max(1,Number(e.detail&&e.detail.hours)||1);
