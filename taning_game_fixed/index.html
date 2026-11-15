@@ -718,40 +718,23 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
 
   function showElevenArrivalSequence() {
     const token = ++elevenArrivalSequenceToken;
-    let overlay = document.getElementById('eleven-arrival-sequence');
-    if (!overlay) {
-      overlay = document.createElement('div');
-      overlay.id = 'eleven-arrival-sequence';
-      overlay.innerHTML = '<div class="eleven-arrival-alert"><div class="eleven-arrival-kicker">RIFT ASH // EMERGENCY BROADCAST</div><div class="eleven-arrival-warning">⚠ SYSTEM ALERT ⚠</div><div class="eleven-arrival-main">SURVEILLANCE NETWORK COMPROMISED</div><div class="eleven-arrival-sub">ALL SECURITY CAMERAS OFFLINE</div><div class="eleven-arrival-scan"></div></div>';
-      document.body.appendChild(overlay);
-    }
     const deskScreen = document.querySelector('#btnCam .screen');
-    if (deskScreen) {
-      deskScreen.classList.remove('eleven-message', 'eleven-face');
-      deskScreen.innerHTML = '';
-    }
-    overlay.classList.remove('show-story', 'fade-out');
-    overlay.classList.add('active');
-    playElevenArrivalAlarm();
+    if (!deskScreen) return;
+    deskScreen.classList.remove('eleven-message', 'eleven-face');
+    deskScreen.innerHTML = '';
 
-    // Keep the opening warning. Reveal the personal message and face on the desk monitor.
+    // Keep Eleven's message and face on the desk monitor; do not show a full-screen alert.
     window.setTimeout(() => {
       if (token !== elevenArrivalSequenceToken) return;
-      overlay.classList.add('fade-out');
-      if (deskScreen) {
-        deskScreen.classList.add('eleven-message');
-        deskScreen.innerHTML = '<div class="eleven-monitor-text">我想和你玩玩</div>';
-      }
+      deskScreen.classList.add('eleven-message');
+      deskScreen.innerHTML = '<div class="eleven-monitor-text">我想和你玩玩</div>';
     }, 2800);
     window.setTimeout(() => {
-      if (token !== elevenArrivalSequenceToken || !deskScreen) return;
+      if (token !== elevenArrivalSequenceToken) return;
       deskScreen.classList.remove('eleven-message');
       deskScreen.classList.add('eleven-face');
       deskScreen.innerHTML = '<div class="eleven-monitor-face"><div class="eleven-monitor-ears"></div><div class="eleven-monitor-head"><i class="eye left"></i><i class="eye right"></i><div class="muzzle"></div></div></div>';
     }, 5200);
-    window.setTimeout(() => {
-      if (token === elevenArrivalSequenceToken) overlay.classList.remove('active', 'show-story', 'fade-out');
-    }, 3500);
   }
 
   if (!document.getElementById('eleven-arrival-sequence-style')) {
