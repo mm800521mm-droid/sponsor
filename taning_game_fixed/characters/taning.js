@@ -201,8 +201,12 @@ class TaningAI {
         } else {
           this.timer -= dt;
           if (this.timer <= 0) {
-            this.state = 'ATTACKED';
-            ctx.triggerJumpscare(this.name, this.quote);
+            // 门口冲刺在这里是十一制造的假象：即使玩家没有防御，也不会造成伤害。
+            // 保留冲刺动画和音效，结束后让角色退回巡游流程。
+            this.hideAll(ctx);
+            this.state = 'COOLDOWN';
+            this.timer = this.config.timings.cooldown;
+            ctx.playFootstep('distant');
           }
         }
         break;
