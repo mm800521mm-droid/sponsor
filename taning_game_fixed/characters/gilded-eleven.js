@@ -136,7 +136,7 @@ class GildedElevenAI {
       if (el) {
         el.style.display = 'none';
         el.style.opacity = '0';
-        el.classList.remove('show', 'gilded-eleven-moving');
+        el.classList.remove('show', 'gilded-eleven-moving', 'gilded-eleven-shaking');
       }
     }
   }
@@ -151,7 +151,7 @@ class GildedElevenAI {
       if (other) {
         other.style.display = 'none';
         other.style.opacity = '0';
-        other.classList.remove('show', 'gilded-eleven-moving');
+        other.classList.remove('show', 'gilded-eleven-moving', 'gilded-eleven-shaking');
       }
     }
     el.style.display = 'block';
@@ -307,7 +307,10 @@ class GildedElevenAI {
       this.updateBehindShake(behind);
       if (ctx.isLookingBack()) {
         this.wasLookingBack = true;
-        if (behind) behind.classList.remove('gilded-eleven-moving');
+        if (behind) {
+          behind.classList.remove('gilded-eleven-moving');
+          behind.classList.add('gilded-eleven-shaking');
+        }
         if (this.handleLookBack(dt, ctx, behind)) return;
         this.updateStageStatus('behind');
         return;
@@ -318,7 +321,7 @@ class GildedElevenAI {
         this.lookBackTimerReset = false;
         this.longLookBackReset = false;
       }
-      if (behind) behind.classList.add('gilded-eleven-moving');
+      if (behind) { behind.classList.add('gilded-eleven-moving', 'gilded-eleven-shaking'); }
       if (this.aiLevel > 0) {
         this.timer -= dt;
         if (this.timer <= 0) {
@@ -341,11 +344,14 @@ class GildedElevenAI {
       this.showNode('behind', ctx);
       const behind = this.getVisualElement('behind', ctx);
       this.updateBehindShake(behind);
-      if (behind) behind.classList.add('gilded-eleven-moving');
+      if (behind) behind.classList.add('gilded-eleven-moving', 'gilded-eleven-shaking');
       // 回头看见十一时，阶段提示保持可见，并且每次回头只击退一个阶段。
       if (ctx.isLookingBack()) {
         this.wasLookingBack = true;
-        if (behind) behind.classList.remove('gilded-eleven-moving');
+        if (behind) {
+          behind.classList.remove('gilded-eleven-moving');
+          behind.classList.add('gilded-eleven-shaking');
+        }
         if (this.handleLookBack(dt, ctx, behind)) return;
         this.updateStageStatus('behind');
         return;
