@@ -13,8 +13,8 @@
     chillo: { name: '寒零', cam: 6, glyph: '❄', kind: 'cold' },
     transfer: { name: '移交', cam: 1, glyph: '⌁', kind: 'transfer' }
   };
-  const mutationOrder = ['tannin','lobe','gu','chillo','transfer'];
-  const routes = { tannin:[5,4,1], lobe:[10,9,1], gu:[4,5,1], chillo:[6,3,1], transfer:[1] };
+  const mutationOrder = ['tannin','lobe','gu','chillo'];
+  const routes = { tannin:[5,4,1], lobe:[10,9,1], gu:[4,5,1], chillo:[6,3,1] };
   let activeCam = 1, routeIndex = 0, routeClock = 0, attackClock = 0;
   let night = 0, locked = false, active = null, activeId = '', defended = new Set();
   let frame = { running:false, camOpen:false, camId:1, leftClosed:false, rightClosed:false };
