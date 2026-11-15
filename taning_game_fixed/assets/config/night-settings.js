@@ -65,7 +65,7 @@
 
   // Auxiliary companions follow Tannin; they are not independent hostile AI entries.
   window.RIFT_CHARACTER_GROUPS = Object.freeze({
-    tannin: Object.freeze({ role: 'leader', companions: Object.freeze(['cosmo']), unregisteredCompanionNames: Object.freeze(['一脚']) })
+    tannin: Object.freeze({ role: 'leader', companions: Object.freeze(['cosmo', 'transfer']), aliases: Object.freeze({ transfer: Object.freeze(['移交', '一脚']) }) })
   });
 
   window.RIFT_CHARACTER_ROSTER = roster.slice();
