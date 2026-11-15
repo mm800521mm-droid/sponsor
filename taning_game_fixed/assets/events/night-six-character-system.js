@@ -26,6 +26,8 @@
     .rift-n6-sprite{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;z-index:8;pointer-events:none;background:radial-gradient(ellipse at 50% 70%,rgba(0,0,0,.2),transparent 65%)}
     .rift-n6-sprite .figure{width:clamp(48px,10vw,116px);height:clamp(74px,22vh,190px);display:flex;align-items:center;justify-content:center;position:relative;color:#cbbda2;font: bold clamp(34px,7vw,76px) Georgia,serif;text-shadow:0 0 8px #d5c6a0,0 0 24px #8b1c1c;filter:drop-shadow(0 8px 9px #000);animation:riftN6Sway 2.8s ease-in-out infinite}
     .rift-n6-sprite .figure:before{content:"";position:absolute;inset:12% 16% 0;border:2px solid rgba(190,170,140,.5);border-radius:48% 48% 18% 18%;background:linear-gradient(145deg,rgba(70,58,48,.9),rgba(8,8,8,.98));z-index:-1;box-shadow:inset 0 0 20px #000,0 0 14px #000}
+    .rift-flux-tv .figure:before{inset:8% 3% 38%;border-radius:7px;background:linear-gradient(145deg,#34302b,#080808);border:3px solid #a79b87;box-shadow:inset 0 0 0 3px #151515,inset 0 0 18px #8b1c1c,0 0 10px #000}
+    .rift-flux-tv .figure:after{content:'';position:absolute;top:0;left:32%;width:36%;height:13%;border-top:2px solid #b7a88e;border-left:2px solid #b7a88e;transform:skew(-25deg);}
     .rift-n6-sprite .tag{font:10px/1.2 'Courier New',monospace;letter-spacing:2px;color:#e7d6b7;background:#090807d9;border:1px solid #806d52;padding:3px 7px}
     .rift-n6-sprite.active .figure{color:#d8b8a2;text-shadow:0 0 8px #f44,0 0 25px #b00;animation:riftN6Glitch .18s steps(2) infinite}
     @keyframes riftN6Sway{50%{transform:translateY(-4px) rotate(1deg)}}
@@ -77,7 +79,7 @@
   function renderFlux(){
     const feed=$('feed-'+fluxCam);if(!feed)return;
     let el=feed.querySelector('[data-rift-character="flux"]');
-    if(!el){el=document.createElement('div');el.className='rift-n6-sprite';el.dataset.riftCharacter='flux';el.innerHTML='<div class="figure">▣</div><div class="tag">闪流 // TV DIRECTOR</div>';feed.appendChild(el);}
+    if(!el){el=document.createElement('div');el.className='rift-n6-sprite rift-flux-tv';el.dataset.riftCharacter='flux';el.innerHTML='<div class="figure">▣</div><div class="tag">闪流 // TV DIRECTOR</div>';feed.appendChild(el);}
     el.style.display=night===6&&!locked&&!fluxAtDoor?'flex':'none';
   }
   function renderSprites(){
