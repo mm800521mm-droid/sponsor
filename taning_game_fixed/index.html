@@ -354,6 +354,33 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
 }
 /* Keep the existing right-door layout unchanged in this pass. */
 
+<style id="rift-eleven-visible-style">
+.gilded-eleven-node{isolation:isolate;animation:eleven-enter .35s steps(3,end) both;}
+.gilded-eleven-node .eleven-head{position:absolute;left:20%;top:13%;width:60%;height:30%;border:5px solid #59482b;border-radius:42% 42% 34% 34%;background:linear-gradient(110deg,#211b12 0%,#9a783d 28%,#4d3b20 54%,#17130e 100%);box-shadow:inset 0 0 0 4px #21190e,0 0 14px #000;}
+.gilded-eleven-node .eleven-ears{position:absolute;left:15%;top:0;width:70%;height:29%;background:linear-gradient(90deg,#342716,#a08043 45%,#21180e);clip-path:polygon(0 0,27% 5%,37% 75%,63% 75%,73% 5%,100% 0,86% 100%,14% 100%);filter:drop-shadow(0 3px 3px #000);}
+.gilded-eleven-node .eleven-eye{position:absolute;top:39%;width:17%;height:8%;background:#ffdc72;box-shadow:0 0 10px 4px #e5a52b,0 0 22px #f00;}
+.gilded-eleven-node .eleven-eye.left{left:20%;}.gilded-eleven-node .eleven-eye.right{right:20%;}
+.gilded-eleven-node .eleven-muzzle{position:absolute;left:31%;bottom:9%;width:38%;height:26%;border-radius:45%;background:linear-gradient(#b39a68,#43331d);border:3px solid #21180e;}
+.gilded-eleven-node .eleven-muzzle:after{content:'';position:absolute;left:42%;top:30%;width:16%;height:16%;background:#130e09;border-radius:50%;}
+.gilded-eleven-node .eleven-neck{position:absolute;left:42%;top:41%;width:16%;height:9%;background:#554126;border-left:3px solid #a1844c;border-right:3px solid #1a140d;}
+.gilded-eleven-node .eleven-body{position:absolute;left:24%;top:47%;width:52%;height:39%;border:5px solid #3c2c18;border-radius:22% 22% 8% 8%;background:repeating-linear-gradient(90deg,#17130e 0 12%,#806238 13% 24%,#302315 25% 36%);box-shadow:inset 0 0 18px #000;}
+.gilded-eleven-node .eleven-button{position:absolute;left:46%;width:8%;height:5%;border-radius:50%;background:#c7a15c;box-shadow:0 0 5px #000;}
+.gilded-eleven-node .eleven-button.b1{top:20%;}.gilded-eleven-node .eleven-button.b2{top:40%;}.gilded-eleven-node .eleven-button.b3{top:60%;}
+.gilded-eleven-node .eleven-arm{position:absolute;top:51%;width:17%;height:34%;background:linear-gradient(90deg,#17120d,#8b6b39,#21190f);border:3px solid #3b2b18;border-radius:18%;}
+.gilded-eleven-node .eleven-arm.left{left:8%;transform:rotate(8deg);}.gilded-eleven-node .eleven-arm.right{right:8%;transform:rotate(-8deg);}
+.gilded-eleven-node .eleven-leg{position:absolute;top:82%;width:19%;height:18%;background:linear-gradient(90deg,#17120d,#806039,#21190f);border:3px solid #3b2b18;}
+.gilded-eleven-node .eleven-leg.left{left:29%;}.gilded-eleven-node .eleven-leg.right{right:29%;}
+@keyframes eleven-enter{from{opacity:0;transform:translate(-50%,-47%) scale(.94)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@media(max-width:700px){#rift-eleven-stage-status{top:58px!important;left:8px!important;width:min(260px,68vw)!important;font-size:11px!important}.gilded-eleven-node{width:min(42vw,230px)!important;height:min(44vh,330px)!important}}
+<style id="rift-eleven-camera-blackout-style">
+#camera-panel.eleven-blackout #cam-feed-container{background:#000!important;filter:none!important;}
+#camera-panel.eleven-blackout #cam-static{display:block!important;opacity:1!important;visibility:visible!important;background:repeating-linear-gradient(0deg,#080808 0 2px,#222 2px 3px,#050505 3px 6px)!important;z-index:90!important;}
+#camera-panel.eleven-blackout #cam-static:after{content:'SIGNAL LOST  /  NO VIDEO';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#b9b9b9;font: bold clamp(18px,3vw,38px) Courier New,monospace;letter-spacing:.2em;text-shadow:0 0 8px #f00;animation:riftSignalFlicker .18s steps(2,end) infinite;}
+#camera-panel.eleven-blackout .cam-btn{opacity:.25!important;pointer-events:none!important;filter:grayscale(1);}
+#camera-panel.eleven-blackout #cam-title{color:#f44!important;}
+@keyframes riftSignalFlicker{0%,100%{opacity:.8}50%{opacity:.25}}
+</style>
+</style>
 </style>
 </head>
 <body>
@@ -640,7 +667,35 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
 
   let currentView = 0, targetView = 0;
   let isCamOpen = false;
+  let elevenCameraBlackout = false;
   let highestNight = 1;
+
+  function setElevenCameraBlackout(enabled) {
+    elevenCameraBlackout = !!enabled;
+    if (elevenCameraBlackout) {
+      if (isCamOpen) {
+        isCamOpen = false;
+        cameraPanel.classList.remove('show');
+        playMonitorSound(false);
+      }
+      cameraPanel.classList.add('eleven-blackout');
+      camTitle.innerText = 'SIGNAL LOST // ALL CAMERAS OFFLINE';
+      camBtns.forEach(btn => btn.classList.remove('on'));
+      camScenes.forEach(feed => feed.classList.remove('active'));
+      const staticFeed = document.getElementById('cam-static');
+      if (staticFeed) staticFeed.style.display = 'block';
+    } else {
+      cameraPanel.classList.remove('eleven-blackout');
+      const staticFeed = document.getElementById('cam-static');
+      if (staticFeed) staticFeed.style.display = '';
+    }
+  }
+
+  window.addEventListener('rift:night-special-time', (event) => {
+    const detail = event.detail || {};
+    if (Number(detail.night) !== 6) return;
+    if (detail.id === 'eleven-awakens') setElevenCameraBlackout(true);
+  });
   let currentTapePlayId = 0;
   let currentCamId = 1;
 
@@ -1036,6 +1091,7 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
   const camNames = ["SECURITY ROOM", "MAIN STAGE", "CORRIDOR A", "CORRIDOR B", "STORAGE ROOM", "STAFF LOUNGE", "LOADING YARD", "REPAIR WORKSHOP", "ARCHIVE ROOM", "GEAR PASSAGE", "MANAGER OFFICE", "PROP CUBICLE", "ISOLATION BAY", "FINAL ROOM [LOCKED]"];
 
   function switchCam(camId) {
+    if (elevenCameraBlackout) return;
     const id = String(camId);
     const numericId = Number.parseInt(id, 10);
     if (!Number.isFinite(numericId)) return;
@@ -1053,7 +1109,7 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
 
   camBtns.forEach(btn => {
     btn.onclick = function() {
-      if (!S.running) return;
+      if (!S.running || elevenCameraBlackout) return;
       let camId = this.dataset.cam;
       if (camId == 14) {
         switchCam(14);
@@ -1065,7 +1121,7 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
   });
 
   function toggleMonitor() {
-    if (!S.running) return;
+    if (!S.running || elevenCameraBlackout) return;
     if (isLookingBack) return; 
     isCamOpen = !isCamOpen;
     playMonitorSound(isCamOpen);
@@ -1133,6 +1189,7 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
     S.elapsed = (totalMinutes / 60) * HOUR_MS;
     S.hour = Math.min(8, Math.floor(totalMinutes / 60));
     processedNightEvents = new Set();
+    setElevenCameraBlackout(false);
     if (typeof gildedEleven !== 'undefined') gildedEleven.startNight(S.night, activeNightSettings, GameContext);
     dispatchNightSpecialTimes();
     updateUI();
@@ -1285,6 +1342,7 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
     backView.classList.remove('show', 'warning');
     jumpscareOverlay.classList.remove('show');
     isLookingBack = false;
+    setElevenCameraBlackout(false);
     releaseAllLights();
     
     S.night = nightNum;
