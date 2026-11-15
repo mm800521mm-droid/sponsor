@@ -783,7 +783,8 @@
   const camNames = ["SECURITY ROOM", "MAIN STAGE", "CORRIDOR A", "CORRIDOR B", "STORAGE ROOM", "STAFF LOUNGE", "LOADING YARD", "REPAIR WORKSHOP", "ARCHIVE ROOM", "GEAR PASSAGE", "MANAGER OFFICE", "PROP CUBICLE", "ISOLATION BAY", "FINAL ROOM [LOCKED]"];
 
   function switchCam(camId) {
-    if (elevenCameraBlackout) return;
+    const allowNightSixCrank = S.night === 6 && Number(camId) === 13;
+    if (elevenCameraBlackout && !allowNightSixCrank) return;
     const id = String(camId);
     const numericId = Number.parseInt(id, 10);
     if (!Number.isFinite(numericId)) return;
@@ -813,7 +814,8 @@
   });
 
   function toggleMonitor() {
-    if (!S.running || elevenCameraBlackout) return;
+    const allowNightSixCrank = S.night === 6 && currentCamId === 13;
+    if (!S.running || (elevenCameraBlackout && !allowNightSixCrank)) return;
     if (isLookingBack) return; 
     isCamOpen = !isCamOpen;
     window.dispatchEvent(new CustomEvent('rift:monitor-toggle',{detail:{open:isCamOpen,camId:currentCamId}}));
