@@ -245,16 +245,6 @@ window.NIGHT_DATA = {
     ],
     nightSixMutations: [
       {
-        id: "noka-tone-break", characterId: "noka", name: "诺卡", title: "走音", glitch: false,
-        lines: [
-          "维修工坊的调音设备自行启动。",
-          "一段熟悉的旋律里，突然混进了一个不属于原曲的音符。",
-          "诺卡猛地转头。它像是听见了什么只有它能听见的声音。",
-          "下一秒，它沿着声音冲向保安室——撞击只发生了一次。",
-          "旋律恢复了。走廊里只剩下设备的底噪。"
-        ]
-      },
-      {
         id: "tannin-red-rush", characterId: "tannin", name: "塔宁", title: "红眼探路", glitch: true,
         lines: [
           "后台深处闪过一双红色的眼睛。",
