@@ -371,12 +371,12 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
 .gilded-eleven-node .eleven-leg{position:absolute;top:82%;width:19%;height:18%;background:linear-gradient(90deg,#17120d,#806039,#21190f);border:3px solid #3b2b18;}
 .gilded-eleven-node .eleven-leg.left{left:29%;}.gilded-eleven-node .eleven-leg.right{right:29%;}
 @keyframes eleven-enter{from{opacity:0;transform:translate(-50%,-47%) scale(.94)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-.gilded-eleven-node.gilded-eleven-moving{animation:eleven-enter .35s steps(3,end) both,eleven-behind-motion 1.1s ease-in-out infinite alternate;transform-origin:50% 90%;}
+.gilded-eleven-node.gilded-eleven-moving{animation:eleven-enter .35s steps(3,end) both,eleven-behind-motion var(--eleven-shake-duration,1.1s) steps(2,end) infinite;transform-origin:50% 90%;}
 .gilded-eleven-node.gilded-eleven-moving .eleven-arm.left{animation:eleven-arm-left .55s ease-in-out infinite alternate;transform-origin:90% 10%;}
 .gilded-eleven-node.gilded-eleven-moving .eleven-arm.right{animation:eleven-arm-right .55s ease-in-out infinite alternate;transform-origin:10% 10%;}
 .gilded-eleven-node.gilded-eleven-moving .eleven-leg.left{animation:eleven-leg-left .75s ease-in-out infinite alternate;transform-origin:50% 0;}
 .gilded-eleven-node.gilded-eleven-moving .eleven-leg.right{animation:eleven-leg-right .75s ease-in-out infinite alternate;transform-origin:50% 0;}
-@keyframes eleven-behind-motion{0%{translate:0 0;rotate:-1deg;}50%{translate:0 -7px;rotate:1deg;}100%{translate:0 1px;rotate:-1.5deg;}}
+@keyframes eleven-behind-motion{0%{translate:0 0;rotate:calc(var(--eleven-shake-deg,1.5deg) * -1);}18%{translate:calc(var(--eleven-shake-px,1.5px) * -1) calc(var(--eleven-shake-px,1.5px) * .45);rotate:var(--eleven-shake-deg,1.5deg);}38%{translate:var(--eleven-shake-px,1.5px) calc(var(--eleven-shake-px,1.5px) * -1);rotate:calc(var(--eleven-shake-deg,1.5deg) * -1.2);}61%{translate:calc(var(--eleven-shake-px,1.5px) * -.6) var(--eleven-shake-px,1.5px);rotate:var(--eleven-shake-deg,1.5deg);}82%{translate:var(--eleven-shake-px,1.5px) calc(var(--eleven-shake-px,1.5px) * .3);rotate:calc(var(--eleven-shake-deg,1.5deg) * -1);}100%{translate:0 0;rotate:var(--eleven-shake-deg,1.5deg);}}
 @keyframes eleven-arm-left{to{rotate:13deg;}}
 @keyframes eleven-arm-right{to{rotate:-13deg;}}
 @keyframes eleven-leg-left{to{rotate:5deg;}}
