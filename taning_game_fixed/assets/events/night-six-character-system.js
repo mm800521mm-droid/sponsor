@@ -18,7 +18,7 @@
   let night = 0, locked = false, active = null, activeId = '', defended = new Set();
   let frame = { running:false, camOpen:false, camId:1, leftClosed:false, rightClosed:false };
   let crank = 0, transferHeat = 0, transferInside = false, transferTimer = 0;
-  let cosmoLockUntil = 0, nokaLastTick = 0, fluxCam = 2, fluxLookSince = 0, fluxTextShown = false, fluxDelay = 0;
+  let cosmoLockUntil = 0, nokaLastTick = 0, fluxCam = 2, fluxLookSince = 0, fluxTextShown = false, fluxDelay = 0, fluxThreat = 0, fluxAtDoor = false;
   const $ = (id) => document.getElementById(id);
 
   const style = document.createElement('style');
@@ -40,6 +40,9 @@
     #rift-n6-transfer.show{display:flex}
     #rift-n6-transfer .face{font-size:clamp(48px,12vw,100px);text-shadow:0 0 15px #a22}
     #rift-n6-transfer .meter{width:65%;height:7px;background:#342b25}.meter i{display:block;height:100%;width:0;background:#a22}
+    .rift-flux-choice{position:absolute;z-index:50;left:50%;top:28%;transform:translateX(-50%);display:flex;gap:8px;padding:10px;background:#090807eF;border:1px solid #a17b50;color:#f0dfc4;font:16px 'Courier New',monospace;pointer-events:auto}
+    .rift-flux-choice button{min-width:42px;padding:10px;background:#211a16;border:1px solid #8b765b;color:#d5c2a4;font:20px 'Courier New',monospace}
+    .rift-flux-choice button.clear{color:#fff;background:#5a4630;border-color:#f0d5a4;text-shadow:0 0 8px #fff}
     #camera-panel.rift-cosmo-lock #cam-map{pointer-events:none;filter:blur(2px) grayscale(1)}
     #camera-panel.rift-cosmo-lock:after{content:'SIGNAL ORBIT // CONTROL LOST';position:absolute;inset:40% 8% auto;text-align:center;color:#d8c5a2;background:#050505dc;padding:15px;border:1px solid #a17b50;z-index:80;font:12px 'Courier New',monospace;pointer-events:none}
     @media(max-width:700px){.rift-n6-device{bottom:8%;padding:8px;min-width:135px}#rift-n6-transfer{inset:27% 12% 20%}}
@@ -71,6 +74,12 @@
     if(label)label.textContent='发条：'+crank+' / 5';
     if(bar)bar.style.width=(crank/5*100)+'%';
   }
+  function renderFlux(){
+    const feed=$('feed-'+fluxCam);if(!feed)return;
+    let el=feed.querySelector('[data-rift-character="flux"]');
+    if(!el){el=document.createElement('div');el.className='rift-n6-sprite';el.dataset.riftCharacter='flux';el.innerHTML='<div class="figure">▣</div><div class="tag">闪流 // TV DIRECTOR</div>';feed.appendChild(el);}
+    el.style.display=night===6&&!locked&&!fluxAtDoor?'flex':'none';
+  }
   function renderSprites(){
     Object.entries(defs).forEach(([id,d])=>{
       const feed=$('feed-'+d.cam);if(!feed)return;
@@ -82,6 +91,19 @@
       el.querySelector('.figure').textContent=d.glyph;
       el.querySelector('.tag').textContent=d.name+' // CAM '+String(d.cam).padStart(2,'0');
     });
+    renderFlux();
+  }
+  function showFluxChoices(){
+    if(fluxTextShown)return;fluxTextShown=true;
+    const feed=$('feed-'+fluxCam);if(!feed)return;
+    const clearIndex=Math.floor(Math.random()*3), words=['演','幕','场'];
+    const box=document.createElement('div');box.className='rift-flux-choice';box.id='rift-flux-choice';
+    words.forEach((word,index)=>{const b=document.createElement('button');b.type='button';b.textContent=word;if(index===clearIndex)b.classList.add('clear');b.addEventListener('click',()=>{
+      if(index===clearIndex){fluxDelay=Date.now()+25000;fluxThreat=Math.max(0,fluxThreat-1);announce('辨认成功：闪流抵达门口的时间被延缓');const close=$('btnCamClose');if(close)close.click();}
+      else{fluxThreat++;announce('辨认错误：闪流正在靠近');if(fluxThreat>=2){fluxAtDoor=true;announce('闪流已经来到门口，必须关门');}}
+      box.remove();fluxTextShown=false;fluxLookSince=0;renderFlux();
+    });box.appendChild(b);});
+    feed.appendChild(box);
   }
   function announce(text){
     const el=ensureStatus();el.textContent=text;el.classList.add('show');
@@ -146,10 +168,16 @@
     }
     if(night===6 && frame.running && Date.now()-nokaLastTick>12000){crank=Math.max(0,crank-1);nokaLastTick=Date.now();renderCrank();window.dispatchEvent(new CustomEvent('rift:night-six-noka-wind-level',{detail:{value:crank,max:5,calm:crank>0}}));}
     if(active==='noka'&&crank>=5)finishAttack(true,'music-box-wound');
+    if(night===6&&!locked&&!fluxAtDoor){
+      if(frame.camOpen&&Number(frame.camId)===fluxCam){if(!fluxLookSince)fluxLookSince=Date.now();if(Date.now()-fluxLookSince>1250)showFluxChoices();}
+      else{fluxLookSince=0;const choice=$('rift-flux-choice');if(choice){choice.remove();fluxTextShown=false;}}
+      if(fluxDelay&&Date.now()>fluxDelay){fluxDelay=0;fluxAtDoor=true;announce('闪流已经来到门口，必须关门');renderFlux();}
+    }
   }
   function onDoor(e){
     const d=e.detail||{};
     if(!active)return;
+    if(fluxAtDoor&&(d.leftClosed||d.rightClosed||frame.leftClosed||frame.rightClosed)){fluxAtDoor=false;fluxThreat=0;fluxDelay=0;announce('闪流被门挡住，暂时退开');renderFlux();}
     if(active==='gu'&&(d.leftClosed||frame.leftClosed))finishAttack(true,'left-door');
     else if(active==='chillo'&&(d.rightClosed||frame.rightClosed))finishAttack(true,'right-door');
     else if(active==='noka'&&d.rightClosed&&d.elevenEventActive)finishAttack(true,'eleven-right-door');
@@ -165,7 +193,7 @@
   }
   function resetNight(e){
     night=Number(e.detail&&e.detail.night)||0;locked=false;active=null;activeId='';defended.clear();
-    crank=0;transferHeat=0;transferInside=false;cosmoLockUntil=0;fluxCam=2+Math.floor(Math.random()*10);if(fluxCam===10||fluxCam===13)fluxCam=9;fluxLookSince=0;fluxTextShown=false;fluxDelay=0;nokaLastTick=Date.now();renderCrank();hideTransfer();
+    crank=0;transferHeat=0;transferInside=false;cosmoLockUntil=0;fluxCam=2+Math.floor(Math.random()*10);if(fluxCam===10||fluxCam===13)fluxCam=9;fluxLookSince=0;fluxTextShown=false;fluxDelay=0;fluxThreat=0;fluxAtDoor=false;nokaLastTick=Date.now();renderCrank();hideTransfer();
     const p=$('camera-panel');if(p)p.classList.remove('rift-cosmo-lock');
     renderSprites();if(night===6)ensureDevices();
   }
