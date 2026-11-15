@@ -47,3 +47,6 @@
 #rift-transfer-companion-scare{position:fixed;inset:0;z-index:2147482000;display:none;align-items:center;justify-content:center;background:rgba(5,3,3,.94);color:#f2ddd0;font:bold clamp(24px,7vw,72px) Courier New,monospace;text-shadow:0 0 18px #b00;letter-spacing:.12em;pointer-events:none;}
 #rift-transfer-companion-scare.show{display:flex;animation:riftTransferPulse .16s steps(2,end) infinite;}
 @keyframes riftTransferPulse{0%,100%{opacity:1}50%{opacity:.72;transform:translateX(2px)}}
+
+/* CAM13 remains selectable during Eleven's camera blackout for the music-box defense. */
+#camera-panel.eleven-blackout .cam-btn[data-cam="13"]{opacity:1!important;pointer-events:auto!important;filter:none!important;color:#f0d6a6!important;border-color:#c49b58!important;}
