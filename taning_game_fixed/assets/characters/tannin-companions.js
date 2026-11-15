@@ -5,7 +5,8 @@
 (() => {
   'use strict';
   const companionDefs = [
-    { id: 'cosmo', name: '小宇宙', glyph: '✦', className: 'rift-tannin-companion-cosmo' }
+    { id: 'cosmo', name: '小宇宙', glyph: '✦', className: 'rift-tannin-companion-cosmo' },
+    { id: 'transfer', name: '移交／一脚', glyph: '⌁', className: 'rift-tannin-companion-transfer' }
   ];
   const feeds = ['feed-3','feed-4','feed-5'];
   let currentNode = null;
@@ -44,6 +45,6 @@
   window.addEventListener('rift:night-start', () => { currentNode = null; hideAll(); });
   window.addEventListener('rift:night-six-others-return', () => { currentNode = null; hideAll(); });
   window.RIFT_TANNIN_COMPANIONS = Object.freeze({
-    getState: () => ({ leader: 'tannin', node: currentNode, companions: ['cosmo'], pendingIdentity: ['一脚'] })
+    getState: () => ({ leader: 'tannin', node: currentNode, companions: ['cosmo', 'transfer'], aliases: { transfer: ['移交', '一脚'] } })
   });
 })();
