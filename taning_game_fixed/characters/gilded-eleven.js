@@ -81,7 +81,7 @@ class GildedElevenAI {
   updateStageStatus(node) {
     const panel = this.ensureStageStatus();
     const names = { behind: '玩家身后', stage: '排练小舞台', storage: '玩偶储藏舱', workshop: '维修工坊', props: '道具仓库', mainHall: '走廊区域' };
-    const phases = { DORMANT: '休眠中', ACTIVE: this.phase === 'BEHIND' ? '身后接近阶段' : '区域巡游阶段', ATTACKED: '攻击触发' };
+    const phases = { DORMANT: '休眠中', ACTIVE: this.phase === 'BEHIND' ? '身后接近阶段' : this.phase === 'ROAMING' ? '区域巡游阶段' : '攻击阶段', ATTACKED: '攻击阶段' };
     const name = panel.querySelector('#rift-eleven-stage-name');
     const place = panel.querySelector('#rift-eleven-stage-place');
     const count = panel.querySelector('#rift-eleven-stage-count');
@@ -181,14 +181,16 @@ class GildedElevenAI {
     }
   }
 
-  updateNightSixStageStatus() {
+  updateNightSixStageStatus(node) {
     const panel = this.ensureStageStatus();
+    const names = { behind: '玩家身后', stage: '排练小舞台', storage: '玩偶储藏舱', workshop: '维修工坊', props: '道具仓库', mainHall: '走廊区域' };
+    const currentNode = node || this.path[this.currentNodeIndex] || 'mainHall';
     const name = panel.querySelector('#rift-eleven-stage-name');
     const place = panel.querySelector('#rift-eleven-stage-place');
     const count = panel.querySelector('#rift-eleven-stage-count');
     const bar = panel.querySelector('#rift-eleven-stage-bar');
-    if (name) name.textContent = '第六夜：设施异常阶段';
-    if (place) place.textContent = '活动位置：无法确认';
+    if (name) name.textContent = this.state === 'ATTACKED' ? '十一：攻击阶段' : '第六夜：设施异常阶段';
+    if (place) place.textContent = '当前位置：' + (names[currentNode] || '区域未知');
     if (count) count.textContent = '阶段进度：' + Math.min(this.stage || 0, this.config.maxStages) + ' / ' + this.config.maxStages;
     if (bar) bar.style.width = (Math.min(this.stage || 0, this.config.maxStages) / this.config.maxStages * 100) + '%';
     panel.style.display = 'block';
@@ -205,7 +207,16 @@ class GildedElevenAI {
     this.timer = this.config.timings.roam;
     // 第六夜只在设施内部活动，不把实体渲染到保安视角或场景中。
     this.hideAll(ctx);
-    this.updateNightSixStageStatus();
+    this.updateNightSixStageStatus(this.path[this.currentNodeIndex]);
+  }
+
+  triggerAttack(ctx, node) {
+    this.state = 'ATTACKED';
+    this.phase = 'ATTACK';
+    if (this.specialAwakened) this.updateNightSixStageStatus(node);
+    else this.updateStageStatus(node || (this.phase === 'BEHIND' ? 'behind' : this.path[this.currentNodeIndex]));
+    this.hideAll(ctx);
+    if (ctx && typeof ctx.triggerJumpscare === 'function') ctx.triggerJumpscare(this.name, this.quote);
   }
 
   retreatOneStage(ctx) {
@@ -241,10 +252,8 @@ class GildedElevenAI {
         this.timer = this.config.timings.stage;
         this.updateStageStatus('behind');
         if (this.stage >= this.config.maxStages) {
-          this.state = 'ATTACKED';
           this.debugVisible = false;
-          this.hideAll(ctx);
-          ctx.triggerJumpscare(this.name, this.quote);
+          this.triggerAttack(ctx, 'behind');
         }
       }
       return;
@@ -278,9 +287,7 @@ class GildedElevenAI {
         this.updateStageStatus('behind');
         this.timer = this.config.timings.stage;
         if (this.stage >= this.config.maxStages) {
-          this.state = 'ATTACKED';
-          this.hideAll(ctx);
-          ctx.triggerJumpscare(this.name, this.quote);
+          this.triggerAttack(ctx, 'behind');
         }
       }
       return;
@@ -301,16 +308,14 @@ class GildedElevenAI {
         this.currentNodeIndex = Math.min(this.currentNodeIndex + 1, this.path.length - 1);
         this.timer = this.config.timings.roam;
         if (this.specialAwakened) {
-          this.updateNightSixStageStatus();
+          const currentNode = this.path[this.currentNodeIndex] || 'mainHall';
           if (this.stage >= this.config.maxStages) {
-            this.state = 'ATTACKED';
-            this.hideAll(ctx);
-            ctx.triggerJumpscare(this.name, this.quote);
+            this.triggerAttack(ctx, currentNode);
+          } else {
+            this.updateNightSixStageStatus(currentNode);
           }
         } else if (this.stage >= this.config.maxStages) {
-          this.state = 'ATTACKED';
-          this.hideAll(ctx);
-          ctx.triggerJumpscare(this.name, this.quote);
+          this.triggerAttack(ctx, this.path[this.currentNodeIndex] || 'mainHall');
         } else {
           this.hideAll(ctx);
           this.showNode(this.path[this.currentNodeIndex], ctx);
