@@ -1189,6 +1189,7 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
     S.elapsed = (totalMinutes / 60) * HOUR_MS;
     S.hour = Math.min(8, Math.floor(totalMinutes / 60));
     processedNightEvents = new Set();
+    setElevenCameraBlackout(false);
     if (typeof gildedEleven !== 'undefined') gildedEleven.startNight(S.night, activeNightSettings, GameContext);
     dispatchNightSpecialTimes();
     updateUI();
