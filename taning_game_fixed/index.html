@@ -822,7 +822,7 @@
 
   camBtns.forEach(btn => {
     btn.onclick = function() {
-      if (!S.running || elevenCameraBlackout) return;
+      if (!S.running || (elevenCameraBlackout && this.dataset.cam !== '13')) return;
       let camId = this.dataset.cam;
       if (camId == 14) {
         switchCam(14);
