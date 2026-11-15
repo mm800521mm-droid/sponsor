@@ -207,11 +207,7 @@ class GildedElevenAI {
       this.showNode('behind', ctx);
       const behind = this.getVisualElement('behind', ctx);
       if (behind) behind.classList.add('gilded-eleven-moving');
-      // 调试显示模式下也运行身后阶段计时；回头观察时冻结动作，但不清空已完成阶段。
-      if (ctx.isLookingBack()) {
-        this.timer = this.config.timings.stage;
-        return;
-      }
+      // 调试显示模式用于验证阶段推进，因此即使强制显示回头视角，也持续推进计时。
       this.timer -= dt;
       if (this.timer <= 0) {
         this.stage += 1;
@@ -238,6 +234,7 @@ class GildedElevenAI {
       if (behind) behind.classList.add('gilded-eleven-moving');
       // 玩家回头观察时，十一停止动作；已完成的阶段保留。
       if (ctx.isLookingBack()) {
+        if (behind) behind.classList.remove('gilded-eleven-moving');
         this.timer = this.config.timings.stage;
         return;
       }
