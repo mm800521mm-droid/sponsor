@@ -50,3 +50,10 @@
 
 /* CAM13 remains selectable during Eleven's camera blackout for the music-box defense. */
 #camera-panel.eleven-blackout .cam-btn[data-cam="13"]{opacity:1!important;pointer-events:auto!important;filter:none!important;color:#f0d6a6!important;border-color:#c49b58!important;}
+
+/* Compact monitor devices; keep the feed visible around them. */
+.rift-n6-device{left:auto;right:2%;top:3%;bottom:auto;transform:none;width:clamp(88px,11vw,118px);min-width:0;padding:5px 6px;font-size:9px;line-height:1.25;}
+.rift-n6-device button{margin-top:4px;padding:4px 6px;font-size:9px;}
+.rift-n6-meter{height:3px;margin-top:4px;}
+.cam-scene .rift-n6-sprite{z-index:18;visibility:visible;opacity:1;}
+@media(max-width:700px){.rift-n6-device{right:2%;top:2%;width:88px;min-width:0;padding:4px;font-size:8px}.rift-n6-device button{padding:4px;font-size:8px}}
