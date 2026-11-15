@@ -21,8 +21,6 @@
 .rift-flux-choice{position:absolute;z-index:50;left:50%;top:28%;transform:translateX(-50%);display:flex;gap:8px;padding:10px;background:#090807ef;border:1px solid #a17b50;color:#f0dfc4;font:16px 'Courier New',monospace;pointer-events:auto}
 .rift-flux-choice button{min-width:42px;padding:10px;background:#211a16;border:1px solid #8b765b;color:#d5c2a4;font:20px 'Courier New',monospace}
 .rift-flux-choice button.clear{color:#fff;background:#5a4630;border-color:#f0d5a4;text-shadow:0 0 8px #fff}
-#camera-panel.rift-cosmo-lock #cam-map{pointer-events:none;filter:blur(2px) grayscale(1)}
-#camera-panel.rift-cosmo-lock:after{content:'SIGNAL ORBIT // CONTROL LOST';position:absolute;inset:40% 8% auto;text-align:center;color:#d8c5a2;background:#050505dc;padding:15px;border:1px solid #a17b50;z-index:80;font:12px 'Courier New',monospace;pointer-events:none}
 @media(max-width:700px){.rift-n6-device{bottom:8%;padding:8px;min-width:135px}#rift-n6-transfer{inset:27% 12% 20%}}
 
 /* Night 6 attack reaches the office after crossing its CCTV route. */
