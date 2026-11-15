@@ -32,3 +32,9 @@
 /* CAM 10 flashlight can be fired even when Lobe is absent. */
 #feed-10.rift-cam10-flash:after{content:"";position:absolute;inset:0;z-index:80;background:rgba(255,248,220,.96);pointer-events:none;animation:riftCam10Flash .24s ease-out forwards}
 @keyframes riftCam10Flash{0%{opacity:1}55%{opacity:.9}100%{opacity:0}}
+
+/* Tannin's two companions share his CCTV room and are visual-only followers. */
+.rift-tannin-companion{position:absolute;left:8%;bottom:9%;z-index:34;display:none;align-items:center;gap:7px;padding:7px 10px;background:rgba(5,4,4,.78);border:1px solid rgba(180,150,110,.55);color:#e8d8bf;font:12px/1.2 "Courier New",monospace;letter-spacing:.06em;text-shadow:0 0 7px #000;pointer-events:none;box-shadow:0 0 12px rgba(120,20,20,.25)}
+.rift-tannin-companion .glyph{font-size:20px;color:#d9b77d}
+.rift-tannin-companion-transfer .glyph{color:#c98b83}
+.rift-tannin-companion .name{white-space:nowrap}
