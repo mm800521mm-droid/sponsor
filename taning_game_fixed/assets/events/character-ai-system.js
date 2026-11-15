@@ -81,7 +81,7 @@
     emit('rift:character-appearance',{characterId:a.id,camId:a.cam});
   }
   function returnActor(a){
-    clearChoice(a);a.phase='idle';a.cam=a.home;a.threat=0;a.look=0;a.deadline=0;
+    clearChoice(a);a.phase='idle';a.cam=a.home;a.timer=a.interval;a.threat=0;a.look=0;a.deadline=0;
     removeActorVisual(a);
     emit('rift:character-returned',{characterId:a.id});
   }
@@ -193,8 +193,8 @@
     if(!Number.isInteger(cam))return;
     for(const a of Object.values(state.actors)){
       if(a.id==='flux'||a.phase==='idle'||a.cam!==cam)continue;
-      if(a.id==='gu'){a.cam=a.cam===4?5:1;a.phase=a.cam===1?'door':'moving';a.timer=0;a.deadline=Date.now()+8000;}
-      else if(a.id==='chillo'){a.cam=a.cam===6?3:1;a.phase=a.cam===1?'door':'moving';a.timer=0;a.deadline=Date.now()+8000;}
+      if(a.id==='gu'){a.cam=a.cam===4?5:1;a.phase=a.cam===1?'door':'moving';a.timer=7;a.deadline=Date.now()+8000;}
+      else if(a.id==='chillo'){a.cam=a.cam===6?3:1;a.phase=a.cam===1?'door':'moving';a.timer=7;a.deadline=Date.now()+8000;}
       else if(a.id==='lobe'){returnActor(a);continue;}
       render(a);
       emit('rift:character-skipped-by-noka',{characterId:a.id,camId:cam,nextCamId:a.cam});
