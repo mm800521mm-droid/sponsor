@@ -143,6 +143,18 @@
   function showTransferScare(){let el=$('rift-n6-transfer-scare');if(!el){el=document.createElement('div');el.id='rift-n6-transfer-scare';el.textContent='TRANSFER // SIGNAL OVERRUN';el.style.cssText='position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:#050303;color:#f2ddd0;font:bold clamp(24px,7vw,72px) Courier New,monospace;text-shadow:0 0 18px #b00;letter-spacing:.12em;pointer-events:none;';document.body.appendChild(el);}el.style.display='flex';setTimeout(()=>{el.style.display='none';},1100);}
   function onFrame(e){
     frame={...frame,...(e.detail||{})};
+    if(active && frame.running){
+      const dt=Math.min(.1,Math.max(0,Number(frame.dt)||0));
+      routeClock+=dt;attackClock+=dt;
+      const route=routes[active]||[defs[active].cam,1];
+      if(routeClock>=2.2 && routeIndex<route.length-1){
+        routeClock=0;routeIndex++;activeCam=route[routeIndex];renderActiveAtCam();
+      }
+      if(active!=='cosmo' && active!=='transfer' && active!=='lobe' && attackClock>=8.5){
+        window.dispatchEvent(new CustomEvent('rift:night-six-mutation-failed',{detail:{night:6,characterId:active,mutationId:activeId}}));
+        finishAttack(false,'attack-timeout');
+      }
+    }
     if(active==='transfer'){
       const dt=Math.min(.1,Math.max(0,Number(frame.dt)||0));
       transferHeat=transferInside?Math.min(3,transferHeat+dt*.48):Math.max(0,transferHeat-dt*.18);
@@ -152,7 +164,6 @@
       if(transferHeat>=3){hideTransfer();showTransferScare();finishAttack(false,'transfer-stage-three-jumpscare');announce('移交的三阶段已满！');}
     }
     if(night===6 && frame.running && Date.now()-nokaLastTick>12000){crank=Math.max(0,crank-1);nokaLastTick=Date.now();renderCrank();window.dispatchEvent(new CustomEvent('rift:night-six-noka-wind-level',{detail:{value:crank,max:5,calm:crank>0}}));}
-    if(active==='noka'&&crank>=5)finishAttack(true,'music-box-wound');
     if(night===6&&!locked&&!fluxAtDoor){
       if(frame.camOpen&&Number(frame.camId)===fluxCam){if(!fluxLookSince)fluxLookSince=Date.now();if(Date.now()-fluxLookSince>1250)showFluxChoices();}
       else{fluxLookSince=0;const choice=$('rift-flux-choice');if(choice){choice.remove();fluxTextShown=false;}}
@@ -165,12 +176,9 @@
     if(fluxAtDoor&&(d.leftClosed||d.rightClosed||frame.leftClosed||frame.rightClosed)){fluxAtDoor=false;fluxThreat=0;fluxDelay=0;announce('闪流被门挡住，暂时退开');renderFlux();}
     if(active==='gu'&&(d.leftClosed||frame.leftClosed))finishAttack(true,'left-door');
     else if(active==='chillo'&&(d.rightClosed||frame.rightClosed))finishAttack(true,'right-door');
-    else if(active==='noka'&&d.rightClosed&&d.elevenEventActive)finishAttack(true,'eleven-right-door');
     else if(active==='tannin'&&(d.leftClosed||d.rightClosed))finishAttack(true,'door');
   }
-  function onCrank(){
-    if(active==='noka'&&crank>=5)finishAttack(true,'music-box-wound');
-  }
+  function onCrank(){ /* Noka is handled by the independent music-box rule. */ }
   function onFlash(){if(active==='lobe'&&frame.camOpen&&Number(frame.camId)===10)finishAttack(true,'cam10-flash');}
   function onMonitor(e){
     const d=e.detail||{};
