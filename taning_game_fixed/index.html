@@ -1133,7 +1133,7 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
     S.elapsed = (totalMinutes / 60) * HOUR_MS;
     S.hour = Math.min(8, Math.floor(totalMinutes / 60));
     processedNightEvents = new Set();
-    if (window.gildedEleven) gildedEleven.startNight(S.night, activeNightSettings, GameContext);
+    if (typeof gildedEleven !== 'undefined') gildedEleven.startNight(S.night, activeNightSettings, GameContext);
     dispatchNightSpecialTimes();
     updateUI();
   });
@@ -1261,8 +1261,8 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
         if (typeof taning !== 'undefined') {
           try { taning.update(dt, GameContext); } catch (e) { console.error('Taning AI update failed:', e); }
         }
-        if (window.gildedEleven) {
-          try { window.gildedEleven.update(dt, GameContext); } catch (e) { console.error('Gilded Eleven AI update failed:', e); }
+        if (typeof gildedEleven !== 'undefined') {
+          try { gildedEleven.update(dt, GameContext); } catch (e) { console.error('Gilded Eleven AI update failed:', e); }
         }
       }
       updateUI();
