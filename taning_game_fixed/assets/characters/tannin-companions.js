@@ -10,6 +10,7 @@
     transfer: { name: '移交／一脚', glyph: '⌁', className: 'rift-tannin-companion-transfer' }
   };
   const visible = new Map();
+  let transferHeat=0, transferInside=false, scareCooldown=0;
 
   function hideCharacter(id) {
     document.querySelectorAll('[data-tannin-companion="' + id + '"]').forEach(el => {
@@ -35,7 +36,16 @@
       el = document.createElement('div');
       el.className = 'rift-tannin-companion ' + def.className;
       el.dataset.tanninCompanion = id;
-      el.innerHTML = '<span class="glyph"></span><span class="name"></span>';
+      el.innerHTML = '<span class="glyph"></span><span class="name"></span><span class="transfer-meter"><i></i></span><small class="transfer-stage">阶段 0 / 3</small>';
+      if(id==='transfer'){
+        el.style.pointerEvents='auto';
+        el.addEventListener('pointerenter',()=>{transferInside=true;});
+        el.addEventListener('pointerleave',()=>{transferInside=false;});
+        el.addEventListener('pointerdown',event=>{if(event.pointerType!=='mouse')transferInside=true;});
+        el.addEventListener('pointerup',()=>{transferInside=false;});
+        el.addEventListener('pointercancel',()=>{transferInside=false;});
+        el.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();});
+      }
       feed.appendChild(el);
     }
     el.querySelector('.glyph').textContent = def.glyph;
@@ -60,10 +70,23 @@
     place({characterId:id,camId,x:8+Math.random()*72,y:6+Math.random()*24});
     schedule[id].visible = 5 + Math.random() * 7;
   }
+  function transferScare(){
+    let overlay=document.getElementById('rift-transfer-companion-scare');
+    if(!overlay){overlay=document.createElement('div');overlay.id='rift-transfer-companion-scare';overlay.textContent='TRANSFER // SIGNAL OVERRUN';document.body.appendChild(overlay);}
+    overlay.classList.add('show');
+    window.setTimeout(()=>overlay.classList.remove('show'),1100);
+    hideCharacter('transfer');schedule.transfer.visible=0;scheduleNext('transfer');
+  }
+
   window.addEventListener('rift:game-frame', event => {
     const d = event.detail || {};
     if (locked || !d.running) return;
     const dt = Math.min(.1, Math.max(0, Number(d.dt) || 0));
+    scareCooldown=Math.max(0,scareCooldown-dt);
+    transferHeat=transferInside?Math.min(3,transferHeat+dt*.48):Math.max(0,transferHeat-dt*.18);
+    const transferEl=document.querySelector('[data-tannin-companion="transfer"]');
+    if(transferEl){const bar=transferEl.querySelector('.transfer-meter i');const stage=transferEl.querySelector('.transfer-stage');if(bar)bar.style.width=(transferHeat/3*100)+'%';if(stage)stage.textContent='阶段 '+Math.min(3,Math.floor(transferHeat+0.01))+' / 3';}
+    if(transferHeat>=3 && scareCooldown<=0){transferHeat=0;transferInside=false;scareCooldown=8;transferScare();}
     for (const id of Object.keys(schedule)) {
       const item = schedule[id];
       if (item.visible > 0) {
@@ -82,7 +105,7 @@
     if (id && defs[id]) hideCharacter(id);
     else Object.keys(defs).forEach(hideCharacter);
   });
-  window.addEventListener('rift:night-start', () => { locked=false; Object.keys(defs).forEach(id=>{hideCharacter(id);scheduleNext(id);schedule[id].visible=0;}); });
+  window.addEventListener('rift:night-start', () => { locked=false;transferHeat=0;transferInside=false;scareCooldown=0; Object.keys(defs).forEach(id=>{hideCharacter(id);scheduleNext(id);schedule[id].visible=0;}); });
   window.addEventListener('rift:night-six-others-return', () => { locked=true; Object.keys(defs).forEach(id=>{hideCharacter(id);schedule[id].visible=0;}); });
 
   window.RIFT_TANNIN_COMPANIONS = Object.freeze({
