@@ -19,7 +19,7 @@
   let night = 0, locked = false, active = null, activeId = '', defended = new Set();
   let frame = { running:false, camOpen:false, camId:1, leftClosed:false, rightClosed:false };
   let crank = 0, transferHeat = 0, transferInside = false, transferTimer = 0;
-  let cosmoLockUntil = 0, nokaLastTick = 0, fluxCam = 2, fluxLookSince = 0, fluxTextShown = false, fluxDelay = 0, fluxThreat = 0, fluxAtDoor = false;
+  let nokaLastTick = 0, fluxCam = 2, fluxLookSince = 0, fluxTextShown = false, fluxDelay = 0, fluxThreat = 0, fluxAtDoor = false;
   const $ = (id) => document.getElementById(id);
 
   function ensureStatus(){
@@ -125,7 +125,6 @@
       lobe:'耳机突变：切换10号监控并使用专属闪光灯。',
       gu:'孤突变：关闭左门防御。',
       chillo:'寒零突变：通过监控判断位置，关闭右门防御。',
-      cosmo:'小宇宙突变：监控控制即将发生，持续数秒后恢复。',
       transfer:'移交突变：不要点击他，也不要让鼠标停留在他身上。'
     };
     announce(tips[active]);
@@ -196,8 +195,7 @@
   }
   function resetNight(e){
     night=Number(e.detail&&e.detail.night)||0;locked=false;active=null;activeId='';defended.clear();activeCam=1;routeIndex=0;routeClock=0;attackClock=0;
-    crank=0;transferHeat=0;transferInside=false;cosmoLockUntil=0;fluxCam=2+Math.floor(Math.random()*10);if(fluxCam===10||fluxCam===13)fluxCam=9;fluxLookSince=0;fluxTextShown=false;fluxDelay=0;fluxThreat=0;fluxAtDoor=false;nokaLastTick=Date.now();renderCrank();hideTransfer();
-    const p=$('camera-panel');if(p)p.classList.remove('rift-cosmo-lock');
+    crank=0;transferHeat=0;transferInside=false;fluxCam=2+Math.floor(Math.random()*10);if(fluxCam===10||fluxCam===13)fluxCam=9;fluxLookSince=0;fluxTextShown=false;fluxDelay=0;fluxThreat=0;fluxAtDoor=false;nokaLastTick=Date.now();renderCrank();hideTransfer();
     renderSprites();ensureDevices();
   }
   window.addEventListener('rift:night-start',resetNight);
