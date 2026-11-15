@@ -26,6 +26,13 @@ class GildedElevenAI {
   }
 
   setDebugBehind(enabled, ctx) {
+    // 第六夜特殊觉醒后，十一只在设施内部活动，调试按钮也不能把他召回身后。
+    if (this.specialAwakened) {
+      this.debugVisible = false;
+      this.hideAll(ctx);
+      this.updateNightSixStageStatus();
+      return;
+    }
     this.debugVisible = !!enabled;
     if (this.debugVisible) {
       this.state = 'ACTIVE';
@@ -211,8 +218,11 @@ class GildedElevenAI {
   update(dt, ctx) {
     if (!ctx || !ctx.isGameRunning()) return;
     this.ensureVisualNodes(ctx);
-    if (this.specialAwakened) this.hideAll(ctx);
-    if (this.debugVisible) {
+    if (this.specialAwakened) {
+      this.debugVisible = false;
+      this.hideAll(ctx);
+    }
+    if (this.debugVisible && !this.specialAwakened) {
       this.showNode('behind', ctx);
       const behind = this.getVisualElement('behind', ctx);
       if (ctx.isLookingBack()) {
