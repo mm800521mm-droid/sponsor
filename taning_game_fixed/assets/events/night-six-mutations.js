@@ -78,6 +78,27 @@
     }));
   }
 
+  async function testAllSubtitles() {
+    activeNight = 6;
+    locked = false;
+    triggered.clear();
+    hideOverlay();
+    const data = window.NIGHT_DATA && window.NIGHT_DATA[6];
+    const mutations = data && data.nightSixMutations;
+    if (!Array.isArray(mutations) || !mutations.length) return false;
+    for (const item of mutations) {
+      if (activeNight !== 6) break;
+      await showSequence(item);
+      await new Promise(resolve => window.setTimeout(resolve, item.lines.length * 1150 + 2100));
+    }
+    return true;
+  }
+
+  window.RIFT_NIGHT6_MUTATION_TEST = Object.freeze({
+    playAllSubtitles: testAllSubtitles,
+    stop: () => { hideOverlay(); }
+  });
+
   window.addEventListener('rift:night-start', event => {
     activeNight = Number(event.detail && event.detail.night) || 0;
     locked = false;
