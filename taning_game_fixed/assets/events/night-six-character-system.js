@@ -68,6 +68,8 @@
     renderFlux();
   }
   function renderActiveAtCam(){
+    const office=$('rift-n6-office-attacker');
+    if(office)office.style.display=(active && activeCam===1)?'flex':'none';
     if(!active || !defs[active])return;
     const d=defs[active];
     document.querySelectorAll('[data-rift-character="'+active+'"]').forEach(el=>{if(el.parentElement)el.style.display='none';});
@@ -77,6 +79,11 @@
     el.style.display='flex';el.classList.add('active');
     el.querySelector('.figure').textContent=d.glyph;
     el.querySelector('.tag').textContent=d.name+' // CAM '+String(activeCam).padStart(2,'0');
+    if(activeCam===1)ensureOfficeAttacker();
+  }
+  function ensureOfficeAttacker(){
+    let el=$('rift-n6-office-attacker');if(!el){el=document.createElement('div');el.id='rift-n6-office-attacker';el.innerHTML='<div class="figure"></div><div class="tag"></div>';($('game')||document.body).appendChild(el);}
+    el.style.display=active?'flex':'none';el.querySelector('.figure').textContent=defs[active].glyph;el.querySelector('.tag').textContent=defs[active].name+' // ATTACK';
   }
   function showFluxChoices(){
     if(fluxTextShown)return;fluxTextShown=true;
@@ -126,6 +133,7 @@
       setTimeout(()=>{if(active==='cosmo')finishAttack(true,'cosmo-control-ended');},4300);
     }
     if(active==='transfer')showTransfer();
+    if((active==='gu'&&frame.leftClosed)||(active==='chillo'&&frame.rightClosed)||(active==='tannin'&&(frame.leftClosed||frame.rightClosed)))finishAttack(true,'door-already-closed');
     if(active==='noka')onCrank();
   }
   function showTransfer(){
@@ -150,9 +158,14 @@
       if(routeClock>=2.2 && routeIndex<route.length-1){
         routeClock=0;routeIndex++;activeCam=route[routeIndex];renderActiveAtCam();
       }
-      if(active!=='cosmo' && active!=='transfer' && active!=='lobe' && attackClock>=8.5){
-        window.dispatchEvent(new CustomEvent('rift:night-six-mutation-failed',{detail:{night:6,characterId:active,mutationId:activeId}}));
-        finishAttack(false,'attack-timeout');
+      if(active!=='cosmo' && active!=='transfer' && attackClock>=8.5){
+        if(active==='lobe'){
+          window.dispatchEvent(new CustomEvent('rift:night-six-time-rollback',{detail:{hours:1,characterId:'lobe'}}));
+          finishAttack(true,'lobe-time-rollback');
+        }else{
+          window.dispatchEvent(new CustomEvent('rift:night-six-mutation-failed',{detail:{night:6,characterId:active,mutationId:activeId}}));
+          finishAttack(false,'attack-timeout');
+        }
       }
     }
     if(active==='transfer'){
@@ -192,7 +205,7 @@
   }
   window.addEventListener('rift:night-start',resetNight);
   window.addEventListener('rift:night-six-mutation-attack',e=>beginAttack(e.detail));
-  window.addEventListener('rift:night-six-others-return',()=>{locked=true;active=null;renderSprites();});
+  window.addEventListener('rift:night-six-others-return',()=>{locked=true;active=null;const office=$('rift-n6-office-attacker');if(office)office.style.display='none';renderSprites();});
   window.addEventListener('rift:night-six-eleven-awakened',()=>{locked=false;renderSprites();});
   window.addEventListener('rift:game-frame',onFrame);
   window.addEventListener('rift:night-six-door-change',onDoor);
