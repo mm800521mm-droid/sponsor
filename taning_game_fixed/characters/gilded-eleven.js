@@ -262,6 +262,7 @@ class GildedElevenAI {
     const duration = 1.1 - progress * 0.82;
     el.style.setProperty('--eleven-shake-px', pixels.toFixed(2) + 'px');
     el.style.setProperty('--eleven-shake-deg', degrees.toFixed(2) + 'deg');
+    el.style.setProperty('--eleven-shake-neg-deg', (-degrees).toFixed(2) + 'deg');
     el.style.setProperty('--eleven-shake-duration', duration.toFixed(2) + 's');
   }
 
