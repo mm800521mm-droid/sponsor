@@ -19,7 +19,7 @@
   let night = 0, locked = false, active = null, activeId = '', defended = new Set();
   let frame = { running:false, camOpen:false, camId:1, leftClosed:false, rightClosed:false };
   let crank = 0, nokaCam = 13, nokaMoveTick = 0, transferHeat = 0, transferInside = false, transferTimer = 0;
-  let nokaLastTick = 0, nokaAI = 0, nokaThreatTimer = 0, fluxCam = 2, fluxLookSince = 0, fluxTextShown = false, fluxDelay = 0, fluxThreat = 0, fluxAtDoor = false;
+  let nokaLastTick = 0, nokaAI = 0, nokaThreatTimer = 0, flashReadyAt = 0, fluxCam = 2, fluxLookSince = 0, fluxTextShown = false, fluxDelay = 0, fluxThreat = 0, fluxAtDoor = false;
   const $ = (id) => document.getElementById(id);
 
   function ensureStatus(){
@@ -40,7 +40,10 @@
       box.innerHTML='<div>CAM 10 // FLASH</div><div>发现耳机时照射</div><button type="button" id="rift-n6-flash-btn">闪光</button>';
       f10.appendChild(box);
       box.querySelector('button').addEventListener('click',()=>{
-        if(!frame.running||!frame.camOpen||Number(frame.camId)!==10)return;
+        if(!frame.running||!frame.camOpen||Number(frame.camId)!==10||Date.now()<flashReadyAt)return;
+        flashReadyAt=Date.now()+3000;
+        const flashButton=box.querySelector('button');flashButton.disabled=true;flashButton.textContent='冷却 3s';
+        let remaining=3;const cooldown=setInterval(()=>{remaining--;if(remaining>0){flashButton.textContent='冷却 '+remaining+'s';}else{clearInterval(cooldown);flashButton.disabled=false;flashButton.textContent='闪光';}},1000);
         const feed=$('feed-10');if(feed){feed.classList.remove('rift-cam10-flash');void feed.offsetWidth;feed.classList.add('rift-cam10-flash');setTimeout(()=>feed.classList.remove('rift-cam10-flash'),260);}
         window.dispatchEvent(new CustomEvent('rift:night-six-flash',{detail:{camId:10,deviceOnly:true}}));
       });
@@ -179,6 +182,7 @@
       if(label)label.textContent='阶段 '+Math.min(3,Math.floor(transferHeat+0.01))+' / 3';
       if(transferHeat>=3){hideTransfer();showTransferScare();finishAttack(false,'transfer-stage-three-jumpscare');announce('移交的三阶段已满！');}
     }
+    nokaAI=Math.max(0,Number((window.RIFT_CURRENT_AI_LEVELS||{}).noka ?? ((((window.NIGHT_SETTINGS||{})[night]||{}).characters||{}).noka))||0);
     if(frame.running && (night===6 || nokaAI>0) && Date.now()-nokaLastTick>12000){crank=Math.max(0,crank-1);nokaLastTick=Date.now();renderCrank();window.dispatchEvent(new CustomEvent('rift:night-six-noka-wind-level',{detail:{value:crank,max:5,calm:crank>0}}));}
     if(night>0 && frame.running && nokaAI>0){
       if(crank>0){nokaThreatTimer=0;nokaMoveTick=0;}
@@ -197,9 +201,10 @@
     if(!active&&!fluxAtDoor&&!(nokaAI>0&&nokaThreatTimer>0))return;
     if(nokaAI>0&&nokaThreatTimer>0&&d.elevenEventActive&&(d.rightClosed||frame.rightClosed)){nokaThreatTimer=0;nokaMoveTick=0;nokaCam=13;crank=Math.max(1,crank);nokaLastTick=Date.now();renderCrank();renderSprites();announce('十一的异常期间，右门暂时挡住了诺卡');}
     if(fluxAtDoor&&(d.leftClosed||d.rightClosed||frame.leftClosed||frame.rightClosed)){fluxAtDoor=false;fluxThreat=0;fluxDelay=0;announce('闪流被门挡住，暂时退开');renderFlux();}
-    if(active==='gu'&&(d.leftClosed||frame.leftClosed))finishAttack(true,'left-door');
-    else if(active==='chillo'&&(d.rightClosed||frame.rightClosed))finishAttack(true,'right-door');
-    else if(active==='tannin'&&(d.leftClosed||d.rightClosed))finishAttack(true,'door');
+    const closedLeft=!!(d.leftClosed||frame.leftClosed), closedRight=!!(d.rightClosed||frame.rightClosed);
+    const doorDefense={gu:closedLeft,chillo:closedRight,tannin:closedLeft||closedRight};
+    if(active && doorDefense[active])finishAttack(true,'shared-door-defense');
+    if(doorDefense.tannin)window.dispatchEvent(new CustomEvent('rift:shared-defense',{detail:{method:'door',side:closedLeft?'left':'right',source:active||'office-door'}}));
   }
   function onCrank(e){const d=e&&e.detail||{};crank=Math.max(0,Math.min(5,Number(d.value)||0));nokaThreatTimer=0;nokaMoveTick=0;nokaCam=13;nokaLastTick=Date.now();renderCrank();renderSprites();}
   function onFlash(){if(active==='lobe'&&frame.camOpen&&Number(frame.camId)===10)finishAttack(true,'cam10-flash');}
@@ -209,11 +214,12 @@
   }
   function resetNight(e){
     night=Number(e.detail&&e.detail.night)||0;locked=false;active=null;activeId='';defended.clear();activeCam=1;routeIndex=0;routeClock=0;attackClock=0;
-    crank=5;nokaCam=13;nokaMoveTick=0;nokaAI=Math.max(0,Number((((window.NIGHT_SETTINGS||{})[night]||{}).characters||{}).noka)||0);nokaThreatTimer=0;transferHeat=0;transferInside=false;fluxCam=2+Math.floor(Math.random()*10);if(fluxCam===10||fluxCam===13)fluxCam=9;fluxLookSince=0;fluxTextShown=false;fluxDelay=0;fluxThreat=0;fluxAtDoor=false;nokaLastTick=Date.now();renderCrank();hideTransfer();
+    crank=5;nokaCam=13;nokaMoveTick=0;nokaAI=Math.max(0,Number((((window.NIGHT_SETTINGS||{})[night]||{}).characters||{}).noka)||0);nokaThreatTimer=0;transferHeat=0;transferInside=false;fluxCam=2+Math.floor(Math.random()*10);if(fluxCam===10||fluxCam===13)fluxCam=9;fluxLookSince=0;fluxTextShown=false;fluxDelay=0;fluxThreat=0;fluxAtDoor=false;nokaLastTick=Date.now();flashReadyAt=0;renderCrank();hideTransfer();
     renderSprites();ensureDevices();
   }
   window.addEventListener('rift:night-start',resetNight);
   window.addEventListener('rift:night-six-mutation-attack',e=>beginAttack(e.detail));
+  window.addEventListener('rift:night-ai-levels-changed',e=>{const v=e.detail&&e.detail.values||{};nokaAI=Math.max(0,Number(v.noka)||0);renderSprites();});
   window.addEventListener('rift:noka-enter-room',e=>{const cam=Number(e.detail&&e.detail.camId);if(active&&activeCam===cam){const route=routes[active]||[];if(routeIndex<route.length-1){routeIndex++;activeCam=route[routeIndex];routeClock=0;renderActiveAtCam();}}});
   window.addEventListener('rift:night-six-others-return',()=>{locked=true;active=null;const office=$('rift-n6-office-attacker');if(office)office.style.display='none';renderSprites();});
   window.addEventListener('rift:night-six-eleven-awakened',()=>{locked=false;renderSprites();});
