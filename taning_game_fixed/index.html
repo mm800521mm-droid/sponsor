@@ -428,6 +428,8 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
 </div>
 <div id="rift-test-controls" style="position:fixed;top:44px;left:50%;transform:translateX(-50%);z-index:100000;display:flex;align-items:center;gap:6px;padding:6px;background:rgba(0,0,0,.88);border:1px solid #806b45;color:#f0dfbd;font:12px 'Courier New',monospace;">
   <button id="test-behind" type="button" style="padding:5px 8px;">显示/隐藏十一</button>
+  <button id="test-stage-down" type="button" style="padding:5px 8px;">阶段 −</button>
+  <button id="test-stage-up" type="button" style="padding:5px 8px;">阶段 +</button>
   <button id="test-pause" type="button" style="padding:5px 8px;">暂停</button>
   <input id="test-time" type="time" value="05:40" step="60" style="padding:4px;width:92px;">
   <button id="test-jump" type="button" style="padding:5px 8px;">跳到时间</button>
@@ -1184,11 +1186,15 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
 
   // 测试工具：不改变正式夜晚配置，只提供手动显示、暂停和时间跳转。
   const testBehindBtn = document.getElementById('test-behind');
+  const testStageDownBtn = document.getElementById('test-stage-down');
+  const testStageUpBtn = document.getElementById('test-stage-up');
   const testPauseBtn = document.getElementById('test-pause');
   const testJumpBtn = document.getElementById('test-jump');
   const testResumeBtn = document.getElementById('test-resume');
   const testTimeInput = document.getElementById('test-time');
   let testPaused = false;
+  testStageDownBtn.addEventListener('click', () => { if (S.running) gildedEleven.setDebugStage(-1, GameContext); });
+  testStageUpBtn.addEventListener('click', () => { if (S.running) gildedEleven.setDebugStage(1, GameContext); });
   testBehindBtn.addEventListener('click', () => {
     if (!S.running) return;
     const enable = !gildedEleven.debugVisible;
