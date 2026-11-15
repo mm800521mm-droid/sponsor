@@ -40,7 +40,11 @@
       const box=document.createElement('div');box.className='rift-n6-device';box.dataset.device='flash';
       box.innerHTML='<div>CAM 10 // FLASH</div><div>发现耳机时照射</div><button type="button" id="rift-n6-flash-btn">闪光</button>';
       f10.appendChild(box);
-      box.querySelector('button').addEventListener('click',()=>{if(night!==6||!frame.running||!frame.camOpen||Number(frame.camId)!==10)return;window.dispatchEvent(new CustomEvent('rift:night-six-flash',{detail:{camId:10}}));});
+      box.querySelector('button').addEventListener('click',()=>{
+        if(!frame.running||!frame.camOpen||Number(frame.camId)!==10)return;
+        const feed=$('feed-10');if(feed){feed.classList.remove('rift-cam10-flash');void feed.offsetWidth;feed.classList.add('rift-cam10-flash');setTimeout(()=>feed.classList.remove('rift-cam10-flash'),260);}
+        window.dispatchEvent(new CustomEvent('rift:night-six-flash',{detail:{camId:10,deviceOnly:true}}));
+      });
     }
   }
   function renderCrank(){
@@ -201,7 +205,7 @@
     night=Number(e.detail&&e.detail.night)||0;locked=false;active=null;activeId='';defended.clear();activeCam=1;routeIndex=0;routeClock=0;attackClock=0;
     crank=0;transferHeat=0;transferInside=false;cosmoLockUntil=0;fluxCam=2+Math.floor(Math.random()*10);if(fluxCam===10||fluxCam===13)fluxCam=9;fluxLookSince=0;fluxTextShown=false;fluxDelay=0;fluxThreat=0;fluxAtDoor=false;nokaLastTick=Date.now();renderCrank();hideTransfer();
     const p=$('camera-panel');if(p)p.classList.remove('rift-cosmo-lock');
-    renderSprites();if(night===6)ensureDevices();
+    renderSprites();ensureDevices();
   }
   window.addEventListener('rift:night-start',resetNight);
   window.addEventListener('rift:night-six-mutation-attack',e=>beginAttack(e.detail));
