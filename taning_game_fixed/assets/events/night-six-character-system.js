@@ -18,7 +18,7 @@
   let activeCam = 1, routeIndex = 0, routeClock = 0, attackClock = 0;
   let night = 0, locked = false, active = null, activeId = '', defended = new Set();
   let frame = { running:false, camOpen:false, camId:1, leftClosed:false, rightClosed:false };
-  let crank = 0, transferHeat = 0, transferInside = false, transferTimer = 0;
+  let crank = 0, nokaCam = 13, nokaMoveTick = 0, transferHeat = 0, transferInside = false, transferTimer = 0;
   let nokaLastTick = 0, nokaAI = 0, nokaThreatTimer = 0, fluxCam = 2, fluxLookSince = 0, fluxTextShown = false, fluxDelay = 0, fluxThreat = 0, fluxAtDoor = false;
   const $ = (id) => document.getElementById(id);
 
@@ -60,14 +60,15 @@
   }
   function renderSprites(){
     Object.entries(defs).forEach(([id,d])=>{
-      const feed=$('feed-'+d.cam);if(!feed)return;
+      const cam=id==='noka'?nokaCam:d.cam;
+      const feed=$('feed-'+cam);if(!feed)return;
       let el=feed.querySelector('[data-rift-character="'+id+'"]');
       if(!el){el=document.createElement('div');el.className='rift-n6-sprite';el.dataset.riftCharacter=id;el.innerHTML='<div class="figure"></div><div class="tag"></div>';feed.appendChild(el);}
       const visible=night===6 && ((id==='noka') || (id==='lobe') || (active===id) || defended.has(id));
       el.style.display=(visible && (id==='noka'||id==='lobe'?true:(active===id?Number(d.cam)===activeCam:defended.has(id))))?'flex':'none';
       el.classList.toggle('active',active===id);
       el.querySelector('.figure').textContent=d.glyph;
-      el.querySelector('.tag').textContent=d.name+' // CAM '+String(d.cam).padStart(2,'0');
+      el.querySelector('.tag').textContent=d.name+' // CAM '+String(cam).padStart(2,'0');
     });
     renderFlux();
   }
@@ -178,21 +179,28 @@
     }
     if(night===6 && frame.running && Date.now()-nokaLastTick>12000){crank=Math.max(0,crank-1);nokaLastTick=Date.now();renderCrank();window.dispatchEvent(new CustomEvent('rift:night-six-noka-wind-level',{detail:{value:crank,max:5,calm:crank>0}}));}
     if(night===6 && frame.running && nokaAI>0){
-      if(crank>0)nokaThreatTimer=0;
-      else {nokaThreatTimer+=Math.min(.1,Math.max(0,Number(frame.dt)||0));if(nokaThreatTimer>=10){nokaThreatTimer=0;window.dispatchEvent(new CustomEvent('rift:character-jumpscare',{detail:{characterId:'noka',name:'诺卡',reason:'music-box-unwound'}}));}}
+      if(crank>0){nokaThreatTimer=0;nokaMoveTick=0;}
+      else {
+        nokaThreatTimer+=Math.min(.1,Math.max(0,Number(frame.dt)||0));
+        if(nokaThreatTimer>=nokaMoveTick+3.5 && nokaThreatTimer<12){
+          nokaMoveTick+=3.5;let next=1+Math.floor(Math.random()*12);if(next===nokaCam)next=next===12?1:next+1;nokaCam=next;renderSprites();
+          window.dispatchEvent(new CustomEvent('rift:noka-enter-room',{detail:{camId:nokaCam,night:6}}));
+        }
+        if(nokaThreatTimer>=12){nokaThreatTimer=0;window.dispatchEvent(new CustomEvent('rift:character-jumpscare',{detail:{characterId:'noka',name:'诺卡',reason:'music-box-unwound'}}));}
+      }
     }
     // Flux is handled by character-ai-system.js on every night.
   }
   function onDoor(e){
     const d=e.detail||{};
     if(!active&&!fluxAtDoor&&!(nokaAI>0&&nokaThreatTimer>0))return;
-    if(nokaAI>0&&nokaThreatTimer>0&&d.elevenEventActive&&(d.rightClosed||frame.rightClosed)){nokaThreatTimer=0;crank=Math.max(1,crank);renderCrank();announce('十一的异常期间，右门暂时挡住了诺卡');}
+    if(nokaAI>0&&nokaThreatTimer>0&&d.elevenEventActive&&(d.rightClosed||frame.rightClosed)){nokaThreatTimer=0;nokaMoveTick=0;nokaCam=13;crank=Math.max(1,crank);renderCrank();renderSprites();announce('十一的异常期间，右门暂时挡住了诺卡');}
     if(fluxAtDoor&&(d.leftClosed||d.rightClosed||frame.leftClosed||frame.rightClosed)){fluxAtDoor=false;fluxThreat=0;fluxDelay=0;announce('闪流被门挡住，暂时退开');renderFlux();}
     if(active==='gu'&&(d.leftClosed||frame.leftClosed))finishAttack(true,'left-door');
     else if(active==='chillo'&&(d.rightClosed||frame.rightClosed))finishAttack(true,'right-door');
     else if(active==='tannin'&&(d.leftClosed||d.rightClosed))finishAttack(true,'door');
   }
-  function onCrank(e){const d=e&&e.detail||{};crank=Math.max(0,Math.min(5,Number(d.value)||0));nokaThreatTimer=0;renderCrank();}
+  function onCrank(e){const d=e&&e.detail||{};crank=Math.max(0,Math.min(5,Number(d.value)||0));nokaThreatTimer=0;nokaMoveTick=0;nokaCam=13;renderCrank();renderSprites();}
   function onFlash(){if(active==='lobe'&&frame.camOpen&&Number(frame.camId)===10)finishAttack(true,'cam10-flash');}
   function onMonitor(e){
     const d=e.detail||{};
@@ -200,11 +208,12 @@
   }
   function resetNight(e){
     night=Number(e.detail&&e.detail.night)||0;locked=false;active=null;activeId='';defended.clear();activeCam=1;routeIndex=0;routeClock=0;attackClock=0;
-    crank=5;nokaAI=Math.max(0,Number((((window.NIGHT_SETTINGS||{})[night]||{}).characters||{}).noka)||0);nokaThreatTimer=0;transferHeat=0;transferInside=false;fluxCam=2+Math.floor(Math.random()*10);if(fluxCam===10||fluxCam===13)fluxCam=9;fluxLookSince=0;fluxTextShown=false;fluxDelay=0;fluxThreat=0;fluxAtDoor=false;nokaLastTick=Date.now();renderCrank();hideTransfer();
+    crank=5;nokaCam=13;nokaMoveTick=0;nokaAI=Math.max(0,Number((((window.NIGHT_SETTINGS||{})[night]||{}).characters||{}).noka)||0);nokaThreatTimer=0;transferHeat=0;transferInside=false;fluxCam=2+Math.floor(Math.random()*10);if(fluxCam===10||fluxCam===13)fluxCam=9;fluxLookSince=0;fluxTextShown=false;fluxDelay=0;fluxThreat=0;fluxAtDoor=false;nokaLastTick=Date.now();renderCrank();hideTransfer();
     renderSprites();ensureDevices();
   }
   window.addEventListener('rift:night-start',resetNight);
   window.addEventListener('rift:night-six-mutation-attack',e=>beginAttack(e.detail));
+  window.addEventListener('rift:noka-enter-room',e=>{const cam=Number(e.detail&&e.detail.camId);if(active&&activeCam===cam){const route=routes[active]||[];if(routeIndex<route.length-1){routeIndex++;activeCam=route[routeIndex];routeClock=0;renderActiveAtCam();}}});
   window.addEventListener('rift:night-six-others-return',()=>{locked=true;active=null;const office=$('rift-n6-office-attacker');if(office)office.style.display='none';renderSprites();});
   window.addEventListener('rift:night-six-eleven-awakened',()=>{locked=false;renderSprites();});
   window.addEventListener('rift:game-frame',onFrame);
