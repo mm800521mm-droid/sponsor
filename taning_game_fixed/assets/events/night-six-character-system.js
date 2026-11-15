@@ -21,36 +21,6 @@
   let cosmoLockUntil = 0, nokaLastTick = 0, fluxCam = 2, fluxLookSince = 0, fluxTextShown = false, fluxDelay = 0, fluxThreat = 0, fluxAtDoor = false;
   const $ = (id) => document.getElementById(id);
 
-  const style = document.createElement('style');
-  style.textContent = `
-    .rift-n6-sprite{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;z-index:8;pointer-events:none;background:radial-gradient(ellipse at 50% 70%,rgba(0,0,0,.2),transparent 65%)}
-    .rift-n6-sprite .figure{width:clamp(48px,10vw,116px);height:clamp(74px,22vh,190px);display:flex;align-items:center;justify-content:center;position:relative;color:#cbbda2;font: bold clamp(34px,7vw,76px) Georgia,serif;text-shadow:0 0 8px #d5c6a0,0 0 24px #8b1c1c;filter:drop-shadow(0 8px 9px #000);animation:riftN6Sway 2.8s ease-in-out infinite}
-    .rift-n6-sprite .figure:before{content:"";position:absolute;inset:12% 16% 0;border:2px solid rgba(190,170,140,.5);border-radius:48% 48% 18% 18%;background:linear-gradient(145deg,rgba(70,58,48,.9),rgba(8,8,8,.98));z-index:-1;box-shadow:inset 0 0 20px #000,0 0 14px #000}
-    .rift-flux-tv .figure:before{inset:8% 3% 38%;border-radius:7px;background:linear-gradient(145deg,#34302b,#080808);border:3px solid #a79b87;box-shadow:inset 0 0 0 3px #151515,inset 0 0 18px #8b1c1c,0 0 10px #000}
-    .rift-flux-tv .figure:after{content:'';position:absolute;top:0;left:32%;width:36%;height:13%;border-top:2px solid #b7a88e;border-left:2px solid #b7a88e;transform:skew(-25deg);}
-    .rift-n6-sprite .tag{font:10px/1.2 'Courier New',monospace;letter-spacing:2px;color:#e7d6b7;background:#090807d9;border:1px solid #806d52;padding:3px 7px}
-    .rift-n6-sprite.active .figure{color:#d8b8a2;text-shadow:0 0 8px #f44,0 0 25px #b00;animation:riftN6Glitch .18s steps(2) infinite}
-    @keyframes riftN6Sway{50%{transform:translateY(-4px) rotate(1deg)}}
-    @keyframes riftN6Glitch{50%{transform:translate(3px,-1px) skew(-3deg);filter:hue-rotate(30deg) contrast(1.8)}}
-    .rift-n6-device{position:absolute;z-index:35;left:50%;bottom:12%;transform:translateX(-50%);display:none;min-width:150px;padding:10px;background:#080706ed;border:1px solid #9a7951;color:#ead8b8;text-align:center;font:12px 'Courier New',monospace;box-shadow:0 5px 22px #000}
-    #feed-13.active .rift-n6-device[data-device="crank"],#feed-10.active .rift-n6-device[data-device="flash"]{display:block}
-    .rift-n6-device button{margin-top:6px;padding:8px 12px;background:#39291d;border:1px solid #b18a58;color:#fff0d5;font:12px 'Courier New',monospace;touch-action:manipulation}
-    .rift-n6-meter{height:5px;background:#332b22;margin-top:7px}.rift-n6-meter i{display:block;height:100%;width:0;background:#c99b57}
-    #rift-n6-status{position:absolute;top:clamp(115px,17vh,170px);left:50%;transform:translateX(-50%);z-index:100;display:none;max-width:min(90vw,540px);padding:9px 14px;background:#090706e8;border:1px solid #a17b50;color:#f0dfc4;font:12px/1.5 'Courier New',monospace;text-align:center;pointer-events:none}
-    #rift-n6-status.show{display:block}
-    #rift-n6-transfer{position:absolute;inset:24% 30% 18%;z-index:90;display:none;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:radial-gradient(ellipse,#1b1713ed,#050505cc 72%);border:1px solid #8b765b;color:#ead8c0;font:13px 'Courier New',monospace;touch-action:manipulation}
-    #rift-n6-transfer.show{display:flex}
-    #rift-n6-transfer .face{font-size:clamp(48px,12vw,100px);text-shadow:0 0 15px #a22}
-    #rift-n6-transfer .meter{width:65%;height:7px;background:#342b25}.meter i{display:block;height:100%;width:0;background:#a22}
-    .rift-flux-choice{position:absolute;z-index:50;left:50%;top:28%;transform:translateX(-50%);display:flex;gap:8px;padding:10px;background:#090807eF;border:1px solid #a17b50;color:#f0dfc4;font:16px 'Courier New',monospace;pointer-events:auto}
-    .rift-flux-choice button{min-width:42px;padding:10px;background:#211a16;border:1px solid #8b765b;color:#d5c2a4;font:20px 'Courier New',monospace}
-    .rift-flux-choice button.clear{color:#fff;background:#5a4630;border-color:#f0d5a4;text-shadow:0 0 8px #fff}
-    #camera-panel.rift-cosmo-lock #cam-map{pointer-events:none;filter:blur(2px) grayscale(1)}
-    #camera-panel.rift-cosmo-lock:after{content:'SIGNAL ORBIT // CONTROL LOST';position:absolute;inset:40% 8% auto;text-align:center;color:#d8c5a2;background:#050505dc;padding:15px;border:1px solid #a17b50;z-index:80;font:12px 'Courier New',monospace;pointer-events:none}
-    @media(max-width:700px){.rift-n6-device{bottom:8%;padding:8px;min-width:135px}#rift-n6-transfer{inset:27% 12% 20%}}
-  `;
-  document.head.appendChild(style);
-
   function ensureStatus(){
     let el=$('rift-n6-status');
     if(!el){el=document.createElement('div');el.id='rift-n6-status';($('game')||document.body).appendChild(el);}
