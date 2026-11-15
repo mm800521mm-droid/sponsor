@@ -39,7 +39,7 @@
     }
     subtitle.replaceChildren();
     subtitle.classList.add('show');
-    const commandPattern = /\\[(red|glitch)\\]/g;
+    const commandPattern = /\[(red|glitch)\]/g;
     const parts = String(alertText).split(commandPattern);
     let effects = [];
     for (const part of parts) {
