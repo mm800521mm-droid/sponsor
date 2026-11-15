@@ -57,11 +57,38 @@ class GildedElevenAI {
     return document.getElementById(id) || (ctx.dom && ctx.dom[id]) || null;
   }
 
+  ensureStageStatus() {
+    let panel = document.getElementById('rift-eleven-stage-status');
+    if (!panel) {
+      panel = document.createElement('div');
+      panel.id = 'rift-eleven-stage-status';
+      panel.style.cssText = 'position:absolute;left:18px;top:72px;z-index:85;display:none;width:min(310px,42vw);padding:12px 14px;background:rgba(5,5,5,.92);border:1px solid #8e713e;box-shadow:0 0 18px #000, inset 0 0 18px rgba(180,130,55,.12);color:#e7d3a8;font: bold 13px/1.5 Courier New,monospace;letter-spacing:1px;pointer-events:none;';
+      panel.innerHTML = '<div style="color:#c69b53;font-size:11px;letter-spacing:3px;">RIFT ASH // ENTITY TRACKER</div><div id="rift-eleven-stage-name" style="font-size:19px;color:#fff;margin:3px 0 2px;">十一：待机</div><div id="rift-eleven-stage-place">位置：未知</div><div id="rift-eleven-stage-count">阶段：0 / 4</div><div style="height:5px;background:#292117;margin-top:8px;"><div id="rift-eleven-stage-bar" style="height:100%;width:0;background:#c69b53;box-shadow:0 0 8px #c69b53;"></div></div>';
+      (document.getElementById('game') || document.body).appendChild(panel);
+    }
+    return panel;
+  }
+
+  updateStageStatus(node) {
+    const panel = this.ensureStageStatus();
+    const names = { behind: '玩家身后', stage: '排练小舞台', storage: '玩偶储藏舱', workshop: '维修工坊', props: '道具仓库', mainHall: '走廊区域' };
+    const phases = { DORMANT: '休眠中', ACTIVE: this.phase === 'BEHIND' ? '身后接近阶段' : '区域巡游阶段', ATTACKED: '攻击触发' };
+    const name = panel.querySelector('#rift-eleven-stage-name');
+    const place = panel.querySelector('#rift-eleven-stage-place');
+    const count = panel.querySelector('#rift-eleven-stage-count');
+    const bar = panel.querySelector('#rift-eleven-stage-bar');
+    if (name) name.textContent = '十一：' + (phases[this.state] || '状态未知');
+    if (place) place.textContent = '当前位置：' + (names[node] || names[this.path[this.currentNodeIndex]] || '尚未出现');
+    if (count) count.textContent = '阶段进度：' + Math.min(this.stage || 0, this.config.maxStages) + ' / ' + this.config.maxStages;
+    if (bar) bar.style.width = (Math.min(this.stage || 0, this.config.maxStages) / this.config.maxStages * 100) + '%';
+    panel.style.display = this.state === 'DORMANT' ? 'none' : 'block';
+  }
+
   ensureVisualNodes(ctx) {
     const host = document.getElementById('stage') || document.getElementById('game');
     if (!host) return;
+    this.ensureStageStatus();
     for (const [node, id] of Object.entries(this.config.visualMap)) {
-      // 防止重复初始化/重复脚本执行留下多个同 ID 的可视节点。
       const matches = document.querySelectorAll('[id="' + id + '"]');
       if (matches.length) {
         for (let i = 1; i < matches.length; i++) matches[i].remove();
@@ -71,7 +98,8 @@ class GildedElevenAI {
       el.id = id;
       el.className = 'gilded-eleven-node';
       el.setAttribute('aria-hidden', 'true');
-      el.style.cssText = 'position:absolute;display:none;pointer-events:none;z-index:35;width:min(20vw,210px);height:min(42vh,360px);left:50%;top:48%;transform:translate(-50%,-50%);background:linear-gradient(90deg,transparent 5%,rgba(17,13,9,.98) 22%,rgba(93,68,28,.95) 50%,rgba(17,13,9,.98) 78%,transparent 95%);clip-path:polygon(35% 0,65% 0,78% 12%,76% 30%,90% 42%,82% 100%,18% 100%,10% 42%,24% 30%,22% 12%);filter:drop-shadow(0 0 15px rgba(201,157,65,.35));';
+      el.style.cssText = 'position:absolute;display:none;pointer-events:none;z-index:36;width:min(25vw,270px);height:min(48vh,410px);left:50%;top:48%;transform:translate(-50%,-50%);filter:drop-shadow(0 0 18px rgba(190,145,65,.65));';
+      el.innerHTML = '<div class="eleven-ears"></div><div class="eleven-head"><i class="eleven-eye left"></i><i class="eleven-eye right"></i><div class="eleven-muzzle"></div></div><div class="eleven-neck"></div><div class="eleven-body"><i class="eleven-button b1"></i><i class="eleven-button b2"></i><i class="eleven-button b3"></i></div><div class="eleven-arm left"></div><div class="eleven-arm right"></div><div class="eleven-leg left"></div><div class="eleven-leg right"></div>';
       el.dataset.riftNode = node;
       host.appendChild(el);
     }
@@ -130,6 +158,7 @@ class GildedElevenAI {
       el.style.height = 'min(42vh,360px)';
     }
     el.style.transform = 'translate(-50%,-50%)';
+    this.updateStageStatus(node);
   }
 
   startNight(night, settings, ctx) {
@@ -153,6 +182,7 @@ class GildedElevenAI {
     this.timer = this.config.timings.roam;
     this.hideAll(ctx);
     this.showNode('stage', ctx);
+    this.updateStageStatus('stage');
   }
 
   update(dt, ctx) {
