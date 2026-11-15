@@ -13,6 +13,7 @@
   let transferHeat=0, transferInside=false, scareCooldown=0;
 
   function hideCharacter(id) {
+    if(id==='transfer')transferInside=false;
     document.querySelectorAll('[data-tannin-companion="' + id + '"]').forEach(el => {
       el.style.display = 'none';
     });
