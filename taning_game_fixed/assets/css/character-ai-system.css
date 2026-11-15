@@ -17,3 +17,5 @@
 .rift-n6-device button{margin-top:6px;padding:6px 10px;background:#24201b;border:1px solid #b39b70;color:#f1e8d7;font:inherit;cursor:pointer}
 .rift-n6-device button:disabled{opacity:.35;cursor:not-allowed}
 @media(max-width:700px){.rift-shared-character .tag{font-size:8px}.rift-n6-device{min-width:120px;padding:6px;font-size:9px}.rift-flux-choice{gap:6px;padding:6px}.rift-flux-choice button{min-width:38px;min-height:38px}}
+
+.rift-shared-noka .figure{color:#d7c58e;text-shadow:0 0 12px #d3a84b,0 0 22px #6b4b1e;}
