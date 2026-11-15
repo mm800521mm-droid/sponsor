@@ -594,6 +594,27 @@
     }
   });
 
+  // Night 6 mutation outcomes are routed back into the host game state.
+  window.addEventListener('rift:night-six-mutation-failed', (event) => {
+    const id = event.detail && event.detail.characterId;
+    const names = { tannin: '塔宁', gu: '孤', chillo: '寒零', cosmo: '小宇宙' };
+    if (id === 'transfer') return; // Transfer has its own non-standard scare, not a normal death.
+    if (names[id]) triggerJumpscare(names[id], '……');
+  });
+  window.addEventListener('rift:night-six-time-rollback', (event) => {
+    const hours = Math.max(1, Number(event.detail && event.detail.hours) || 1);
+    S.elapsed = Math.max(0, S.elapsed - hours * HOUR_MS);
+    S.hour = Math.min(8, Math.floor(S.elapsed / HOUR_MS));
+    processedNightEvents = new Set(
+      (activeNightSettings && activeNightSettings.specialTimes || [])
+        .filter(item => {
+          const parts = String(item.at || '00:00').split(':').map(Number);
+          return ((parts[0] || 0) * 60 + (parts[1] || 0)) <= Math.floor((S.elapsed / HOUR_MS) * 60);
+        }).map(item => item.id)
+    );
+    console.info('[Rift Ash] Earphone mutation rolled the clock back by', hours, 'hour(s).');
+  });
+
   async function playTape(tapeLines, audioFile) {
     if (!tapeLines || tapeLines.length === 0) return;
     const tapeUi = document.getElementById('tape-ui');
