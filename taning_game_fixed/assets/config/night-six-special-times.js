@@ -1,6 +1,6 @@
 /*
  * Rift Ash - Night 6 special-time schedule.
- * Five mutation attacks (excluding Eleven, Flux, Noka, and Tannin's companions) begin after Eleven awakens.
+ * Four independent mutation attacks begin after Eleven awakens; Tannin's companions follow him.
  */
 window.RIFT_NIGHT6_SPECIAL_TIMES = Object.freeze([
   { id: 'all-return', at: '05:30', type: 'all_except_eleven_return_to_start' },
@@ -11,6 +11,5 @@ window.RIFT_NIGHT6_SPECIAL_TIMES = Object.freeze([
   { id: 'eleven-turns', at: '07:30', type: 'eleven_changes_direction_toward_deadin' },
   { id: 'chillo-final-promo', mutationId: 'chillo-final-promo', at: '07:40', type: 'night_six_one_shot_mutation' },
   { id: 'line-impact', at: '07:45', type: 'nearby_line_impact' },
-  { id: 'call-cut', at: '07:56', type: 'deadin_call_disconnects' },
-  { id: 'transfer-collective-rage', mutationId: 'transfer-collective-rage', at: '08:10', type: 'night_six_one_shot_mutation' }
+  { id: 'call-cut', at: '07:56', type: 'deadin_call_disconnects' }
 ]);
