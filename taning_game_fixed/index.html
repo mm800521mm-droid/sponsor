@@ -834,8 +834,8 @@
   });
 
   function toggleMonitor() {
-    const allowNightSixCrank = S.night === 6 && currentCamId === 13;
-    if (!S.running || (elevenCameraBlackout && !allowNightSixCrank)) return;
+    // Monitor may still open during Eleven's blackout so the player can select CAM13.
+    if (!S.running) return;
     if (isLookingBack) return; 
     isCamOpen = !isCamOpen;
     window.dispatchEvent(new CustomEvent('rift:monitor-toggle',{detail:{open:isCamOpen,camId:currentCamId}}));
