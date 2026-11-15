@@ -91,7 +91,7 @@
   }
   function handleDoor(){
     for(const a of Object.values(state.actors)){
-      if(a.phase==='door' && ((a.id==='gu'&&state.leftClosed)||(a.id==='chillo'&&state.rightClosed)||(a.id==='flux'&&(state.leftClosed||state.rightClosed)))){
+      if(a.phase==='door' && (state.leftClosed||state.rightClosed) && ['gu','chillo','flux'].includes(a.id)){
         returnActor(a);
         emit('rift:shared-defense',{method:'door',side:a.id==='gu'?'left':a.id==='chillo'?'right':'either',source:a.id});
         emit('rift:character-status',{characterId:a.id,status:'repelled'});
@@ -99,7 +99,7 @@
     }
     for(const a of Object.values(state.actors)){
       if(a.phase!=='door')continue;
-      const safe=a.id==='gu'?state.leftClosed:a.id==='chillo'?state.rightClosed:false;
+      const safe=(a.id==='gu'||a.id==='chillo'||a.id==='flux')&&(state.leftClosed||state.rightClosed);
       if(a.id==='flux'){
         if(state.leftClosed||state.rightClosed){returnActor(a);emit('rift:character-status',{characterId:'flux',status:'repelled'});}
         else if(Date.now()>=a.deadline)fail(a,'flux-door-timeout');
