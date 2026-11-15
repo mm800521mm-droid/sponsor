@@ -6,6 +6,7 @@ class GildedElevenAI {
     this.aiLevel = 0;
     this.specialAwakened = false;
     this.debugVisible = false;
+    this.wasLookingBack = false;
     this.reset(null);
   }
 
@@ -40,6 +41,7 @@ class GildedElevenAI {
 
   reset(ctx) {
     this.debugVisible = false;
+    this.wasLookingBack = false;
     this.state = 'DORMANT';
     this.phase = 'BEHIND';
     this.timer = this.config.timings.stage;
@@ -199,6 +201,13 @@ class GildedElevenAI {
     this.updateNightSixStageStatus();
   }
 
+  retreatOneStage(ctx) {
+    this.stage = Math.max(0, this.stage - 1);
+    this.timer = this.config.timings.stage;
+    if (this.specialAwakened) this.updateNightSixStageStatus();
+    else this.updateStageStatus('behind');
+  }
+
   update(dt, ctx) {
     if (!ctx || !ctx.isGameRunning()) return;
     this.ensureVisualNodes(ctx);
@@ -206,8 +215,16 @@ class GildedElevenAI {
     if (this.debugVisible) {
       this.showNode('behind', ctx);
       const behind = this.getVisualElement('behind', ctx);
+      if (ctx.isLookingBack()) {
+        if (!this.wasLookingBack) this.retreatOneStage(ctx);
+        this.wasLookingBack = true;
+        if (behind) behind.classList.remove('gilded-eleven-moving');
+        this.updateStageStatus('behind');
+        return;
+      }
+      this.wasLookingBack = false;
       if (behind) behind.classList.add('gilded-eleven-moving');
-      // 调试显示模式用于验证阶段推进，因此即使强制显示回头视角，也持续推进计时。
+      // 调试显示模式与正式模式使用相同的回头退阶段规则。
       this.timer -= dt;
       if (this.timer <= 0) {
         this.stage += 1;
@@ -232,12 +249,15 @@ class GildedElevenAI {
       this.showNode('behind', ctx);
       const behind = this.getVisualElement('behind', ctx);
       if (behind) behind.classList.add('gilded-eleven-moving');
-      // 玩家回头观察时，十一停止动作；已完成的阶段保留。
+      // 回头看见十一时，阶段提示保持可见，并且每次回头只击退一个阶段。
       if (ctx.isLookingBack()) {
+        if (!this.wasLookingBack) this.retreatOneStage(ctx);
+        this.wasLookingBack = true;
         if (behind) behind.classList.remove('gilded-eleven-moving');
-        this.timer = this.config.timings.stage;
+        this.updateStageStatus('behind');
         return;
       }
+      this.wasLookingBack = false;
       this.timer -= dt;
       if (this.timer <= 0) {
         if (!this.canTakeAction()) {
@@ -289,4 +309,55 @@ class GildedElevenAI {
     }
   }
 }
+
+window.drawGildedElevenJumpscareFace = function (canvas) {
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+  ctx.imageSmoothingEnabled = false;
+  const unit = Math.max(3, Math.floor(Math.min(w / 40, h / 48)));
+  const ox = Math.floor((w - unit * 40) / 2);
+  const oy = Math.floor((h - unit * 48) / 2);
+  const px = (x, y, ww, hh, color) => {
+    ctx.fillStyle = color;
+    ctx.fillRect(ox + x * unit, oy + y * unit, ww * unit, hh * unit);
+  };
+  const dark='#17100d', rust='#493021', shadow='#2b1c15', gold='#8b642d',
+    mid='#bd9147', light='#e0bd70', pale='#f0d99b', black='#080707',
+    red='#f21c13', steel='#77716a';
+  // Ears and battered outer silhouette.
+  px(3,4,10,12,dark); px(5,3,7,11,rust); px(7,4,4,8,gold);
+  px(27,3,10,13,dark); px(29,4,7,10,rust); px(30,5,4,7,gold);
+  // Head shell, uneven and cracked.
+  px(6,10,28,27,dark); px(8,9,24,27,rust); px(10,8,20,28,gold);
+  px(8,13,3,17,shadow); px(29,13,4,16,shadow);
+  px(11,10,18,4,mid); px(9,17,22,13,mid);
+  px(12,14,5,3,light); px(24,13,5,3,light);
+  // Brow ridges and eye sockets.
+  px(9,18,10,8,dark); px(22,18,10,8,dark);
+  px(11,20,7,4,black); px(23,20,7,4,black);
+  px(13,20,3,4,red); px(25,20,3,4,red);
+  px(14,20,1,2,'#fff1c5'); px(26,20,1,2,'#fff1c5');
+  // Snout, split muzzle and square teeth.
+  px(13,27,14,8,dark); px(15,27,10,6,light);
+  px(18,26,4,4,pale); px(16,31,8,3,'#b18b51');
+  px(14,34,13,3,black); px(15,34,3,2,pale); px(20,34,3,2,pale); px(25,34,2,2,pale);
+  // Cracks, exposed bolts and endoskeleton at jaw.
+  px(7,15,2,6,steel); px(31,15,2,5,steel);
+  px(10,12,2,4,dark); px(12,12,1,3,pale);
+  px(27,11,2,5,dark); px(26,12,1,4,pale);
+  px(8,29,4,2,dark); px(29,29,4,2,dark);
+  px(17,38,6,3,steel); px(13,41,14,3,dark);
+  // Hard shadowing and gold glints.
+  px(5,23,3,9,shadow); px(32,23,3,9,shadow);
+  px(11,9,5,2,pale); px(25,9,4,2,pale);
+  ctx.fillStyle='rgba(0,0,0,.35)';
+  ctx.fillRect(0,0,w,h);
+  ctx.globalCompositeOperation='screen';
+  ctx.fillStyle='rgba(170,0,0,.10)';
+  ctx.fillRect(0,0,w,h);
+  ctx.globalCompositeOperation='source-over';
+};
+
 window.GildedElevenAI = GildedElevenAI;
