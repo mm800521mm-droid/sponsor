@@ -579,6 +579,8 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
 <script src="characters/taning.js"></script>
 <script src="characters/taning_fight_load.js"></script>
 <script src="characters/tannin_pixel.js"></script>
+<script src="characters/gilded-eleven.js"></script>
+<script src="characters/gilded-eleven-fight-load.js"></script>
 
 <script>
 (function () {
@@ -842,6 +844,7 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
   const GameContext = {
     getNight: () => S.night,
     isGameRunning: () => S.running && !S.ended,
+    isLookingBack: () => isLookingBack,
     isPlayerLookingAt: (dir) => (dir === 'L' && Math.abs(currentView + 1) < 0.16) || (dir === 'R' && Math.abs(currentView - 1) < 0.16),
     isLightOn: (dir) => (dir === 'L' ? btnLlight : btnRlight).classList.contains('on'),
     isDoorClosed: (dir) => dir === 'L' ? dL : dR,
@@ -861,6 +864,13 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
       flashR: document.getElementById('flashR')
     }
   };
+
+  window.addEventListener('rift:night-special-time', (event) => {
+    if (typeof gildedEleven !== 'undefined') {
+      try { gildedEleven.onSpecialTime({ ...event.detail, night: S.night }, GameContext); }
+      catch (e) { console.error('Gilded Eleven special-time event failed:', e); }
+    }
+  });
 
   async function playTape(tapeLines, audioFile) {
     if (!tapeLines || tapeLines.length === 0) return;
@@ -1217,6 +1227,9 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
         if (typeof taning !== 'undefined') {
           try { taning.update(dt, GameContext); } catch (e) { console.error('Taning AI update failed:', e); }
         }
+        if (window.gildedEleven) {
+          try { window.gildedEleven.update(dt, GameContext); } catch (e) { console.error('Gilded Eleven AI update failed:', e); }
+        }
       }
       updateUI();
     }
@@ -1285,6 +1298,10 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
           taning.setAILevel(Number(roster.tannin ?? 0));
           taning.reset(GameContext);
         } catch(e) { console.error('Could not apply Tannin night AI:', e); }
+    }
+    if (typeof gildedEleven !== 'undefined') {
+      try { gildedEleven.startNight(nightNum, activeNightSettings, GameContext); }
+      catch(e) { console.error('Could not apply Gilded Eleven night AI:', e); }
     }
     (activeNightSettings.alwaysPresent || []).forEach(id => {
       window.dispatchEvent(new CustomEvent('rift:character-presence', { detail: { night: nightNum, id, alwaysPresent: true, aiControlled: false } }));
