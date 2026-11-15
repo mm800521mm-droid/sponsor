@@ -714,13 +714,31 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
     } catch (e) { console.warn('[Rift Ash] Eleven arrival alarm unavailable:', e); }
   }
 
+  function speakElevenSystemBroadcast() {
+    try {
+      if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') return;
+      window.speechSynthesis.cancel();
+      const announcement = new SpeechSynthesisUtterance(
+        'Attention. Security system alert. The surveillance network has been compromised. All security cameras are now offline.'
+      );
+      announcement.lang = 'en-US';
+      announcement.rate = 0.88;
+      announcement.pitch = 0.82;
+      announcement.volume = 0.9;
+      const voices = window.speechSynthesis.getVoices();
+      const englishVoice = voices.find(voice => /^en(-|_)/i.test(voice.lang));
+      if (englishVoice) announcement.voice = englishVoice;
+      window.speechSynthesis.speak(announcement);
+    } catch (e) { console.warn('[Rift Ash] Emergency broadcast voice unavailable:', e); }
+  }
+
   function showElevenArrivalSequence() {
     const token = ++elevenArrivalSequenceToken;
     let overlay = document.getElementById('eleven-arrival-sequence');
     if (!overlay) {
       overlay = document.createElement('div');
       overlay.id = 'eleven-arrival-sequence';
-      overlay.innerHTML = '<div class="eleven-arrival-alert"><div class="eleven-arrival-kicker">RIFT ASH // EMERGENCY BROADCAST</div><div class="eleven-arrival-warning">⚠ 系统警报 ⚠</div><div class="eleven-arrival-main">监控网络遭到破坏</div><div class="eleven-arrival-sub">ALL SECURITY CAMERAS OFFLINE</div><div class="eleven-arrival-scan"></div></div>';
+      overlay.innerHTML = '<div class="eleven-arrival-alert"><div class="eleven-arrival-kicker">RIFT ASH // EMERGENCY BROADCAST</div><div class="eleven-arrival-warning">⚠ SYSTEM ALERT ⚠</div><div class="eleven-arrival-main">SURVEILLANCE NETWORK COMPROMISED</div><div class="eleven-arrival-sub">ALL SECURITY CAMERAS OFFLINE</div><div class="eleven-arrival-scan"></div></div>';
       document.body.appendChild(overlay);
     }
     const deskScreen = document.querySelector('#btnCam .screen');
@@ -731,6 +749,7 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
     overlay.classList.remove('show-story', 'fade-out');
     overlay.classList.add('active');
     playElevenArrivalAlarm();
+    speakElevenSystemBroadcast();
 
     // Keep the opening warning. Reveal the personal message and face on the desk monitor.
     window.setTimeout(() => {
