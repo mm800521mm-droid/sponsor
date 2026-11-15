@@ -901,8 +901,13 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
       cameraPanel.classList.remove('show');
     }
     const faceCanvas = document.getElementById('jumpscare-face-model');
-    if (faceCanvas && window.drawTanninJumpscareFace) {
-      window.drawTanninJumpscareFace(faceCanvas, true);
+    const isEleven = /十一|Gilded Eleven/i.test(String(name || ''));
+    if (faceCanvas) {
+      if (isEleven && window.drawGildedElevenJumpscareFace) {
+        window.drawGildedElevenJumpscareFace(faceCanvas);
+      } else if (window.drawTanninJumpscareFace) {
+        window.drawTanninJumpscareFace(faceCanvas, true);
+      }
     }
     jumpscareOverlay.classList.remove('gameover');
     jumpscareOverlay.classList.add('show');
