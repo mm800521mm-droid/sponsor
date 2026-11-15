@@ -29,7 +29,7 @@
     document.querySelectorAll('[data-rift-shared-character="'+a.id+'"]').forEach(el=>el.remove());
   }
   function render(a,camOverride){
-    if(!a || aiFor(a.id)<=0 || state.night===6)return;
+    if(!a || aiFor(a.id)<=0 || (state.night===6 && a.id!=='flux'))return;
     const cam=Number(camOverride||a.cam);
     const feed=$('feed-'+cam);
     if(!feed)return;
@@ -43,8 +43,9 @@
     }
     const glyph={flux:'▣',lobe:'▤',gu:'▥',chillo:'❄'}[a.id];
     a.el.querySelector('.figure').textContent=glyph;
-    a.el.querySelector('.tag').textContent=names[a.id]+' // CAM '+String(cam).padStart(2,'0');
-    a.el.style.display=state.night>0&&a.phase!=='idle'?'flex':'none';
+    a.el.querySelector('.tag').textContent=names[a.id]+' // CAM '+String(cam).padStart(2,'0')+(a.phase==='idle'?' // 待机':'');
+    a.el.style.display=state.night>0?'flex':'none';
+    a.el.style.opacity=a.phase==='idle'?'0.72':'1';
   }
   function showFluxChoice(a){
     if(a.choiceEl || !state.camOpen || state.camId!==a.cam)return;
@@ -83,6 +84,7 @@
   function returnActor(a){
     clearChoice(a);a.phase='idle';a.cam=a.home;a.timer=a.interval;a.threat=0;a.look=0;a.deadline=0;
     removeActorVisual(a);
+    if(aiFor(a.id)>0)render(a);
     emit('rift:character-returned',{characterId:a.id});
   }
   function fail(a,reason){
@@ -165,7 +167,7 @@
   }
   function onMonitor(e){
     const d=e.detail||{};state.camOpen=!!d.open;state.camId=Number(d.camId)||state.camId;
-    if(state.camOpen) for(const actor of Object.values(state.actors)) if(actor.phase!=='idle') render(actor);
+    if(state.camOpen) for(const actor of Object.values(state.actors)) if(aiFor(actor.id)>0) render(actor);
     const flux=state.actors.flux;
     if(flux && !state.camOpen && flux.phase==='moving' && flux.look>0){
       if(flux.choiceEl){clearChoice(flux);flux.threat++;flux.phase=flux.threat>=2?'door':'approach';flux.deadline=Date.now()+(flux.phase==='door'?9000:12000);}
@@ -212,7 +214,7 @@
     state.night=Number(e.detail&&e.detail.night)||0;
     state.running=false;state.camOpen=false;state.camId=1;state.leftClosed=false;state.rightClosed=false;
     state.actors=actorList();
-    Object.values(state.actors).forEach(a=>{removeActorVisual(a);a.timer=a.interval;});
+    Object.values(state.actors).forEach(a=>{removeActorVisual(a);a.timer=a.interval;if(aiFor(a.id)>0)render(a);});
     state.crank=5;state.nokaTimer=0;
   }
   window.addEventListener('rift:night-start',reset);
