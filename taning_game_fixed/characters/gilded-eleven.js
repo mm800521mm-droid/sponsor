@@ -307,6 +307,7 @@ class GildedElevenAI {
       const behind = this.getVisualElement('behind', ctx);
       this.updateBehindShake(behind);
       if (ctx.isLookingBack()) {
+        if (!this.wasLookingBack) this.retreatOneStage(ctx);
         this.wasLookingBack = true;
         if (behind) {
           behind.classList.remove('gilded-eleven-moving');
@@ -348,6 +349,7 @@ class GildedElevenAI {
       if (behind) behind.classList.add('gilded-eleven-moving', 'gilded-eleven-shaking');
       // 回头看见十一时，阶段提示保持可见，并且每次回头只击退一个阶段。
       if (ctx.isLookingBack()) {
+        if (!this.wasLookingBack) this.retreatOneStage(ctx);
         this.wasLookingBack = true;
         if (behind) {
           behind.classList.remove('gilded-eleven-moving');
