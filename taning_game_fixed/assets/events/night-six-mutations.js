@@ -140,7 +140,8 @@
 
   window.RIFT_NIGHT6_MUTATION_TEST = Object.freeze({
     playAllSubtitles: testAllSubtitles,
-    playAllCharacterSubtitles: testAllCharacterSubtitles,\n    playCharacterSubtitle: playOneCharacterSubtitle,
+    playAllCharacterSubtitles: testAllCharacterSubtitles,
+    playCharacterSubtitle: playOneCharacterSubtitle,
     stop: () => { testRunToken++; hideOverlay(); }
   });
 
