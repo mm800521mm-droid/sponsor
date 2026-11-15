@@ -30,28 +30,28 @@
 
   window.NIGHT_SETTINGS = {
     1: makeNight({
-      gildedEleven: 0, flux: 0, noka: 0, tannin: 0, lobe: 0, gu: 0,
-      chillo: 0, cosmo: 0, transfer: 0
+      gildedEleven: 0, flux: 0, noka: 0, tannin: 0, lobe: 0, gu: 3,
+      chillo: 0, cosmo: 2, transfer: 2
     }),
     2: makeNight({
-      gildedEleven: 0, flux: 0, noka: 0, tannin: 0, lobe: 0, gu: 4,
-      chillo: 0, cosmo: 0, transfer: 0
+      gildedEleven: 0, flux: 0, noka: 3, tannin: 3, lobe: 2, gu: 8,
+      chillo: 0, cosmo: 8, transfer: 8
     }),
     3: makeNight({
-      gildedEleven: 0, flux: 4, noka: 0, tannin: 5, lobe: 0, gu: 5,
-      chillo: 4, cosmo: 0, transfer: 0
+      gildedEleven: 1, flux: 3, noka: 10, tannin: 0, lobe: 8, gu: 8,
+      chillo: 3, cosmo: 8, transfer: 8
     }),
     4: makeNight({
-      gildedEleven: 0, flux: 6, noka: 0, tannin: 7, lobe: 0, gu: 6,
-      chillo: 5, cosmo: 0, transfer: 0
+      gildedEleven: 2, flux: 4, noka: 15, tannin: 0, lobe: 10, gu: 10,
+      chillo: 6, cosmo: 10, transfer: 10
     }),
     5: makeNight({
-      gildedEleven: 0, flux: 8, noka: 0, tannin: 10, lobe: 0, gu: 8,
-      chillo: 7, cosmo: 0, transfer: 0
+      gildedEleven: 5, flux: 10, noka: 20, tannin: 15, lobe: 16, gu: 16,
+      chillo: 6, cosmo: 16, transfer: 16
     }),
     6: makeNight({
-      gildedEleven: 0, flux: 10, noka: 0, tannin: 12, lobe: 0, gu: 10,
-      chillo: 9, cosmo: 0, transfer: 0
+      gildedEleven: 12, flux: 15, noka: 20, tannin: 20, lobe: 20, gu: 20,
+      chillo: 20, cosmo: 20, transfer: 20
     }, window.RIFT_NIGHT6_SPECIAL_TIMES || [], ['noka'])
   };
 
