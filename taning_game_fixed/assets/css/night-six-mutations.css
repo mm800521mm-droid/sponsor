@@ -1,0 +1,37 @@
+/* 第六夜突变事件：顶部文字提示，不占用电话字幕区域 */
+#night-six-mutation-text {
+  position: absolute;
+  top: clamp(58px, 9vh, 110px);
+  left: 8vw;
+  right: 8vw;
+  z-index: 72;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 16px;
+  color: #e8e3d8;
+  background: linear-gradient(90deg, transparent, rgba(5,5,5,.84) 14%, rgba(5,5,5,.84) 86%, transparent);
+  border-top: 1px solid rgba(190,35,35,.55);
+  border-bottom: 1px solid rgba(190,35,35,.35);
+  font: 600 clamp(12px, 1.25vw, 18px)/1.45 "Courier New", monospace;
+  letter-spacing: .035em;
+  text-align: center;
+  text-shadow: 0 0 7px rgba(190,0,0,.7);
+  opacity: 0;
+  transform: translateY(-9px);
+  transition: opacity .22s ease, transform .22s ease;
+  pointer-events: none;
+}
+#night-six-mutation-text.show { opacity: 1; transform: translateY(0); }
+#night-six-mutation-text.glitch { animation: nightSixMutationGlitch .12s steps(2,end) infinite; }
+.night-six-mutation-heading {
+  color: #ff7777;
+  font-size: .82em;
+  letter-spacing: .12em;
+}
+.night-six-mutation-line { min-height: 1.35em; }
+@keyframes nightSixMutationGlitch {
+  0%,100% { text-shadow: 2px 0 #a00, -2px 0 #0aa; }
+  50% { text-shadow: -2px 0 #a00, 2px 0 #0aa; transform: translateX(2px); }
+}
