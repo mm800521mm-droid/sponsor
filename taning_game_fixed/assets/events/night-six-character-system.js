@@ -33,16 +33,32 @@
       const box=document.createElement('div');box.className='rift-n6-device';box.dataset.device='crank';
       box.innerHTML='<div>CAM 13 // MUSIC BOX</div><div id="rift-n6-crank-count">发条：0 / 5</div><div class="rift-n6-meter"><i id="rift-n6-crank-meter"></i></div><button type="button" id="rift-n6-crank-btn">上发条</button>';
       f13.appendChild(box);
-      box.querySelector('button').addEventListener('click',()=>{if(!frame.running||!frame.camOpen||Number(frame.camId)!==13)return;crank=Math.min(5,crank+1);nokaThreatTimer=0;renderCrank();window.dispatchEvent(new CustomEvent('rift:night-six-crank',{detail:{value:crank,max:5,camId:13}}));window.dispatchEvent(new CustomEvent('rift:noka-music',{detail:{value:crank,max:5,camId:13}}));});
+      const crankButton=box.querySelector('button');
+      crankButton.addEventListener('click',e=>{
+        e.preventDefault();e.stopPropagation();
+        const panel=$('camera-panel'),feed=$('feed-13');
+        const monitorVisible=!!(panel&&panel.classList.contains('show'));
+        const correctFeed=!!(feed&&feed.classList.contains('active'));
+        if(!frame.running||!monitorVisible||!correctFeed)return;
+        crank=Math.min(5,crank+1);nokaThreatTimer=0;nokaMoveTick=0;nokaLastTick=Date.now();
+        renderCrank();
+        const detail={value:crank,max:5,camId:13,source:'music-box-button'};
+        window.dispatchEvent(new CustomEvent('rift:night-six-crank',{detail}));
+        window.dispatchEvent(new CustomEvent('rift:noka-music',{detail}));
+      });
+      crankButton.addEventListener('pointerdown',e=>{e.stopPropagation();},{passive:true});
     }
     if(f10&&!f10.querySelector('[data-device="flash"]')){
       const box=document.createElement('div');box.className='rift-n6-device';box.dataset.device='flash';
       box.innerHTML='<div>CAM 10 // FLASH</div><div>发现耳机时照射</div><button type="button" id="rift-n6-flash-btn">闪光</button>';
       f10.appendChild(box);
-      box.querySelector('button').addEventListener('click',()=>{
-        if(!frame.running||!frame.camOpen||Number(frame.camId)!==10||Date.now()<flashReadyAt)return;
+      const flashButton=box.querySelector('button');
+      flashButton.addEventListener('click',e=>{
+        e.preventDefault();e.stopPropagation();
+        const panel=$('camera-panel'),feed=$('feed-10');
+        if(!frame.running||!panel||!panel.classList.contains('show')||!feed||!feed.classList.contains('active')||Date.now()<flashReadyAt)return;
         flashReadyAt=Date.now()+3000;
-        const flashButton=box.querySelector('button');flashButton.disabled=true;flashButton.textContent='冷却 3s';
+        flashButton.disabled=true;flashButton.textContent='冷却 3s';
         let remaining=3;const cooldown=setInterval(()=>{remaining--;if(remaining>0){flashButton.textContent='冷却 '+remaining+'s';}else{clearInterval(cooldown);flashButton.disabled=false;flashButton.textContent='闪光';}},1000);
         const feed=$('feed-10');if(feed){feed.classList.remove('rift-cam10-flash');void feed.offsetWidth;feed.classList.add('rift-cam10-flash');setTimeout(()=>feed.classList.remove('rift-cam10-flash'),260);}
         window.dispatchEvent(new CustomEvent('rift:night-six-flash',{detail:{camId:10,deviceOnly:true}}));
@@ -211,6 +227,7 @@
   function onFlash(){if(active==='lobe'&&frame.camOpen&&Number(frame.camId)===10)finishAttack(true,'cam10-flash');}
   function onMonitor(e){
     const d=e.detail||{};
+    frame.camOpen=!!d.open;frame.camId=Number(d.camId)||frame.camId;
     if(active==='flux'&&d.open===false)finishAttack(true,'monitor-closed');
   }
   function resetNight(e){
