@@ -57,3 +57,29 @@
 .rift-n6-meter{height:3px;margin-top:4px;}
 .cam-scene .rift-n6-sprite{z-index:18;visibility:visible;opacity:1;}
 @media(max-width:700px){.rift-n6-device{right:2%;top:2%;width:88px;min-width:0;padding:4px;font-size:8px}.rift-n6-device button{padding:4px;font-size:8px}}
+
+
+/* Interactive CAM devices must remain above CCTV overlays and accept touch/mouse input. */
+.rift-n6-device {
+  z-index: 250 !important;
+  pointer-events: auto !important;
+  isolation: isolate;
+}
+.rift-n6-device button,
+.rift-n6-device button:disabled {
+  position: relative;
+  z-index: 251;
+  pointer-events: auto !important;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+#feed-13.active .rift-n6-device[data-device="crank"],
+#feed-10.active .rift-n6-device[data-device="flash"] {
+  display: block !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+#feed-13.active .rift-n6-device[data-device="crank"] button,
+#feed-10.active .rift-n6-device[data-device="flash"] button {
+  pointer-events: auto !important;
+}
