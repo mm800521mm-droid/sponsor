@@ -23,12 +23,12 @@ class GildedElevenAI {
   }
 
   getStageDuration() {
-    const level = this.specialAwakened ? 20 : this.aiLevel;
+    const level = this.aiLevel;
     return level <= 0 ? 20 : 20 - (level / 20) * 13.5;
   }
 
   canTakeAction() {
-    const level = this.specialAwakened ? 20 : this.aiLevel;
+    const level = this.aiLevel;
     if (level <= 0) return false;
     if (typeof window.riftCanCharacterMove === 'function') {
       return window.riftCanCharacterMove(level);
@@ -214,7 +214,7 @@ class GildedElevenAI {
   }
 
   onSpecialTime(event, ctx) {
-    if (!event || event.id !== 'eleven-awakens' || Number(event.night) !== 6) return;
+    if (!event || event.id !== 'eleven-awakens' || Number(event.night) !== 6 || this.aiLevel <= 0) return;
     this.specialAwakened = true;
     this.stageDuration = this.getStageDuration();
     this.debugVisible = false;
@@ -316,6 +316,7 @@ class GildedElevenAI {
     if (!ctx || !ctx.isGameRunning()) return;
     dt = Math.max(0, Math.min(Number(dt) || 0, 0.1));
     this.ensureVisualNodes(ctx);
+    if (this.aiLevel <= 0) { this.state = 'DORMANT'; this.hideAll(ctx); this.updateStageStatus('behind'); return; }
     if (this.specialAwakened) {
       this.debugVisible = false;
       this.hideAll(ctx);
@@ -345,6 +346,7 @@ class GildedElevenAI {
       if (this.aiLevel > 0) {
         this.timer -= dt;
         if (this.timer <= 0) {
+          if (!this.canTakeAction()) { this.timer = this.stageDuration; return; }
           this.stage += 1;
           this.timer = this.stageDuration;
           this.updateStageStatus('behind');
@@ -385,6 +387,7 @@ class GildedElevenAI {
       }
       this.timer -= dt;
       if (this.timer <= 0) {
+        if (!this.canTakeAction()) { this.timer = this.stageDuration; return; }
         this.stage += 1;
         this.updateStageStatus('behind');
         this.timer = this.stageDuration;
