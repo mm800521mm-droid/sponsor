@@ -232,8 +232,12 @@
   window.addEventListener('rift:night-six-mutation-defended',hideTransfer);
   window.addEventListener('rift:night-six-mutation-resolved',hideTransfer);
   window.RIFT_NIGHT6_CHARACTER_SYSTEM=Object.freeze({
-    getState:()=>({night,locked,active,crank,transferHeat,defended:Array.from(defended)}),
-    reset:()=>resetNight({detail:{night:6}})
+    getState:()=>({night,locked,active,activeCam,crank,nokaCam,transferHeat,defended:Array.from(defended)}),
+    reset:()=>resetNight({detail:{night:6}}),
+    forceMutation:characterId=>{if(night!==6||!mutationOrder.includes(characterId))return false;beginAttack({characterId,mutationId:'debug-'+characterId});return active===characterId;},
+    forceNokaCamera:cam=>{if(night!==6&&nokaAI<=0)return false;nokaCam=Math.max(1,Math.min(12,Number(cam)||1));renderSprites();return true;},
+    setCrank:value=>{onCrank({detail:{value:Number(value),camId:13}});window.dispatchEvent(new CustomEvent('rift:night-six-crank',{detail:{value:crank,max:5,camId:13,debug:true}}));return crank;},
+    triggerFlash:()=>onFlash()
   });
   ensureDevices();
 })();
