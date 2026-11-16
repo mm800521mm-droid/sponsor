@@ -180,7 +180,8 @@
   function onFlash(e){
     const d=e.detail||{};
     const a=state.actors.lobe;
-    if(state.night!==6 && a && a.phase==='flash-window' && Number(d.camId)===10){
+    // The CAM10 flashlight works for Lobe on every night, including Night 6.
+    if(a && a.phase==='flash-window' && Number(d.camId)===10){
       returnActor(a);emit('rift:character-status',{characterId:'lobe',status:'flashed'});
     }
   }
