@@ -131,6 +131,9 @@ class TaningAI {
       return;
     }
     dt = Math.max(0, Math.min(dt, 0.1));
+    // Nights 1-5 progressively shorten action phases; Night 6 keeps its authored special timing.
+    const night = Number(ctx.getNight && ctx.getNight()) || 1;
+    if (night >= 1 && night <= 5) dt *= 1 + (night - 1) * 0.12;
 
     switch (this.state) {
       case 'WANDER': {
