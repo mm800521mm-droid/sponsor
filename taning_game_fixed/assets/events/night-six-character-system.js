@@ -27,53 +27,54 @@
     if(!el){el=document.createElement('div');el.id='rift-n6-status';($('game')||document.body).appendChild(el);}
     return el;
   }
+  function syncDeviceVisibility(){
+    const panel=$('camera-panel');
+    const visible=!!(frame.running&&frame.camOpen&&panel&&panel.classList.contains('show'));
+    const crankBox=panel&&panel.querySelector('[data-device="crank"]');
+    const flashBox=panel&&panel.querySelector('[data-device="flash"]');
+    if(crankBox)crankBox.style.display=visible&&Number(frame.camId)===13?'block':'none';
+    if(flashBox)flashBox.style.display=visible&&Number(frame.camId)===10?'block':'none';
+  }
   function ensureDevices(){
-    const f13=$('feed-13'), f10=$('feed-10');
-    if(f13&&!f13.querySelector('[data-device="crank"]')){
+    const panel=$('camera-panel');
+    if(!panel)return;
+    if(!panel.querySelector('[data-device="crank"]')){
       const box=document.createElement('div');box.className='rift-n6-device';box.dataset.device='crank';
       box.innerHTML='<div>CAM 13 // MUSIC BOX</div><div id="rift-n6-crank-count">发条：0 / 5</div><div class="rift-n6-meter"><i id="rift-n6-crank-meter"></i></div><button type="button" id="rift-n6-crank-btn">上发条</button>';
-      f13.appendChild(box);
-      const crankButton=box.querySelector('button');
-      let lastCrankPress=0;
-      const windMusicBox=e=>{
-        if(e){e.preventDefault();e.stopPropagation();}
-        const panel=$('camera-panel'),crankFeed=$('feed-13');
-        const monitorVisible=!!(panel&&panel.classList.contains('show'));
-        const correctFeed=!!(crankFeed&&crankFeed.classList.contains('active'));
-        if(!frame.running||!monitorVisible||!correctFeed)return;
+      panel.appendChild(box);
+      box.querySelector('button').addEventListener('click',e=>{
+        e.preventDefault();e.stopPropagation();
+        if(!frame.running||!frame.camOpen||Number(frame.camId)!==13)return;
         const now=Date.now();
-        if(now-lastCrankPress<350)return;
-        lastCrankPress=now;
         crank=Math.min(5,crank+1);nokaThreatTimer=0;nokaMoveTick=0;nokaLastTick=now;
         renderCrank();
         const detail={value:crank,max:5,camId:13,source:'music-box-button'};
         window.dispatchEvent(new CustomEvent('rift:night-six-crank',{detail}));
         window.dispatchEvent(new CustomEvent('rift:noka-music',{detail}));
-      };
-      crankButton.addEventListener('pointerdown',windMusicBox);
-      crankButton.addEventListener('click',windMusicBox);
+      });
     }
-    if(f10&&!f10.querySelector('[data-device="flash"]')){
+    if(!panel.querySelector('[data-device="flash"]')){
       const box=document.createElement('div');box.className='rift-n6-device';box.dataset.device='flash';
       box.innerHTML='<div>CAM 10 // FLASH</div><div>发现耳机时照射</div><button type="button" id="rift-n6-flash-btn">闪光</button>';
-      f10.appendChild(box);
+      panel.appendChild(box);
       const flashButton=box.querySelector('button');
-      let lastFlashPress=0;
-      const fireFlash=e=>{
-        if(e){e.preventDefault();e.stopPropagation();}
-        const panel=$('camera-panel'),feed=$('feed-10');
-        if(!frame.running||!panel||!panel.classList.contains('show')||!feed||!feed.classList.contains('active')||Date.now()<flashReadyAt)return;
-        if(Date.now()-lastFlashPress<350)return;
-        lastFlashPress=Date.now();
+      flashButton.addEventListener('click',e=>{
+        e.preventDefault();e.stopPropagation();
+        if(!frame.running||!frame.camOpen||Number(frame.camId)!==10||Date.now()<flashReadyAt)return;
         flashReadyAt=Date.now()+3000;
         flashButton.disabled=true;flashButton.textContent='冷却 3s';
-        let remaining=3;const cooldown=setInterval(()=>{remaining--;if(remaining>0){flashButton.textContent='冷却 '+remaining+'s';}else{clearInterval(cooldown);flashButton.disabled=false;flashButton.textContent='闪光';}},1000);
-        const flashFeed=$('feed-10');if(flashFeed){flashFeed.classList.remove('rift-cam10-flash');void flashFeed.offsetWidth;flashFeed.classList.add('rift-cam10-flash');setTimeout(()=>flashFeed.classList.remove('rift-cam10-flash'),260);}
+        let remaining=3;
+        const cooldown=setInterval(()=>{
+          remaining--;
+          if(remaining>0){flashButton.textContent='冷却 '+remaining+'s';}
+          else{clearInterval(cooldown);flashButton.disabled=false;flashButton.textContent='闪光';}
+        },1000);
+        const feed=$('feed-10');
+        if(feed){feed.classList.remove('rift-cam10-flash');void feed.offsetWidth;feed.classList.add('rift-cam10-flash');setTimeout(()=>feed.classList.remove('rift-cam10-flash'),260);}
         window.dispatchEvent(new CustomEvent('rift:night-six-flash',{detail:{camId:10,deviceOnly:true}}));
-      };
-      flashButton.addEventListener('pointerdown',fireFlash);
-      flashButton.addEventListener('click',fireFlash);
+      });
     }
+    syncDeviceVisibility();
   }
   function aiFor(id){const current=window.RIFT_CURRENT_AI_LEVELS||{};const settings=(((window.NIGHT_SETTINGS||{})[night]||{}).characters||{});return Math.max(0,Math.min(20,Number(current[id] ?? settings[id])||0));}
   function nokaActionCheck(){return nokaAI>0 && (typeof window.riftCanCharacterMove==='function'?window.riftCanCharacterMove(nokaAI):Math.random()*100<nokaAI*5);}
@@ -185,6 +186,7 @@
   function showTransferScare(){let el=$('rift-n6-transfer-scare');if(!el){el=document.createElement('div');el.id='rift-n6-transfer-scare';el.textContent='TRANSFER // SIGNAL OVERRUN';el.style.cssText='position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:#050303;color:#f2ddd0;font:bold clamp(24px,7vw,72px) Courier New,monospace;text-shadow:0 0 18px #b00;letter-spacing:.12em;pointer-events:none;';document.body.appendChild(el);}el.style.display='flex';setTimeout(()=>{el.style.display='none';},1100);}
   function onFrame(e){
     frame={...frame,...(e.detail||{})};
+    syncDeviceVisibility();
     if(active && frame.running){
       const dt=Math.min(.1,Math.max(0,Number(frame.dt)||0));
       routeClock+=dt;attackClock+=dt;
@@ -239,6 +241,7 @@
   function onMonitor(e){
     const d=e.detail||{};
     frame.camOpen=!!d.open;frame.camId=Number(d.camId)||frame.camId;
+    syncDeviceVisibility();
     if(active==='flux'&&d.open===false)finishAttack(true,'monitor-closed');
   }
   function resetNight(e){
