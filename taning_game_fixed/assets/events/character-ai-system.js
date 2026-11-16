@@ -223,7 +223,7 @@
   window.addEventListener('rift:night-start',reset);
   window.addEventListener('rift:night-six-mutation-attack',e=>{const id=e.detail&&e.detail.characterId;if(state.actors[id]){suspended.add(id);removeActorVisual(state.actors[id]);}});
   window.addEventListener('rift:night-six-mutation-resolved',e=>{const id=e.detail&&e.detail.characterId;if(state.actors[id]){suspended.delete(id);returnActor(state.actors[id]);}});
-  window.addEventListener('rift:night-six-mutation-defended',e=>{const id=e.detail&&e.detail.characterId;if(state.actors[id]){suspended.delete(id);returnActor(state.actors[id]);}});
+  window.addEventListener('rift:night-six-mutation-defended',e=>{const id=e.detail&&e.detail.characterId;if(state.actors[id]){suspended.add(id);removeActorVisual(state.actors[id]);}});
   window.addEventListener('rift:game-frame',onFrame);
   window.addEventListener('rift:monitor-toggle',onMonitor);
   window.addEventListener('rift:night-six-flash',onFlash);
