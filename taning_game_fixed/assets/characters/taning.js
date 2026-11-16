@@ -70,7 +70,7 @@ class TaningAI {
     }
     const el = this.getVisualElement(node, ctx);
     if (el) {
-      const cameraMatch=/^cam(\\d+)$/.exec(node);
+      const cameraMatch=/^cam(\d+)$/.exec(node);
       const feed=cameraMatch&&document.getElementById('feed-'+Number(cameraMatch[1]));
       if(feed && el.parentElement!==feed) feed.appendChild(el);
       // Reassert the host and pixel canvas visibility whenever Tannin occupies a node.
