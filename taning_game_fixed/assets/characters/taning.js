@@ -147,7 +147,7 @@ class TaningAI {
       case 'MOVE_HALL': {
         const currentNode = this.path[this.currentNodeIndex];
         const camId = currentNode === 'cam4' ? 4 : 3;
-        if (!ctx.isWatchingCam(camId)) this.timer -= dt;
+        this.timer -= dt; // 摄像头是否被玩家观看，不影响塔宁行动
         if (this.timer <= 0) {
           // 走廊每个节点各自检查一次；未通过则留在当前节点等待下一次检查。
           if (!this.canTakeAction()) {
