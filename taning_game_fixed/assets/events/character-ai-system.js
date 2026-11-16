@@ -29,7 +29,9 @@
     document.querySelectorAll('[data-rift-shared-character="'+a.id+'"]').forEach(el=>el.remove());
   }
   function render(a,camOverride){
-    if(!a || aiFor(a.id)<=0 || (state.night===6 && a.id!=='flux'))return;
+    if(!a)return;
+    if(state.night===6 && a.id!=='flux'){removeActorVisual(a);return;}
+    if(aiFor(a.id)<=0){removeActorVisual(a);return;}
     const cam=Number(camOverride||a.cam);
     const feed=$('feed-'+cam);
     if(!feed)return;
@@ -231,5 +233,8 @@
     emit('rift:night-six-time-rollback',{hours,characterId:'lobe'});
   });
   window.RIFT_SHARED_CHARACTER_AI=Object.freeze({getState:()=>({night:state.night,actors:Object.fromEntries(Object.entries(state.actors).map(([id,a])=>[id,{phase:a.phase,cam:a.cam,threat:a.threat}]))})});
-  window.addEventListener('rift:night-ai-levels-changed',()=>{ for(const actor of Object.values(state.actors)) if(actor.phase!=='idle') render(actor); });
+  window.addEventListener('rift:night-ai-levels-changed',()=>{
+    // Re-render idle actors too: their AI can rise from 0 at a timed stage.
+    for(const actor of Object.values(state.actors)) render(actor);
+  });
 })();
