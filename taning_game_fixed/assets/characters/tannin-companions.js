@@ -50,7 +50,9 @@
       }
       feed.appendChild(el);
     }
-    el.querySelector('.glyph').textContent = def.glyph;
+    const glyph=el.querySelector('.glyph');
+    if(window.RIFT_PIXEL_CHARACTERS) window.RIFT_PIXEL_CHARACTERS.mount(glyph,id);
+    else glyph.textContent=def.glyph;
     el.querySelector('.name').textContent = def.name + ' // 塔宁辅助';
     if (Number.isFinite(detail.x)) el.style.left = Math.max(0, Math.min(90, detail.x)) + '%';
     if (Number.isFinite(detail.y)) { el.style.bottom = Math.max(0, Math.min(90, detail.y)) + '%'; }
