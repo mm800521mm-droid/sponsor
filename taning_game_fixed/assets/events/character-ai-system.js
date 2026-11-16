@@ -45,7 +45,9 @@
       feed.appendChild(a.el);
     }
     const glyph={flux:'▣',lobe:'▤',gu:'▥',chillo:'❄'}[a.id];
-    a.el.querySelector('.figure').textContent=glyph;
+    const figure=a.el.querySelector('.figure');
+    if(window.RIFT_PIXEL_CHARACTERS) window.RIFT_PIXEL_CHARACTERS.mount(figure,a.id);
+    else figure.textContent=glyph;
     a.el.querySelector('.tag').textContent=names[a.id]+' // CAM '+String(cam).padStart(2,'0')+(a.phase==='idle'?' // 待机':'');
     a.el.style.display=state.night>0?'flex':'none';
     a.el.style.opacity=a.phase==='idle'?'0.72':'1';
