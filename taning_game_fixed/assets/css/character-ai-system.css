@@ -11,7 +11,7 @@
 .rift-shared-gu .figure{color:#b6b6b6}
 .rift-shared-chillo .figure{color:#a9e6f2;text-shadow:0 0 10px #8ad7ec}
 .rift-flux-choice{position:absolute;z-index:100;left:50%;top:12%;transform:translateX(-50%);display:flex;gap:12px;padding:10px;background:rgba(0,0,0,.92);border:1px solid #8ed9e8;box-shadow:0 0 18px rgba(70,180,220,.25)}
-.rift-flux-choice button{min-width:44px;min-height:44px;border:1px solid #aaa;background:#171717;color:#eee;font:bold 24px serif;cursor:pointer}
+.rift-flux-choice button{min-width:clamp(76px,12vw,120px);min-height:clamp(60px,10vw,90px);border:1px solid #aaa;background:#171717;color:#eee;font:bold clamp(18px,3vw,28px) 'Courier New',monospace;letter-spacing:.08em;cursor:pointer}
 .rift-flux-choice button.clear{border-color:#fff;color:#fff;text-shadow:0 0 9px #fff}
 .rift-n6-device{position:absolute;z-index:110;right:3%;top:4%;min-width:150px;padding:9px 11px;background:rgba(7,10,12,.9);border:1px solid rgba(200,190,160,.55);color:#e7dfcf;font:11px/1.5 Courier New,monospace;box-shadow:0 0 12px rgba(0,0,0,.8)}
 .rift-n6-device button{margin-top:6px;padding:6px 10px;background:#24201b;border:1px solid #b39b70;color:#f1e8d7;font:inherit;cursor:pointer}
