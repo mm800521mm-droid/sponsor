@@ -65,7 +65,8 @@
       });
     }
   }
-  function nokaActionCheck(){return typeof window.riftCanCharacterMove==='function'?window.riftCanCharacterMove(nokaAI):Math.random()*100<nokaAI*5;}
+  function aiFor(id){return Math.max(0,Math.min(20,Number((window.RIFT_CURRENT_AI_LEVELS||{})[id] ?? ((((window.NIGHT_SETTINGS||{})[night]||{}).characters||{})[id]))||0);}
+  function nokaActionCheck(){return nokaAI>0 && (typeof window.riftCanCharacterMove==='function'?window.riftCanCharacterMove(nokaAI):Math.random()*100<nokaAI*5);}
   function renderCrank(){
     const label=$('rift-n6-crank-count'), bar=$('rift-n6-crank-meter');
     if(label)label.textContent='发条：'+crank+' / 5';
@@ -86,8 +87,8 @@
       let el=feed.querySelector('[data-rift-character="'+id+'"]');
       if(!el){el=document.createElement('div');el.className='rift-n6-sprite';el.dataset.riftCharacter=id;el.innerHTML='<div class="figure"></div><div class="tag"></div>';feed.appendChild(el);}
       const baseAI=Math.max(0,Number((window.RIFT_CURRENT_AI_LEVELS||{})[id] ?? ((((window.NIGHT_SETTINGS||{})[night]||{}).characters||{})[id]))||0);
-      const visible=(id==='noka' && (night===6 || nokaAI>0)) || (night===6 && (baseAI>0 || id==='lobe' || active===id || defended.has(id)));
-      el.style.display=(visible && (id==='noka'||(active===id?Number(cam)===activeCam:(night===6&&baseAI>0)||id==='lobe'||defended.has(id))))?'flex':'none';
+      const visible=(id==='noka' && nokaAI>0) || (night===6 && active===id && baseAI>0);
+      el.style.display=(visible && (id==='noka'||(active===id&&Number(cam)===activeCam)))?'flex':'none';
       el.classList.toggle('active',active===id);
       el.querySelector('.figure').textContent=d.glyph;
       el.querySelector('.tag').textContent=d.name+' // CAM '+String(cam).padStart(2,'0');
@@ -140,7 +141,7 @@
     if(success)announce(defs[id].name+' 已被防御，返回初始位置并停止行动');
   }
   function beginAttack(detail){
-    if(night!==6||locked||!detail||!mutationOrder.includes(detail.characterId)||defended.has(detail.characterId))return;
+    if(night!==6||locked||!detail||!mutationOrder.includes(detail.characterId)||defended.has(detail.characterId)||aiFor(detail.characterId)<=0)return;
     // 每个突变事件都必须从独立的路线和计时状态开始，不能继承上一名角色的进度。
     routeIndex=0;routeClock=0;attackClock=0;
     active=detail.characterId;activeId=detail.mutationId||'';
