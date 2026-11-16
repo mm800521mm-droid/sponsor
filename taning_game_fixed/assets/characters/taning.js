@@ -70,15 +70,19 @@ class TaningAI {
     }
     const el = this.getVisualElement(node, ctx);
     if (el) {
+      // Reassert the host and pixel canvas visibility whenever Tannin occupies a node.
+      // Other CCTV effects may hide the host between frames; restore both layers together.
       el.style.setProperty('display', 'block', 'important');
       el.style.setProperty('visibility', 'visible', 'important');
       el.style.setProperty('opacity', '1', 'important');
+      el.style.setProperty('z-index', '60', 'important');
       el.classList.add('show');
       const sprite = el.querySelector('.tannin-pixel-sprite');
       if (sprite) {
         sprite.style.setProperty('display', 'block', 'important');
         sprite.style.setProperty('visibility', 'visible', 'important');
         sprite.style.setProperty('opacity', '1', 'important');
+        sprite.style.setProperty('z-index', '61', 'important');
       }
       if (this.state === 'MOVE_HALL' && (node === 'cam3' || node === 'cam4')) {
         el.classList.add('taning-moving');
