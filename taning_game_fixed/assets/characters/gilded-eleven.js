@@ -223,7 +223,7 @@ class GildedElevenAI {
     const patrolCam = /^cam\\d+$/.test(currentNode) ? Number(currentNode.slice(3)) : 0;
     if (place) place.textContent = '当前位置：' + (patrolCam ? (patrolCam === 1 ? '保安室（CAM 01）' : '监控区域 CAM ' + String(patrolCam).padStart(2,'0')) : (names[currentNode] || '区域未知'));
     const progress = patrolCam ? this.currentNodeIndex + 1 : Math.min(this.stage || 0, this.config.maxStages);
-    const total = patrolCam ? this.path.length : this.config.maxStages;
+    const total = patrolCam ? 12 : this.config.maxStages;
     if (count) count.textContent = '巡查进度：' + progress + ' / ' + total;
     if (bar) bar.style.width = (progress / total * 100) + '%';
     panel.style.display = 'block';
@@ -316,7 +316,7 @@ class GildedElevenAI {
     this.currentNodeIndex = 0;
     this.timer = this.config.timings.roam;
     this.roomEncountered.clear();
-    // 十一从最深处 CAM 14 出发，逐个巡查 CAM 14 至 CAM 01，最后抵达保安室。
+    // CAM 13、14 不属于可见监控巡逻路线；十一从 CAM 12 逐站巡查至 CAM 01。
     this.hideAll(ctx);
     const firstRoom = this.path[this.currentNodeIndex];
     this.showNode(firstRoom, ctx);
