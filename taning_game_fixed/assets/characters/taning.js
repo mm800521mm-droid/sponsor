@@ -76,6 +76,8 @@ class TaningAI {
       el.style.setProperty('visibility', 'visible', 'important');
       el.style.setProperty('opacity', '1', 'important');
       el.style.setProperty('z-index', '60', 'important');
+      el.style.setProperty('clip-path', 'none', 'important');
+      el.style.setProperty('overflow', 'visible', 'important');
       el.classList.add('show');
       const sprite = el.querySelector('.tannin-pixel-sprite');
       if (sprite) {
@@ -83,6 +85,7 @@ class TaningAI {
         sprite.style.setProperty('visibility', 'visible', 'important');
         sprite.style.setProperty('opacity', '1', 'important');
         sprite.style.setProperty('z-index', '61', 'important');
+        sprite.style.setProperty('clip-path', 'none', 'important');
       }
       if (this.state === 'MOVE_HALL' && (node === 'cam3' || node === 'cam4')) {
         el.classList.add('taning-moving');
