@@ -149,11 +149,14 @@ class GildedElevenAI {
   }
 
   showNode(node, ctx) {
-    const el = this.getVisualElement(node, ctx);
+    const patrolCamera = this.specialAwakened && /^cam\\d+$/.test(node) ? Number(node.slice(3)) : 0;
+    const visualNode = patrolCamera ? 'patrol' : node;
+    const el = this.getVisualElement(visualNode, ctx);
     if (!el) return;
+    // 第六夜巡逻时把十一挂到对应监控画面，不再画在保安室主场景上。
     // 每个时刻只允许一个十一节点显示，其他区域节点一律隐藏。
     for (const otherNode of Object.keys(this.config.visualMap)) {
-      if (otherNode === node) continue;
+      if (otherNode === visualNode) continue;
       const other = this.getVisualElement(otherNode, ctx);
       if (other) {
         other.style.display = 'none';
@@ -165,7 +168,12 @@ class GildedElevenAI {
     el.style.visibility = 'visible';
     el.style.opacity = '1';
     el.classList.add('show');
-    if (node === 'behind') {
+    if (patrolCamera) {
+      const feed = document.getElementById('feed-' + patrolCamera);
+      if (feed && el.parentElement !== feed) feed.appendChild(el);
+      el.style.left = '50%'; el.style.top = '53%';
+      el.style.width = 'min(34vw,300px)'; el.style.height = 'min(58vh,430px)';
+    } else if (node === 'behind') {
       const backView = document.getElementById('back-view');
       if (backView && el.parentElement !== backView) backView.appendChild(el);
       el.style.left = '50%';
@@ -206,15 +214,18 @@ class GildedElevenAI {
   updateNightSixStageStatus(node) {
     const panel = this.ensureStageStatus();
     const names = { behind: '玩家身后', stage: '排练小舞台', storage: '玩偶储藏舱', workshop: '维修工坊', props: '道具仓库', mainHall: '走廊区域' };
-    const currentNode = node || this.path[this.currentNodeIndex] || 'mainHall';
+    const currentNode = node || this.path[this.currentNodeIndex] || 'cam1';
     const name = panel.querySelector('#rift-eleven-stage-name');
     const place = panel.querySelector('#rift-eleven-stage-place');
     const count = panel.querySelector('#rift-eleven-stage-count');
     const bar = panel.querySelector('#rift-eleven-stage-bar');
     if (name) name.textContent = this.state === 'ATTACKED' ? '十一：攻击阶段' : '第六夜：设施异常阶段';
-    if (place) place.textContent = '当前位置：' + (names[currentNode] || '区域未知');
-    if (count) count.textContent = '阶段进度：' + Math.min(this.stage || 0, this.config.maxStages) + ' / ' + this.config.maxStages;
-    if (bar) bar.style.width = (Math.min(this.stage || 0, this.config.maxStages) / this.config.maxStages * 100) + '%';
+    const patrolCam = /^cam\\d+$/.test(currentNode) ? Number(currentNode.slice(3)) : 0;
+    if (place) place.textContent = '当前位置：' + (patrolCam ? (patrolCam === 1 ? '保安室（CAM 01）' : '监控区域 CAM ' + String(patrolCam).padStart(2,'0')) : (names[currentNode] || '区域未知'));
+    const progress = patrolCam ? this.currentNodeIndex + 1 : Math.min(this.stage || 0, this.config.maxStages);
+    const total = patrolCam ? this.path.length : this.config.maxStages;
+    if (count) count.textContent = '巡查进度：' + progress + ' / ' + total;
+    if (bar) bar.style.width = (progress / total * 100) + '%';
     panel.style.display = 'block';
   }
 
@@ -232,7 +243,7 @@ class GildedElevenAI {
     this.clockGlitchTick -= dt;
     if (this.clockGlitchTick > 0) return;
     this.clockGlitchTick = 0.085 + Math.random() * 0.11;
-    const digits = Array.from({length: 4}, () => String(1 + Math.floor(Math.random() * 9))).join(' ');
+    const digits = (1 + Math.floor(Math.random() * 9)) + ':00';
     document.querySelectorAll('#clock').forEach(el => {
       if (!el.classList.contains('rift-eleven-clock-glitch')) el.classList.add('rift-eleven-clock-glitch');
       el.setAttribute('data-rift-glitch-digits', digits);
@@ -240,10 +251,9 @@ class GildedElevenAI {
   }
 
   getNightSixRoomCameras(node) {
-    const rooms = {
-      stage: [2, 3], storage: [12, 13], workshop: [10, 11],
-      props: [6, 7, 8, 9], mainHall: [1, 4, 5, 14]
-    };
+    const cameraMatch = /^cam(\\d+)$/.exec(node);
+    if (cameraMatch) return [Number(cameraMatch[1])];
+    const rooms = { stage:[2,3], storage:[12,13], workshop:[10,11], props:[6,7,8,9], mainHall:[1,4,5,14] };
     return rooms[node] || [];
   }
 
@@ -272,7 +282,9 @@ class GildedElevenAI {
   }
 
   onNightSixRoomEntered(node) {
+    const cameraMatch = /^cam(\\d+)$/.exec(node);
     const rooms={stage:'排练小舞台',storage:'玩偶储藏舱',workshop:'维修工坊',props:'道具仓库',mainHall:'主走廊'};
+    if(cameraMatch) rooms[node] = Number(cameraMatch[1])===1 ? '保安室' : '监控区域 CAM '+String(cameraMatch[1]).padStart(2,'0');
     const names={noka:'诺卡',tannin:'塔宁',lobe:'耳机',gu:'孤',chillo:'寒零',flux:'闪流',cosmo:'小宇宙',transfer:'移交'};
     const hints={
       noka:'诺卡在附近，留意发条余量。',tannin:'塔宁被发现了，注意走廊与门口。',
@@ -301,10 +313,10 @@ class GildedElevenAI {
     this.state = 'ACTIVE';
     this.phase = 'ROAMING';
     this.stage = 0;
-    this.currentNodeIndex = 1;
+    this.currentNodeIndex = 0;
     this.timer = this.config.timings.roam;
     this.roomEncountered.clear();
-    // 十一从最远端的排练区开始，按既定路线逐个巡查设施房间。
+    // 十一从最深处 CAM 14 出发，逐个巡查 CAM 14 至 CAM 01，最后抵达保安室。
     this.hideAll(ctx);
     const firstRoom = this.path[this.currentNodeIndex];
     this.showNode(firstRoom, ctx);
@@ -495,14 +507,11 @@ class GildedElevenAI {
         this.currentNodeIndex = Math.min(this.currentNodeIndex + 1, this.path.length - 1);
         this.timer = this.config.timings.roam;
         if (this.specialAwakened) {
-          const currentNode = this.path[this.currentNodeIndex] || 'mainHall';
+          const currentNode = this.path[this.currentNodeIndex] || 'cam1';
           this.showNode(currentNode, ctx);
-          if (this.stage >= this.config.maxStages) {
-            this.triggerAttack(ctx, currentNode);
-          } else {
-            this.updateNightSixStageStatus(currentNode);
-            this.onNightSixRoomEntered(currentNode);
-          }
+          this.updateNightSixStageStatus(currentNode);
+          this.onNightSixRoomEntered(currentNode);
+          if (this.currentNodeIndex >= this.path.length - 1) this.triggerAttack(ctx, currentNode);
         } else if (this.stage >= this.config.maxStages) {
           this.triggerAttack(ctx, this.path[this.currentNodeIndex] || 'mainHall');
         } else {
