@@ -101,7 +101,9 @@
       const visible=(id==='noka' && nokaAI>0) || (night===6 && active===id && baseAI>0);
       el.style.display=(visible && (id==='noka'||(active===id&&Number(cam)===activeCam)))?'flex':'none';
       el.classList.toggle('active',active===id);
-      el.querySelector('.figure').textContent=d.glyph;
+      const figure=el.querySelector('.figure');
+      if(window.RIFT_PIXEL_CHARACTERS) window.RIFT_PIXEL_CHARACTERS.mount(figure,id);
+      else figure.textContent=d.glyph;
       el.querySelector('.tag').textContent=d.name+' // CAM '+String(cam).padStart(2,'0');
     });
     renderFlux();
@@ -116,7 +118,9 @@
     let el=feed.querySelector('[data-rift-character="'+active+'"]');
     if(!el){el=document.createElement('div');el.className='rift-n6-sprite';el.dataset.riftCharacter=active;el.innerHTML='<div class="figure"></div><div class="tag"></div>';feed.appendChild(el);}
     el.style.display='flex';el.classList.add('active');
-    el.querySelector('.figure').textContent=d.glyph;
+    const figure=el.querySelector('.figure');
+    if(window.RIFT_PIXEL_CHARACTERS) window.RIFT_PIXEL_CHARACTERS.mount(figure,active);
+    else figure.textContent=d.glyph;
     el.querySelector('.tag').textContent=d.name+' // CAM '+String(activeCam).padStart(2,'0');
     if(activeCam===1)ensureOfficeAttacker();
   }
