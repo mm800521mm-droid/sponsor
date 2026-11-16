@@ -36,9 +36,9 @@
       const crankButton=box.querySelector('button');
       crankButton.addEventListener('click',e=>{
         e.preventDefault();e.stopPropagation();
-        const panel=$('camera-panel'),feed=$('feed-13');
+        const panel=$('camera-panel'),crankFeed=$('feed-13');
         const monitorVisible=!!(panel&&panel.classList.contains('show'));
-        const correctFeed=!!(feed&&feed.classList.contains('active'));
+        const correctFeed=!!(crankFeed&&crankFeed.classList.contains('active'));
         if(!frame.running||!monitorVisible||!correctFeed)return;
         crank=Math.min(5,crank+1);nokaThreatTimer=0;nokaMoveTick=0;nokaLastTick=Date.now();
         renderCrank();
