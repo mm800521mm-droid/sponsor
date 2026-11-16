@@ -1000,16 +1000,17 @@
     forceEleven: ()=>{if(typeof gildedEleven==='undefined')return false;gildedEleven.setDebugBehind(true,GameContext);if(!isLookingBack)toggleLookBack();return true;},
     forceTannin: ()=>{if(typeof taning==='undefined')return false;taning.state='WANDER';taning.timer=0;taning.showNode('cam5',GameContext);return true;},
     forceCharacter: (id,cam) => {
+      if(S.night===6&&['tannin','lobe','gu','chillo'].includes(id))return !!(window.RIFT_NIGHT6_CHARACTER_SYSTEM&&window.RIFT_NIGHT6_CHARACTER_SYSTEM.forceMutation(id));
       if(['flux','lobe','gu','chillo'].includes(id))return !!(window.RIFT_SHARED_CHARACTER_AI&&window.RIFT_SHARED_CHARACTER_AI.force(id,cam,'moving'));
-      if(id==='tannin')return this.forceTannin();
-      if(id==='gildedEleven')return this.forceEleven();
-      if(['tannin','lobe','gu','chillo'].includes(id)&&S.night===6)return !!(window.RIFT_NIGHT6_CHARACTER_SYSTEM&&window.RIFT_NIGHT6_CHARACTER_SYSTEM.forceMutation(id));
+      if(id==='tannin')return window.RIFT_TEST_BRIDGE.forceTannin();
+      if(id==='gildedEleven')return window.RIFT_TEST_BRIDGE.forceEleven();
       if(['cosmo','transfer'].includes(id))return !!(window.RIFT_TANNIN_COMPANIONS&&window.RIFT_TANNIN_COMPANIONS.setPosition(id,cam||1,40,15));
       return false;
     },
+    transferScare: () => !!(window.RIFT_TANNIN_COMPANIONS&&window.RIFT_TANNIN_COMPANIONS.debugScare()),
     forceMutation: id => !!(window.RIFT_NIGHT6_CHARACTER_SYSTEM&&window.RIFT_NIGHT6_CHARACTER_SYSTEM.forceMutation(id)),
     forceNokaCamera: cam => !!(window.RIFT_NIGHT6_CHARACTER_SYSTEM&&window.RIFT_NIGHT6_CHARACTER_SYSTEM.forceNokaCamera(cam)),
-    setCrank: value => !!(window.RIFT_NIGHT6_CHARACTER_SYSTEM&&window.RIFT_NIGHT6_CHARACTER_SYSTEM.setCrank(value)),
+    setCrank: value => {if(!window.RIFT_NIGHT6_CHARACTER_SYSTEM)return false;window.RIFT_NIGHT6_CHARACTER_SYSTEM.setCrank(value);return true;},
     flash: ()=>{const b=document.getElementById('rift-n6-flash-btn');if(b)b.click();},
     jumpscare: name=>triggerJumpscare(name||'测试角色','TEST JUMPSCARE')
   };
