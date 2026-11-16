@@ -133,7 +133,7 @@
   function showFluxChoices(){
     if(fluxTextShown)return;fluxTextShown=true;
     const feed=$('feed-'+fluxCam);if(!feed)return;
-    const clearIndex=Math.floor(Math.random()*3), words=['演','幕','场'];
+    const clearIndex=Math.floor(Math.random()*3), words=['ACT','CUT','TAKE'];
     const box=document.createElement('div');box.className='rift-flux-choice';box.id='rift-flux-choice';
     words.forEach((word,index)=>{const b=document.createElement('button');b.type='button';b.textContent=word;if(index===clearIndex)b.classList.add('clear');b.addEventListener('click',()=>{
       if(index===clearIndex){fluxDelay=Date.now()+25000;fluxThreat=Math.max(0,fluxThreat-1);announce('辨认成功：闪流抵达门口的时间被延缓');const close=$('btnCamClose');if(close)close.click();}
