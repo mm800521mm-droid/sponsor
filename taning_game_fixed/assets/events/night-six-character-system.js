@@ -18,6 +18,7 @@
   const routes = { lobe:[10], gu:[4,5,1], chillo:[6,3,1] };
   let activeCam = 1, routeIndex = 0, routeClock = 0, attackClock = 0;
   let night = 0, locked = false, active = null, activeId = '', defended = new Set();
+  let fluxPauseStartedAt = 0;
   let frame = { running:false, camOpen:false, camId:1, leftClosed:false, rightClosed:false };
   let crank = 0, nokaCam = 13, nokaMoveTick = 0, transferHeat = 0, transferInside = false, transferTimer = 0;
   let nokaLastTick = 0, nokaAI = 0, nokaThreatTimer = 0, flashReadyAt = 0, fluxCam = 2, fluxLookSince = 0, fluxTextShown = false, fluxDelay = 0, fluxThreat = 0, fluxAtDoor = false;
@@ -191,6 +192,7 @@
   function onFrame(e){
     frame={...frame,...(e.detail||{})};
     syncDeviceVisibility();
+    if(window.RIFT_FLUX_PRIORITY_SCARE_ACTIVE)return;
     if(active && frame.running){
       const dt=Math.min(.1,Math.max(0,Number(frame.dt)||0));
       routeClock+=dt;attackClock+=dt;
@@ -300,6 +302,13 @@
   window.addEventListener('rift:noka-enter-room',e=>{const cam=Number(e.detail&&e.detail.camId);if(active&&activeCam===cam){const route=routes[active]||[];if(routeIndex<route.length-1){routeIndex++;activeCam=route[routeIndex];routeClock=0;renderActiveAtCam();}}});
   window.addEventListener('rift:night-six-others-return',()=>{locked=true;active=null;const office=$('rift-n6-office-attacker');if(office)office.style.display='none';renderSprites();});
   window.addEventListener('rift:night-six-eleven-awakened',()=>{locked=false;renderSprites();});
+  window.addEventListener('rift:flux-priority-scare-start',()=>{fluxPauseStartedAt=Date.now();});
+  window.addEventListener('rift:flux-priority-scare-end',()=>{
+    if(!fluxPauseStartedAt)return;
+    const pausedFor=Date.now()-fluxPauseStartedAt;fluxPauseStartedAt=0;
+    if(nokaLastTick)nokaLastTick+=pausedFor;
+    if(flashReadyAt)flashReadyAt+=pausedFor;
+  });
   window.addEventListener('rift:game-frame',onFrame);
   window.addEventListener('rift:night-six-door-change',onDoor);
   window.addEventListener('rift:night-six-crank',onCrank);
