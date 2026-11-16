@@ -411,6 +411,9 @@ class GildedElevenAI {
   update(dt, ctx) {
     if (!ctx || !ctx.isGameRunning()) return;
     dt = Math.max(0, Math.min(Number(dt) || 0, 0.1));
+    // Nights 1-5 progressively shorten action phases; Night 6 keeps its authored special timing.
+    const night = Number(ctx.getNight && ctx.getNight()) || 1;
+    if (night >= 1 && night <= 5) dt *= 1 + (night - 1) * 0.12;
     this.ensureVisualNodes(ctx);
     if (this.aiLevel <= 0) { this.state = 'DORMANT'; this.hideAll(ctx); this.updateStageStatus('behind'); return; }
     if (this.specialAwakened) {
