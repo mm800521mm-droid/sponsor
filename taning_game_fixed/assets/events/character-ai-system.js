@@ -7,6 +7,7 @@
   'use strict';
   const names = { flux:'闪流', noka:'诺卡', lobe:'耳机', gu:'孤', chillo:'寒零' };
   const suspended = new Set();
+  let fluxPauseStartedAt = 0;
   const state = {
     night:0, running:false, camOpen:false, camId:1,
     leftClosed:false, rightClosed:false, elapsed:0,
@@ -141,7 +142,7 @@
     state.running=!!d.running;state.camOpen=!!d.camOpen;state.camId=Number(d.camId)||1;
     state.leftClosed=!!d.leftClosed;state.rightClosed=!!d.rightClosed;
     syncFlashDevice();
-    if(!state.running)return;
+    if(!state.running || window.RIFT_FLUX_PRIORITY_SCARE_ACTIVE)return;
     const dt=Math.min(.1,Math.max(0,Number(d.dt)||0));
     for(const a of Object.values(state.actors)){
       if(suspended.has(a.id))continue;
@@ -252,6 +253,12 @@
   window.addEventListener('rift:night-six-mutation-attack',e=>{const id=e.detail&&e.detail.characterId;if(state.actors[id]){suspended.add(id);removeActorVisual(state.actors[id]);}});
   window.addEventListener('rift:night-six-mutation-resolved',e=>{const id=e.detail&&e.detail.characterId;if(state.actors[id]){suspended.delete(id);returnActor(state.actors[id]);}});
   window.addEventListener('rift:night-six-mutation-defended',e=>{const id=e.detail&&e.detail.characterId;if(state.actors[id]){suspended.add(id);removeActorVisual(state.actors[id]);}});
+  window.addEventListener('rift:flux-priority-scare-start',()=>{fluxPauseStartedAt=Date.now();});
+  window.addEventListener('rift:flux-priority-scare-end',()=>{
+    if(!fluxPauseStartedAt)return;
+    const pausedFor=Date.now()-fluxPauseStartedAt;fluxPauseStartedAt=0;
+    for(const actor of Object.values(state.actors))if(actor.deadline>0)actor.deadline+=pausedFor;
+  });
   window.addEventListener('rift:game-frame',onFrame);
   window.addEventListener('rift:monitor-toggle',onMonitor);
   window.addEventListener('rift:night-six-flash',onFlash);
