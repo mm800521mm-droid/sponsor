@@ -65,7 +65,7 @@
       });
     }
   }
-  function aiFor(id){return Math.max(0,Math.min(20,Number((window.RIFT_CURRENT_AI_LEVELS||{})[id] ?? ((((window.NIGHT_SETTINGS||{})[night]||{}).characters||{})[id]))||0);}
+  function aiFor(id){const current=window.RIFT_CURRENT_AI_LEVELS||{};const settings=(((window.NIGHT_SETTINGS||{})[night]||{}).characters||{});return Math.max(0,Math.min(20,Number(current[id] ?? settings[id])||0));}
   function nokaActionCheck(){return nokaAI>0 && (typeof window.riftCanCharacterMove==='function'?window.riftCanCharacterMove(nokaAI):Math.random()*100<nokaAI*5);}
   function renderCrank(){
     const label=$('rift-n6-crank-count'), bar=$('rift-n6-crank-meter');
