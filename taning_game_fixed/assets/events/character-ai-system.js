@@ -6,6 +6,7 @@
 (() => {
   'use strict';
   const names = { flux:'闪流', noka:'诺卡', lobe:'耳机', gu:'孤', chillo:'寒零' };
+  const suspended = new Set();
   const state = {
     night:0, running:false, camOpen:false, camId:1,
     leftClosed:false, rightClosed:false, elapsed:0,
@@ -30,7 +31,7 @@
   }
   function render(a,camOverride){
     if(!a)return;
-    if(state.night===6 && a.id!=='flux'){removeActorVisual(a);return;}
+    
     if(aiFor(a.id)<=0){removeActorVisual(a);return;}
     const cam=Number(camOverride||a.cam);
     const feed=$('feed-'+cam);
@@ -118,7 +119,7 @@
     if(!state.running)return;
     const dt=Math.min(.1,Math.max(0,Number(d.dt)||0));
     for(const a of Object.values(state.actors)){
-      if(state.night===6 && a.id!=='flux')continue;
+      if(suspended.has(a.id))continue;
       if(aiFor(a.id)<=0)continue;
       if(a.phase==='idle'){
         a.timer-=dt;
@@ -215,11 +216,14 @@
   function reset(e){
     state.night=Number(e.detail&&e.detail.night)||0;
     state.running=false;state.camOpen=false;state.camId=1;state.leftClosed=false;state.rightClosed=false;
-    state.actors=actorList();
+    suspended.clear();state.actors=actorList();
     Object.values(state.actors).forEach(a=>{removeActorVisual(a);a.timer=a.interval;if(aiFor(a.id)>0)render(a);});
     state.crank=5;state.nokaTimer=0;
   }
   window.addEventListener('rift:night-start',reset);
+  window.addEventListener('rift:night-six-mutation-attack',e=>{const id=e.detail&&e.detail.characterId;if(state.actors[id]){suspended.add(id);removeActorVisual(state.actors[id]);}});
+  window.addEventListener('rift:night-six-mutation-resolved',e=>{const id=e.detail&&e.detail.characterId;if(state.actors[id]){suspended.delete(id);returnActor(state.actors[id]);}});
+  window.addEventListener('rift:night-six-mutation-defended',e=>{const id=e.detail&&e.detail.characterId;if(state.actors[id]){suspended.delete(id);returnActor(state.actors[id]);}});
   window.addEventListener('rift:game-frame',onFrame);
   window.addEventListener('rift:monitor-toggle',onMonitor);
   window.addEventListener('rift:night-six-flash',onFlash);
