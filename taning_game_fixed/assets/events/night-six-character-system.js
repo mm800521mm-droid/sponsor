@@ -13,8 +13,9 @@
     chillo: { name: '寒零', cam: 6, glyph: '❄', kind: 'cold' },
     transfer: { name: '移交', cam: 1, glyph: '⌁', kind: 'transfer' }
   };
-  const mutationOrder = ['tannin','lobe','gu','chillo'];
-  const routes = { tannin:[5,4,1], lobe:[10], gu:[4,5,1], chillo:[6,3,1] };
+  // Tannin keeps its own original AI route and office defense; only the other three use mutation attacks.
+  const mutationOrder = ['lobe','gu','chillo'];
+  const routes = { lobe:[10], gu:[4,5,1], chillo:[6,3,1] };
   let activeCam = 1, routeIndex = 0, routeClock = 0, attackClock = 0;
   let night = 0, locked = false, active = null, activeId = '', defended = new Set();
   let frame = { running:false, camOpen:false, camId:1, leftClosed:false, rightClosed:false };
@@ -164,7 +165,6 @@
     renderSprites();
     const tips={
       noka:'诺卡突变：立即查看13号监控并持续上发条。十一事件期间可额外尝试关闭右门。',
-      tannin:'塔宁突变：观察门口动静，使用对应门或灯光防御。',
       lobe:'耳机突变：切换10号监控并使用专属闪光灯。',
       gu:'孤突变：关闭左门防御。',
       chillo:'寒零突变：通过监控判断位置，关闭右门防御。',
@@ -241,9 +241,8 @@
     if(nokaAI>0&&nokaThreatTimer>0&&d.elevenEventActive&&(d.rightClosed||frame.rightClosed)){nokaThreatTimer=0;nokaMoveTick=0;nokaCam=13;crank=Math.max(1,crank);nokaLastTick=Date.now();renderCrank();renderSprites();announce('十一的异常期间，右门暂时挡住了诺卡');}
     if(fluxAtDoor&&(d.leftClosed||d.rightClosed||frame.leftClosed||frame.rightClosed)){fluxAtDoor=false;fluxThreat=0;fluxDelay=0;announce('闪流被门挡住，暂时退开');renderFlux();}
     const closedLeft=!!(d.leftClosed||frame.leftClosed), closedRight=!!(d.rightClosed||frame.rightClosed);
-    const doorDefense={gu:closedLeft||closedRight,chillo:closedLeft||closedRight,tannin:closedLeft||closedRight};
+    const doorDefense={gu:closedLeft||closedRight,chillo:closedLeft||closedRight};
     if(active && doorDefense[active])finishAttack(true,'shared-door-defense');
-    if(doorDefense.tannin)window.dispatchEvent(new CustomEvent('rift:shared-defense',{detail:{method:'door',side:closedLeft?'left':'right',source:active||'office-door'}}));
   }
   function onCrank(e){const d=e&&e.detail||{};crank=Math.max(0,Math.min(5,Number(d.value)||0));nokaThreatTimer=0;nokaMoveTick=0;nokaCam=13;nokaLastTick=Date.now();renderCrank();renderSprites();}
   function onFlash(){if(active==='lobe'&&frame.camOpen&&Number(frame.camId)===10)finishAttack(true,'cam10-flash');}
@@ -267,7 +266,14 @@
       characterId:id,status:'eleven-room-encounter',room:d.room,camId:d.camId
     }}));
     // 触发角色原有的专属机制，而不只是显示通用提示。
-    if(mutationOrder.includes(id)){
+    if(id==='tannin'){
+      // Eleven's encounter only makes Tannin more eager to use his existing charge.
+      // It does not create a second attack route or alter the player's defense rules.
+      window.dispatchEvent(new CustomEvent('rift:tannin-aggression-increased',{
+        detail:{night:6,source:'eleven-room-encounter',room:d.room,camId:d.camId}
+      }));
+      announce('塔宁的攻击欲望变强了，但仍按原本的路线和方式行动。');
+    } else if(mutationOrder.includes(id)){
       window.dispatchEvent(new CustomEvent('rift:night-six-mutation-attack',{
         detail:{night:6,characterId:id,mutationId:'eleven-room-'+String(d.room||'').replace(/[^a-z0-9_-]/gi,'')}
       }));
