@@ -398,3 +398,9 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
 #cam-feed-container > .cam-scene.active .tannin-pixel-sprite {
   display: block !important; visibility: visible !important;
 }
+
+
+/* 十一降临：只覆盖时钟的显示层，底层游戏时间仍由原计时器正常更新。 */
+#clock.rift-eleven-clock-glitch{color:transparent!important;text-shadow:none!important;position:absolute;isolation:isolate;}
+#clock.rift-eleven-clock-glitch::after{content:attr(data-rift-glitch-digits);position:absolute;inset:-.08em -.12em;display:flex;align-items:center;justify-content:center;white-space:nowrap;padding:0 .12em;color:#f0d7a4;background:rgba(3,2,2,.96);border:1px solid rgba(180,35,25,.72);text-shadow:0 0 7px rgba(255,30,15,.9),0 0 15px rgba(255,0,0,.45);letter-spacing:.18em;overflow:hidden;pointer-events:none;}
+#clock.rift-eleven-clock-glitch::before{content:"";position:absolute;z-index:1;inset:-.08em -.12em;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,30,20,.16) 4px,transparent 5px);pointer-events:none;}
