@@ -13,6 +13,7 @@ class GildedElevenAI {
     this.longLookBackReset = false;
     this.crashTriggered = false;
     this.roomEncountered = new Set();
+    this.clockGlitchTick = 0;
     this.stageDuration = 20;
     this.reset(null);
   }
@@ -75,6 +76,8 @@ class GildedElevenAI {
     this.currentNodeIndex = 0;
     this.specialAwakened = false;
     this.roomEncountered = new Set();
+    this.clockGlitchTick = 0;
+    this.setClockGlitch(false);
     if (ctx) this.hideAll(ctx);
   }
 
@@ -215,6 +218,27 @@ class GildedElevenAI {
     panel.style.display = 'block';
   }
 
+  setClockGlitch(enabled) {
+    document.querySelectorAll('#clock').forEach(el => {
+      el.classList.toggle('rift-eleven-clock-glitch', !!enabled);
+      if (enabled) el.setAttribute('data-rift-glitch-digits', '1 7 3');
+      else el.removeAttribute('data-rift-glitch-digits');
+    });
+    if (!enabled) this.clockGlitchTick = 0;
+  }
+
+  updateClockGlitch(dt) {
+    if (!this.specialAwakened) return;
+    this.clockGlitchTick -= dt;
+    if (this.clockGlitchTick > 0) return;
+    this.clockGlitchTick = 0.085 + Math.random() * 0.11;
+    const digits = Array.from({length: 4}, () => String(1 + Math.floor(Math.random() * 9))).join(' ');
+    document.querySelectorAll('#clock').forEach(el => {
+      if (!el.classList.contains('rift-eleven-clock-glitch')) el.classList.add('rift-eleven-clock-glitch');
+      el.setAttribute('data-rift-glitch-digits', digits);
+    });
+  }
+
   getNightSixRoomCameras(node) {
     const rooms = {
       stage: [2, 3], storage: [12, 13], workshop: [10, 11],
@@ -270,6 +294,8 @@ class GildedElevenAI {
   onSpecialTime(event, ctx) {
     if (!event || event.id !== 'eleven-awakens' || Number(event.night) !== 6 || this.aiLevel <= 0) return;
     this.specialAwakened = true;
+    this.clockGlitchTick = 0;
+    this.setClockGlitch(true);
     this.stageDuration = this.getStageDuration();
     this.debugVisible = false;
     this.state = 'ACTIVE';
@@ -378,6 +404,7 @@ class GildedElevenAI {
     if (this.specialAwakened) {
       this.debugVisible = false;
       this.hideAll(ctx);
+      this.updateClockGlitch(dt);
     }
     if (this.debugVisible && !this.specialAwakened) {
       this.showNode('behind', ctx);
