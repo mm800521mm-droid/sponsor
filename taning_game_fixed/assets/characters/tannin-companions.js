@@ -65,7 +65,7 @@
     transfer: { wait: 0, visible: 0 }
   };
   let locked = false;
-  function aiFor(id) { return Math.max(0,Math.min(20,Number((window.RIFT_CURRENT_AI_LEVELS||{})[id] ?? ((((window.NIGHT_SETTINGS||{})[Number(window.RIFT_NIGHT_STATE&&window.RIFT_NIGHT_STATE.night)]||{}).characters||{})[id]))||0); }
+  function aiFor(id) { const current=window.RIFT_CURRENT_AI_LEVELS||{}; const night=Number(window.RIFT_NIGHT_STATE&&window.RIFT_NIGHT_STATE.night)||0; const settings=(((window.NIGHT_SETTINGS||{})[night]||{}).characters||{}); return Math.max(0,Math.min(20,Number(current[id] ?? settings[id])||0)); }
   function canMove(id) { const ai=aiFor(id); return ai>0 && (typeof window.riftCanCharacterMove==='function' ? window.riftCanCharacterMove(ai) : Math.random()*100<ai*5); }
   function randomCamera() { return 1 + Math.floor(Math.random() * 13); }
   function scheduleNext(id) { schedule[id].wait = 14 + Math.random() * 18; }
