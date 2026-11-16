@@ -2,7 +2,7 @@ const GILDED_ELEVEN_CONFIG = {
   name: '十一 (Gilded Eleven)',
   quote: '……',
   routes: {
-    MAIN: ['cam14','cam13','cam12','cam11','cam10','cam9','cam8','cam7','cam6','cam5','cam4','cam3','cam2','cam1']
+    MAIN: ['cam12','cam11','cam10','cam9','cam8','cam7','cam6','cam5','cam4','cam3','cam2','cam1']
   },
   visualMap: {
     behind: 'gilded-eleven-behind',
