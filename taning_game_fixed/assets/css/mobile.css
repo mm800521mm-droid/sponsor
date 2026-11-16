@@ -16,7 +16,51 @@ body { touch-action: manipulation; }
   max-width: 100vw;
   overflow: hidden;
 }
-#debug-skip-bar, #rift-test-controls { display: none !important; }
+/* Keep the developer test controls available on phones as well as desktop. */
+#debug-skip-bar {
+  display: flex !important;
+  top: max(6px, env(safe-area-inset-top)) !important;
+  left: 50% !important;
+  max-width: 96vw;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px !important;
+  z-index: 99999 !important;
+}
+#debug-skip-bar .debug-btn {
+  min-width: 30px;
+  min-height: 30px;
+  padding: 5px 8px !important;
+  font-size: 12px;
+}
+#rift-test-controls {
+  display: flex !important;
+  top: max(42px, env(safe-area-inset-top) + 38px) !important;
+  left: 50% !important;
+  width: max-content;
+  max-width: 96vw;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px !important;
+  padding: 5px !important;
+  font-size: 10px !important;
+  z-index: 100000 !important;
+}
+#rift-test-controls button {
+  min-height: 30px;
+  padding: 5px 6px !important;
+  font-size: 10px;
+}
+#rift-test-controls input {
+  min-height: 30px;
+  width: 88px !important;
+  font-size: 12px;
+}
+@media (max-width: 600px) {
+  #rift-test-controls {
+    top: max(76px, env(safe-area-inset-top) + 72px) !important;
+  }
+}
 #night-six-mutation-text {
   top: max(58px, env(safe-area-inset-top) + 48px);
   left: 4vw;
