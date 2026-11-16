@@ -213,7 +213,12 @@
       if(transferHeat>=3){hideTransfer();showTransferScare();finishAttack(false,'transfer-stage-three-jumpscare');announce('移交的三阶段已满！');}
     }
     nokaAI=Math.max(0,Number((window.RIFT_CURRENT_AI_LEVELS||{}).noka ?? ((((window.NIGHT_SETTINGS||{})[night]||{}).characters||{}).noka))||0);
-    if(frame.running && (night===6 || nokaAI>0) && Date.now()-nokaLastTick>12000){crank=Math.max(0,crank-1);nokaLastTick=Date.now();renderCrank();window.dispatchEvent(new CustomEvent('rift:night-six-noka-wind-level',{detail:{value:crank,max:5,calm:crank>0}}));}
+    // AI 越高，发条自然流失越快；AI=0 时诺卡完全静止，发条不会自行下降。
+    const nokaDrainInterval=Math.max(6,24-nokaAI*0.9)*1000;
+    if(frame.running && nokaAI>0 && Date.now()-nokaLastTick>=nokaDrainInterval){
+      crank=Math.max(0,crank-1);nokaLastTick=Date.now();renderCrank();
+      window.dispatchEvent(new CustomEvent('rift:night-six-noka-wind-level',{detail:{value:crank,max:5,calm:crank>0,ai:nokaAI,interval:nokaDrainInterval}}));
+    }
     if(night>0 && frame.running && nokaAI>0){
       if(crank>0){nokaThreatTimer=0;nokaMoveTick=0;}
       else {
@@ -249,6 +254,14 @@
     crank=5;nokaCam=13;nokaMoveTick=0;nokaAI=Math.max(0,Number((((window.NIGHT_SETTINGS||{})[night]||{}).characters||{}).noka)||0);nokaThreatTimer=0;transferHeat=0;transferInside=false;fluxCam=2+Math.floor(Math.random()*10);if(fluxCam===10||fluxCam===13)fluxCam=9;fluxLookSince=0;fluxTextShown=false;fluxDelay=0;fluxThreat=0;fluxAtDoor=false;nokaLastTick=Date.now();flashReadyAt=0;renderCrank();hideTransfer();
     renderSprites();ensureDevices();
   }
+  window.addEventListener('rift:night-six-eleven-room-event',e=>{
+    const d=e.detail||{};
+    if(Number(d.night)!==6||!d.characterId)return;
+    announce('十一进入'+(d.roomName||'未知房间')+'，发现'+(d.characterName||d.characterId)+'！'+(d.hint||'注意附近异常。'));
+    window.dispatchEvent(new CustomEvent('rift:character-status',{detail:{
+      characterId:d.characterId,status:'eleven-room-encounter',room:d.room,camId:d.camId
+    }}));
+  });
   window.addEventListener('rift:night-start',resetNight);
   window.addEventListener('rift:night-six-mutation-attack',e=>beginAttack(e.detail));
   window.addEventListener('rift:night-ai-levels-changed',e=>{const v=e.detail&&e.detail.values||{};nokaAI=Math.max(0,Number(v.noka)||0);renderSprites();});
