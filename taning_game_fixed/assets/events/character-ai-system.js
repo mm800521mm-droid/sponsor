@@ -108,7 +108,7 @@
     emit('rift:character-appearance',{characterId:a.id,camId:a.cam});
   }
   function returnActor(a){
-    clearChoice(a);a.phase='idle';a.cam=a.home;a.timer=a.interval;a.threat=0;a.look=0;a.deadline=0;
+    clearChoice(a);a.phase='idle';a.cam=a.home;a.timer=pace(a.interval);a.threat=0;a.look=0;a.deadline=0;a.bonusCam2=false;
     removeActorVisual(a);
     if(aiFor(a.id)>0)render(a);
     emit('rift:character-returned',{characterId:a.id});
@@ -199,7 +199,7 @@
     const flux=state.actors.flux;
     if(flux && !state.camOpen && flux.phase==='moving' && flux.look>0){
       if(flux.choiceEl){clearChoice(flux);flux.threat++;flux.phase=flux.threat>=2?'door':'approach';flux.deadline=Date.now()+(flux.phase==='door'?9000:12000);}
-      else{flux.look=0;flux.phase='delay';flux.deadline=Date.now()+20000;}
+      else{flux.look=0;flux.phase='delay';flux.deadline=Date.now()+pace(20000);}
     }
   }
   function onFlash(e){
@@ -232,8 +232,8 @@
     if(!Number.isInteger(cam))return;
     for(const a of Object.values(state.actors)){
       if(a.id==='flux'||a.phase==='idle'||a.cam!==cam)continue;
-      if(a.id==='gu'){a.cam=a.cam===4?5:1;a.phase=a.cam===1?'door':'moving';a.timer=7;a.deadline=Date.now()+8000;}
-      else if(a.id==='chillo'){a.cam=a.cam===6?3:1;a.phase=a.cam===1?'door':'moving';a.timer=7;a.deadline=Date.now()+8000;}
+      if(a.id==='gu'){a.cam=a.cam===4?5:1;a.phase=a.cam===1?'door':'moving';a.timer=pace(7);a.deadline=Date.now()+pace(8000);}
+      else if(a.id==='chillo'){a.cam=a.cam===6?3:1;a.phase=a.cam===1?'door':'moving';a.timer=pace(7);a.deadline=Date.now()+pace(8000);}
       else if(a.id==='lobe'){returnActor(a);continue;}
       render(a);
       emit('rift:character-skipped-by-noka',{characterId:a.id,camId:cam,nextCamId:a.cam});
@@ -243,7 +243,7 @@
     state.night=Number(e.detail&&e.detail.night)||0;
     state.running=false;state.camOpen=false;state.camId=1;state.leftClosed=false;state.rightClosed=false;
     suspended.clear();state.actors=actorList();
-    Object.values(state.actors).forEach(a=>{removeActorVisual(a);a.timer=a.interval;if(aiFor(a.id)>0)render(a);});
+    Object.values(state.actors).forEach(a=>{removeActorVisual(a);a.timer=pace(a.interval);a.bonusCam2=false;if(aiFor(a.id)>0)render(a);});
     state.crank=5;state.nokaTimer=0;
     for(const a of Object.values(state.actors)){a.timer=pace(a.interval);a.bonusCam2=false;}
   }
@@ -271,7 +271,7 @@
   });
   window.RIFT_SHARED_CHARACTER_AI=Object.freeze({
     getState:()=>({night:state.night,actors:Object.fromEntries(Object.entries(state.actors).map(([id,a])=>[id,{phase:a.phase,cam:a.cam,threat:a.threat}]))}),
-    force:(id,cam,phase='moving')=>{const a=state.actors[id];if(!a||(state.night===6&&id!=='flux'))return false;a.cam=Math.max(1,Math.min(14,Number(cam)||a.home));a.phase=phase==='door'?'door':'moving';a.timer=0;a.deadline=Date.now()+12000;a.threat=0;render(a);return true;},
+    force:(id,cam,phase='moving')=>{const a=state.actors[id];if(!a||(state.night===6&&id!=='flux'))return false;a.cam=Math.max(1,Math.min(14,Number(cam)||a.home));a.phase=phase==='door'?'door':'moving';a.timer=0;a.deadline=Date.now()+pace(12000);a.threat=0;render(a);return true;},
     resetActor:id=>{const a=state.actors[id];if(!a)return false;returnActor(a);return true;}
   });
   window.addEventListener('rift:night-ai-levels-changed',()=>{
