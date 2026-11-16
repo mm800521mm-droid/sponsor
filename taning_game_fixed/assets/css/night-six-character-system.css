@@ -9,7 +9,6 @@
 @keyframes riftN6Sway{50%{transform:translateY(-4px) rotate(1deg)}}
 @keyframes riftN6Glitch{50%{transform:translate(3px,-1px) skew(-3deg);filter:hue-rotate(30deg) contrast(1.8)}}
 .rift-n6-device{position:absolute;z-index:35;left:50%;bottom:12%;transform:translateX(-50%);display:none;min-width:150px;padding:10px;background:#080706ed;border:1px solid #9a7951;color:#ead8b8;text-align:center;font:12px 'Courier New',monospace;box-shadow:0 5px 22px #000}
-#feed-13.active .rift-n6-device[data-device="crank"],#feed-10.active .rift-n6-device[data-device="flash"]{display:block}
 .rift-n6-device button{margin-top:6px;padding:8px 12px;background:#39291d;border:1px solid #b18a58;color:#fff0d5;font:12px 'Courier New',monospace;touch-action:manipulation}
 .rift-n6-meter{height:5px;background:#332b22;margin-top:7px}.rift-n6-meter i{display:block;height:100%;width:0;background:#c99b57}
 #rift-n6-status{position:absolute;top:clamp(115px,17vh,170px);left:50%;transform:translateX(-50%);z-index:100;display:none;max-width:min(90vw,540px);padding:9px 14px;background:#090706e8;border:1px solid #a17b50;color:#f0dfc4;font:12px/1.5 'Courier New',monospace;text-align:center;pointer-events:none}
@@ -61,7 +60,13 @@
 
 /* Interactive CAM devices must remain above CCTV overlays and accept touch/mouse input. */
 .rift-n6-device {
-  z-index: 250 !important;
+  position: absolute !important;
+  right: 2% !important;
+  top: 3% !important;
+  left: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  z-index: 300 !important;
   pointer-events: auto !important;
   isolation: isolate;
 }
@@ -73,13 +78,5 @@
   touch-action: manipulation;
   cursor: pointer;
 }
-#feed-13.active .rift-n6-device[data-device="crank"],
-#feed-10.active .rift-n6-device[data-device="flash"] {
-  display: block !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
-}
-#feed-13.active .rift-n6-device[data-device="crank"] button,
-#feed-10.active .rift-n6-device[data-device="flash"] button {
-  pointer-events: auto !important;
-}
+.rift-n6-device[ data-device ] { visibility: visible; }
+.rift-n6-device button { min-height: 32px; }
