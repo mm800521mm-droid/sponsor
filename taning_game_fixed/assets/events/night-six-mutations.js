@@ -193,15 +193,22 @@
       locked: false,
       triggered: Array.from(triggered)
     };
-    window.dispatchEvent(new CustomEvent('rift:night-six-mutation-attack', {
-      detail: {
-        night: 6,
-        characterId: eventData.characterId,
-        name: eventData.name,
-        mutationId: eventData.id,
-        oneShot: true
-      }
-    }));
+    if (eventData.characterId === 'tannin') {
+      // Tannin's special time raises aggression only; never launch a mutation attack.
+      window.dispatchEvent(new CustomEvent('rift:tannin-aggression-increased', {
+        detail: { night: 6, source: 'special-time', specialId: detail.id }
+      }));
+    } else {
+      window.dispatchEvent(new CustomEvent('rift:night-six-mutation-attack', {
+        detail: {
+          night: 6,
+          characterId: eventData.characterId,
+          name: eventData.name,
+          mutationId: eventData.id,
+          oneShot: true
+        }
+      }));
+    }
     showSequence(eventData);
   });
 })();
