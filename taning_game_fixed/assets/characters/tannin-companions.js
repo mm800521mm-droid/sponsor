@@ -127,6 +127,7 @@
     })),
     hide: characterId => window.dispatchEvent(new CustomEvent('rift:tannin-companion-hide', {
       detail: { characterId }
-    }))
+    })),
+    debugScare: () => { transferScare(); return true; }
   });
 })();
