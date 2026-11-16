@@ -60,7 +60,7 @@
         flashReadyAt=Date.now()+3000;
         flashButton.disabled=true;flashButton.textContent='冷却 3s';
         let remaining=3;const cooldown=setInterval(()=>{remaining--;if(remaining>0){flashButton.textContent='冷却 '+remaining+'s';}else{clearInterval(cooldown);flashButton.disabled=false;flashButton.textContent='闪光';}},1000);
-        const feed=$('feed-10');if(feed){feed.classList.remove('rift-cam10-flash');void feed.offsetWidth;feed.classList.add('rift-cam10-flash');setTimeout(()=>feed.classList.remove('rift-cam10-flash'),260);}
+        const flashFeed=$('feed-10');if(flashFeed){flashFeed.classList.remove('rift-cam10-flash');void flashFeed.offsetWidth;flashFeed.classList.add('rift-cam10-flash');setTimeout(()=>flashFeed.classList.remove('rift-cam10-flash'),260);}
         window.dispatchEvent(new CustomEvent('rift:night-six-flash',{detail:{camId:10,deviceOnly:true}}));
       });
     }
