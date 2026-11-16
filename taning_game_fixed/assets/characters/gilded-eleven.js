@@ -12,6 +12,7 @@ class GildedElevenAI {
     this.lookBackStageRetreat = false;
     this.longLookBackReset = false;
     this.crashTriggered = false;
+    this.roomEncountered = new Set();
     this.stageDuration = 20;
     this.reset(null);
   }
@@ -73,6 +74,7 @@ class GildedElevenAI {
     this.path = this.config.routes.MAIN.slice();
     this.currentNodeIndex = 0;
     this.specialAwakened = false;
+    this.roomEncountered = new Set();
     if (ctx) this.hideAll(ctx);
   }
 
@@ -213,6 +215,58 @@ class GildedElevenAI {
     panel.style.display = 'block';
   }
 
+  getNightSixRoomCameras(node) {
+    const rooms = {
+      stage: [2, 3], storage: [12, 13], workshop: [10, 11],
+      props: [6, 7, 8, 9], mainHall: [1, 4, 5, 14]
+    };
+    return rooms[node] || [];
+  }
+
+  getNightSixRoomOccupants(node) {
+    const cameras = this.getNightSixRoomCameras(node);
+    if (!cameras.length) return [];
+    const found = new Map();
+    const add = (id, cam) => {
+      const camera = Number(cam);
+      if (id && cameras.includes(camera)) found.set(id, camera);
+    };
+    const shared = window.RIFT_SHARED_CHARACTER_AI && window.RIFT_SHARED_CHARACTER_AI.getState();
+    if (shared && shared.actors) Object.entries(shared.actors).forEach(([id,a]) => {
+      if (a && a.phase !== 'idle') add(id,a.cam);
+    });
+    const n6 = window.RIFT_NIGHT6_CHARACTER_SYSTEM && window.RIFT_NIGHT6_CHARACTER_SYSTEM.getState();
+    if (n6) {
+      if (Number(n6.night) === 6 && n6.nokaCam) add('noka',n6.nokaCam);
+      if (n6.active) add(n6.active,n6.activeCam);
+    }
+    const tannin = window.RIFT_TANIN_AI && window.RIFT_TANIN_AI.getState();
+    if (tannin && tannin.aiLevel > 0 && !['DORMANT','COOLDOWN','ATTACKED'].includes(tannin.state)) add('tannin',tannin.camId);
+    const companions = window.RIFT_TANNIN_COMPANIONS && window.RIFT_TANNIN_COMPANIONS.getState();
+    if (companions && companions.positions) Object.entries(companions.positions).forEach(([id,cam])=>add(id,cam));
+    return Array.from(found,([characterId,camId])=>({characterId,camId}));
+  }
+
+  onNightSixRoomEntered(node) {
+    const rooms={stage:'排练小舞台',storage:'玩偶储藏舱',workshop:'维修工坊',props:'道具仓库',mainHall:'主走廊'};
+    const names={noka:'诺卡',tannin:'塔宁',lobe:'耳机',gu:'孤',chillo:'寒零',flux:'闪流',cosmo:'小宇宙',transfer:'移交'};
+    const hints={
+      noka:'诺卡在附近，留意发条余量。',tannin:'塔宁被发现了，注意走廊与门口。',
+      lobe:'耳机在附近，准备使用闪光灯。',gu:'孤在附近，留意左门。',
+      chillo:'寒零在附近，留意右门。',flux:'闪流出现在附近，注意监控画面。',
+      cosmo:'小宇宙出现在附近，留意画面变化。',transfer:'移交出现在附近，不要触碰他。'
+    };
+    this.getNightSixRoomOccupants(node).forEach(({characterId,camId})=>{
+      const key=node+':'+characterId;
+      if(this.roomEncountered.has(key))return;
+      this.roomEncountered.add(key);
+      window.dispatchEvent(new CustomEvent('rift:night-six-eleven-room-event',{detail:{
+        night:6,room:node,roomName:rooms[node]||node,characterId,
+        characterName:names[characterId]||characterId,camId,hint:hints[characterId]||'注意该区域的异常。'
+      }}));
+    });
+  }
+
   onSpecialTime(event, ctx) {
     if (!event || event.id !== 'eleven-awakens' || Number(event.night) !== 6 || this.aiLevel <= 0) return;
     this.specialAwakened = true;
@@ -223,9 +277,13 @@ class GildedElevenAI {
     this.stage = 0;
     this.currentNodeIndex = 1;
     this.timer = this.config.timings.roam;
-    // 第六夜只在设施内部活动，不把实体渲染到保安视角或场景中。
+    this.roomEncountered.clear();
+    // 十一从最远端的排练区开始，按既定路线逐个巡查设施房间。
     this.hideAll(ctx);
-    this.updateNightSixStageStatus(this.path[this.currentNodeIndex]);
+    const firstRoom = this.path[this.currentNodeIndex];
+    this.showNode(firstRoom, ctx);
+    this.updateNightSixStageStatus(firstRoom);
+    this.onNightSixRoomEntered(firstRoom);
   }
 
   triggerAttack(ctx, node) {
@@ -397,10 +455,9 @@ class GildedElevenAI {
     }
 
     if (this.phase === 'ROAMING') {
-      if (!this.specialAwakened) {
-        const node = this.path[this.currentNodeIndex] || 'mainHall';
-        this.showNode(node, ctx);
-      }
+      const currentRoom = this.path[this.currentNodeIndex] || 'mainHall';
+      this.showNode(currentRoom, ctx);
+      if (this.specialAwakened) this.updateNightSixStageStatus(currentRoom);
       this.timer -= dt;
       if (this.timer <= 0) {
         if (!this.canTakeAction()) {
@@ -412,10 +469,12 @@ class GildedElevenAI {
         this.timer = this.config.timings.roam;
         if (this.specialAwakened) {
           const currentNode = this.path[this.currentNodeIndex] || 'mainHall';
+          this.showNode(currentNode, ctx);
           if (this.stage >= this.config.maxStages) {
             this.triggerAttack(ctx, currentNode);
           } else {
             this.updateNightSixStageStatus(currentNode);
+            this.onNightSixRoomEntered(currentNode);
           }
         } else if (this.stage >= this.config.maxStages) {
           this.triggerAttack(ctx, this.path[this.currentNodeIndex] || 'mainHall');
