@@ -257,10 +257,32 @@
   window.addEventListener('rift:night-six-eleven-room-event',e=>{
     const d=e.detail||{};
     if(Number(d.night)!==6||!d.characterId)return;
-    announce('十一进入'+(d.roomName||'未知房间')+'，发现'+(d.characterName||d.characterId)+'！'+(d.hint||'注意附近异常。'));
+    const id=d.characterId;
+    announce('十一进入'+(d.roomName||'未知房间')+'，发现'+(d.characterName||id)+'！'+(d.hint||'注意附近异常。'));
     window.dispatchEvent(new CustomEvent('rift:character-status',{detail:{
-      characterId:d.characterId,status:'eleven-room-encounter',room:d.room,camId:d.camId
+      characterId:id,status:'eleven-room-encounter',room:d.room,camId:d.camId
     }}));
+    // 触发角色原有的专属机制，而不只是显示通用提示。
+    if(mutationOrder.includes(id)){
+      window.dispatchEvent(new CustomEvent('rift:night-six-mutation-attack',{
+        detail:{night:6,characterId:id,mutationId:'eleven-room-'+String(d.room||'').replace(/[^a-z0-9_-]/gi,'')}
+      }));
+    } else if(id==='noka'){
+      nokaThreatTimer=0;
+      nokaMoveTick=0;
+      window.dispatchEvent(new CustomEvent('rift:night-six-noka-eleven-encounter',{
+        detail:{night:6,room:d.room,camId:d.camId,crank,value:crank}
+      }));
+      announce('诺卡专属事件：十一闯入了诺卡所在区域！留意音乐盒发条。');
+    } else if(id==='transfer'){
+      window.dispatchEvent(new CustomEvent('rift:night-six-transfer-eleven-encounter',{
+        detail:{night:6,room:d.room,camId:d.camId}
+      }));
+    } else {
+      window.dispatchEvent(new CustomEvent('rift:night-six-character-eleven-encounter',{
+        detail:{night:6,characterId:id,room:d.room,camId:d.camId}
+      }));
+    }
   });
   window.addEventListener('rift:night-start',resetNight);
   window.addEventListener('rift:night-six-mutation-attack',e=>beginAttack(e.detail));
