@@ -2,7 +2,7 @@ const GILDED_ELEVEN_CONFIG = {
   name: '十一 (Gilded Eleven)',
   quote: '……',
   routes: {
-    MAIN: ['behind', 'stage', 'storage', 'workshop', 'props', 'mainHall']
+    MAIN: ['cam14','cam13','cam12','cam11','cam10','cam9','cam8','cam7','cam6','cam5','cam4','cam3','cam2','cam1']
   },
   visualMap: {
     behind: 'gilded-eleven-behind',
@@ -10,7 +10,8 @@ const GILDED_ELEVEN_CONFIG = {
     storage: 'gilded-eleven-storage',
     workshop: 'gilded-eleven-workshop',
     props: 'gilded-eleven-props',
-    mainHall: 'gilded-eleven-main-hall'
+    mainHall: 'gilded-eleven-main-hall',
+    patrol: 'gilded-eleven-patrol'
   },
   timings: {
     stage: 7.5,
