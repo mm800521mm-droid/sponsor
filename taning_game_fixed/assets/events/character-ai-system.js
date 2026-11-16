@@ -58,7 +58,7 @@
   function showFluxChoice(a){
     if(a.choiceEl || !state.camOpen || state.camId!==a.cam)return;
     const feed=$('feed-'+a.cam); if(!feed)return;
-    const words=['演','幕','场'];
+    const words=['ACT','CUT','TAKE'];
     const correct=Math.floor(Math.random()*words.length);
     const box=document.createElement('div');box.className='rift-flux-choice';box.dataset.riftFluxShared='true';
     words.forEach((word,i)=>{
