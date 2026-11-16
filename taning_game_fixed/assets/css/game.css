@@ -391,3 +391,10 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
 .rift-tannin-companion .glyph{display:flex;align-items:center;justify-content:center;width:clamp(30px,6vw,62px);height:clamp(38px,10vh,86px);font:clamp(24px,5vw,48px) Georgia,serif;color:#b9d8ee;text-shadow:0 0 8px #6da8d8,0 0 18px #263e78}
 .rift-tannin-companion .name{padding:2px 5px;background:#080b12d9;border:1px solid #647c9a;color:#d6e4f1;font:9px 'Courier New',monospace;letter-spacing:1px;white-space:nowrap}
 @keyframes riftCompanionDrift{50%{transform:translateY(-5px)}}
+
+/* Active CCTV feed sits above static and scanline overlays, keeping Tannin visible. */
+#cam-feed-container > .cam-scene.active { z-index: 10 !important; isolation: isolate; }
+#cam-feed-container > .cam-scene.active .tannin-pixel-host,
+#cam-feed-container > .cam-scene.active .tannin-pixel-sprite {
+  display: block !important; visibility: visible !important;
+}
