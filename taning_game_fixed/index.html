@@ -307,6 +307,9 @@
   const clearSubtitle = document.getElementById('clear-subtitle');
   const btnReturnMenu = document.getElementById('btnReturnMenu');
   const jumpscareOverlay = document.getElementById('jumpscare-overlay');
+  let fluxScareActive = false;
+  let fluxScareToken = 0;
+  const pendingJumpscares = [];
 
   const btnLookBack = document.getElementById('btnLookBack');
   const backView = document.getElementById('back-view');
@@ -553,10 +556,20 @@
     const key=String(name||'');
     ctx.imageSmoothingEnabled=false;
     if (/闪流|Flux/.test(key)) {
-      ctx.fillStyle='#15191b';ctx.fillRect(w*.12,h*.16,w*.76,h*.58);
-      ctx.strokeStyle='#9bdce8';ctx.lineWidth=Math.max(4,w*.025);ctx.strokeRect(w*.12,h*.16,w*.76,h*.58);
-      for(let y=h*.22;y<h*.68;y+=Math.max(5,h*.025)){ctx.fillStyle=Math.random()>.5?'rgba(220,240,240,.18)':'rgba(30,80,90,.45)';ctx.fillRect(w*.16,y,w*.68,Math.max(2,h*.008));}
-      ctx.fillStyle='#ff3434';ctx.shadowColor='#f00';ctx.shadowBlur=24;ctx.fillRect(w*.28,h*.39,w*.12,h*.045);ctx.fillRect(w*.60,h*.39,w*.12,h*.045);ctx.shadowBlur=0;
+      // Flux is shown as a full-screen face, never as a text card or TV label.
+      ctx.fillStyle='#080b0d';ctx.beginPath();
+      ctx.moveTo(w*.50,h*.035);ctx.lineTo(w*.82,h*.16);ctx.lineTo(w*.94,h*.48);
+      ctx.lineTo(w*.78,h*.91);ctx.lineTo(w*.50,h*.985);ctx.lineTo(w*.22,h*.91);
+      ctx.lineTo(w*.06,h*.48);ctx.lineTo(w*.18,h*.16);ctx.closePath();ctx.fill();
+      ctx.strokeStyle='#9bdce8';ctx.lineWidth=Math.max(5,w*.018);ctx.stroke();
+      ctx.fillStyle='#182b31';ctx.beginPath();ctx.moveTo(w*.13,h*.30);ctx.lineTo(w*.43,h*.36);ctx.lineTo(w*.40,h*.51);ctx.lineTo(w*.12,h*.47);ctx.closePath();ctx.fill();
+      ctx.beginPath();ctx.moveTo(w*.87,h*.30);ctx.lineTo(w*.57,h*.36);ctx.lineTo(w*.60,h*.51);ctx.lineTo(w*.88,h*.47);ctx.closePath();ctx.fill();
+      ctx.fillStyle='#f8ffff';ctx.shadowColor='#9ff';ctx.shadowBlur=36;
+      ctx.fillRect(w*.22,h*.405,w*.19,h*.055);ctx.fillRect(w*.59,h*.405,w*.19,h*.055);ctx.shadowBlur=0;
+      ctx.fillStyle='#050607';ctx.fillRect(w*.28,h*.415,w*.08,h*.035);ctx.fillRect(w*.64,h*.415,w*.08,h*.035);
+      ctx.fillStyle='#020303';ctx.beginPath();ctx.moveTo(w*.32,h*.68);ctx.lineTo(w*.68,h*.68);ctx.lineTo(w*.61,h*.86);ctx.lineTo(w*.39,h*.86);ctx.closePath();ctx.fill();
+      ctx.fillStyle='#d9f7fa';for(let i=0;i<7;i++){const x=w*(.36+i*.04);ctx.beginPath();ctx.moveTo(x,h*.69);ctx.lineTo(x+w*.022,h*.69);ctx.lineTo(x+w*.012,h*.77);ctx.closePath();ctx.fill();}
+      for(let y=h*.08;y<h*.94;y+=Math.max(7,h*.018)){ctx.fillStyle='rgba(220,250,255,.055)';ctx.fillRect(w*.07,y,w*.86,Math.max(2,h*.004));}
     } else if (/诺卡|Noka/.test(key)) {
       ctx.strokeStyle='#a98545';ctx.lineWidth=Math.max(5,w*.035);ctx.strokeRect(w*.18,h*.22,w*.64,h*.52);
       ctx.fillStyle='#23190f';ctx.fillRect(w*.22,h*.26,w*.56,h*.44);
@@ -581,8 +594,44 @@
     }
   }
 
+  function triggerFluxPriorityScare() {
+    if (S.ended || fluxScareActive) return;
+    fluxScareActive = true;
+    const token = ++fluxScareToken;
+    const overlay = document.createElement('div');
+    overlay.id = 'rift-flux-priority-scare';
+    overlay.setAttribute('aria-hidden', 'true');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;pointer-events:all;';
+    const face = document.createElement('canvas');
+    face.width = 900; face.height = 900;
+    face.style.cssText = 'width:min(96vmin,900px);height:min(96vmin,900px);object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 0 34px #b00000);animation:scareShake .055s infinite;';
+    overlay.appendChild(face);
+    document.body.appendChild(overlay);
+    drawRiftCharacterJumpscareFace(face, 'Flux');
+    playJumpscareSound();
+    // The night clock and game loop keep running behind this opaque face.
+    // Other characters' jumpscares are queued and begin only after Flux clears.
+    window.dispatchEvent(new CustomEvent('rift:flux-priority-scare-start'));
+    setTimeout(() => {
+      if (token !== fluxScareToken) return;
+      overlay.remove();
+      fluxScareActive = false;
+      window.dispatchEvent(new CustomEvent('rift:flux-priority-scare-end'));
+      const next = pendingJumpscares.shift();
+      if (next && !S.ended) triggerJumpscare(next.name, next.quote);
+    }, 2300);
+  }
+
   function triggerJumpscare(name, quote) {
     if (S.ended) return;
+    if (/闪流|Flux/i.test(String(name || ''))) {
+      triggerFluxPriorityScare();
+      return;
+    }
+    if (fluxScareActive) {
+      if (!pendingJumpscares.some(item => item.name === name)) pendingJumpscares.push({name, quote});
+      return;
+    }
     S.ended = true;
     S.running = false;
     releaseAllLights();
@@ -1174,6 +1223,8 @@
     document.getElementById('clear-title').innerText = '8 AM';
     backView.classList.remove('show', 'warning');
     jumpscareOverlay.classList.remove('show');
+    fluxScareToken++; fluxScareActive = false; pendingJumpscares.length = 0;
+    const fluxOverlay = document.getElementById('rift-flux-priority-scare'); if (fluxOverlay) fluxOverlay.remove();
     isLookingBack = false;
     setElevenCameraBlackout(false);
     releaseAllLights();
