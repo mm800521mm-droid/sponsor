@@ -16,6 +16,8 @@
   const emit = (name, detail={}) => window.dispatchEvent(new CustomEvent(name,{detail}));
   const aiFor = id => Math.max(0,Math.min(20,Number((window.RIFT_CURRENT_AI_LEVELS||{})[id] ?? ((((window.NIGHT_SETTINGS||{})[state.night]||{}).characters||{})[id]))||0));
   const chance = id => typeof window.riftCanCharacterMove==='function' ? window.riftCanCharacterMove(aiFor(id)) : Math.random()*100 < aiFor(id)*5;
+  // Nights 1-5 become progressively more aggressive without changing AI probability.
+  const pace = seconds => seconds / (1 + Math.max(0, state.night - 1) * 0.12);
   const makeActor = (id, cam, interval) => ({id,cam,home:cam,interval,timer:interval,phase:'idle',threat:0,look:0,deadline:0,clearWord:'',words:[],el:null});
   function actorList(){
     return {
@@ -63,12 +65,12 @@
       if(i===correct)button.classList.add('clear');
       button.addEventListener('click',()=>{
         if(i===correct){
-          a.threat=0;a.phase='delay';a.deadline=Date.now()+22000;a.timer=0;a.look=0;
+          a.threat=0;a.phase='delay';a.deadline=Date.now()+pace(22000);a.timer=0;a.look=0;
           emit('rift:character-status',{characterId:'flux',status:'delayed'});
           const close=$('btnCamClose');if(close)close.click();
         }else{
           a.threat++;a.phase='approach';
-          if(a.threat>=2){a.phase='door';a.deadline=Date.now()+9000;}
+          if(a.threat>=2){a.phase='door';a.deadline=Date.now()+pace(9000);}
         }
         box.remove();a.choiceEl=null;render(a);
       });
@@ -77,8 +79,27 @@
     a.choiceEl=box;feed.appendChild(box);
   }
   function clearChoice(a){if(a.choiceEl){a.choiceEl.remove();a.choiceEl=null;}}
+  function syncFlashDevice(){
+    if(state.night===6)return;
+    const panel=$('camera-panel');if(!panel)return;
+    let box=panel.querySelector('[data-device="flash"]');
+    if(!box){
+      box=document.createElement('div');box.className='rift-n6-device';box.dataset.device='flash';
+      box.innerHTML='<div>CAM 10 // FLASH</div><div>发现耳机时照射</div><button type="button">闪光</button>';
+      panel.appendChild(box);
+      box.querySelector('button').addEventListener('click',e=>{
+        e.preventDefault();e.stopPropagation();
+        if(!state.running||!state.camOpen||state.camId!==10||box.dataset.cooldown==='1')return;
+        box.dataset.cooldown='1';const button=box.querySelector('button');button.disabled=true;button.textContent='冷却 3s';
+        let remaining=3;const cooldown=()=>{remaining--;if(remaining>0){button.textContent='冷却 '+remaining+'s';setTimeout(cooldown,1000);}else{box.dataset.cooldown='0';button.disabled=false;button.textContent='闪光';}};setTimeout(cooldown,1000);
+        const feed=$('feed-10');if(feed){feed.classList.remove('rift-cam10-flash');void feed.offsetWidth;feed.classList.add('rift-cam10-flash');setTimeout(()=>feed.classList.remove('rift-cam10-flash'),260);}
+        emit('rift:night-six-flash',{camId:10,source:'shared-cam10-device'});
+      });
+    }
+    box.style.display=state.running&&state.camOpen&&state.camId===10?'block':'none';
+  }
   function startActor(a){
-    a.phase='moving';a.timer=a.interval;a.threat=0;a.look=0;
+    a.phase='moving';a.timer=pace(a.interval);a.threat=0;a.look=0;
     if(a.id==='flux'){
       const cams=[2,3,4,5,6,7,8,9,11,12];
       a.cam=cams[Math.floor(Math.random()*cams.length)];
@@ -118,6 +139,7 @@
     const d=event.detail||{};
     state.running=!!d.running;state.camOpen=!!d.camOpen;state.camId=Number(d.camId)||1;
     state.leftClosed=!!d.leftClosed;state.rightClosed=!!d.rightClosed;
+    syncFlashDevice();
     if(!state.running)return;
     const dt=Math.min(.1,Math.max(0,Number(d.dt)||0));
     for(const a of Object.values(state.actors)){
@@ -125,17 +147,17 @@
       if(aiFor(a.id)<=0)continue;
       if(a.phase==='idle'){
         a.timer-=dt;
-        if(a.timer<=0){if(chance(a.id))startActor(a);else a.timer=a.interval;}
+        if(a.timer<=0){if(chance(a.id))startActor(a);else a.timer=pace(a.interval);}
         continue;
       }
       if(a.phase==='delay'){
-        if(Date.now()>=a.deadline){a.phase='moving';a.timer=a.interval;}
+        if(Date.now()>=a.deadline){a.phase='moving';a.timer=pace(a.interval);}
         continue;
       }
       if(a.id==='flux'){
         if(a.phase==='moving'){
           a.timer-=dt;
-          if(a.timer<=0){a.phase='approach';a.deadline=Date.now()+16000;}
+          if(a.timer<=0){a.phase='approach';a.deadline=Date.now()+pace(16000);}
         }
         if(a.phase==='moving' && state.camOpen && state.camId===a.cam){
           a.look+=dt;
@@ -145,21 +167,22 @@
           a.look=0;
         }
         if(a.phase==='approach'){
-          a.deadline=a.deadline||Date.now()+16000;
-          if(Date.now()>=a.deadline){a.phase='door';a.deadline=Date.now()+9000;}
+          a.deadline=a.deadline||Date.now()+pace(16000);
+          if(Date.now()>=a.deadline){a.phase='door';a.deadline=Date.now()+pace(9000);}
         }
         if(a.phase==='door' && !state.leftClosed && !state.rightClosed && Date.now()>=a.deadline)fail(a,'flux-door-timeout');
       } else if(a.phase==='moving'){
         a.timer-=dt;
         if(a.timer<=0){
           if(a.id==='gu'){
-            if(a.cam===4){a.cam=5;a.timer=7;render(a);}
-            else{a.phase='door';a.deadline=Date.now()+8000;emit('rift:character-at-door',{characterId:'gu',side:'left'});}
+            if(a.bonusCam2 && a.cam===2){a.cam=4;a.timer=pace(7);render(a);}
+            else if(a.cam===4){a.cam=5;a.timer=pace(7);render(a);}
+            else{a.bonusCam2=false;a.phase='door';a.deadline=Date.now()+pace(8000);emit('rift:character-at-door',{characterId:'gu',side:'left'});}
           }else if(a.id==='chillo'){
-            if(a.cam===6){a.cam=3;a.timer=7;render(a);}
-            else{a.phase='door';a.deadline=Date.now()+8000;emit('rift:character-at-door',{characterId:'chillo',side:'right',visualSide:'left'});}
+            if(a.cam===6){a.cam=3;a.timer=pace(7);render(a);}
+            else{a.phase='door';a.deadline=Date.now()+pace(8000);emit('rift:character-at-door',{characterId:'chillo',side:'right',visualSide:'left'});}
           }else if(a.id==='lobe'){
-            a.phase='flash-window';a.deadline=Date.now()+6500;
+            a.phase='flash-window';a.deadline=Date.now()+5000;
             emit('rift:character-at-door',{characterId:'lobe',side:'cam10'});
           }
         }
@@ -171,7 +194,7 @@
     handleDoor();
   }
   function onMonitor(e){
-    const d=e.detail||{};state.camOpen=!!d.open;state.camId=Number(d.camId)||state.camId;
+    const d=e.detail||{};state.camOpen=!!d.open;state.camId=Number(d.camId)||state.camId;syncFlashDevice();
     if(state.camOpen) for(const actor of Object.values(state.actors)) if(aiFor(actor.id)>0) render(actor);
     const flux=state.actors.flux;
     if(flux && !state.camOpen && flux.phase==='moving' && flux.look>0){
@@ -183,7 +206,7 @@
     const d=e.detail||{};
     const a=state.actors.lobe;
     // The CAM10 flashlight works for Lobe on every night, including Night 6.
-    if(a && a.phase==='flash-window' && Number(d.camId)===10){
+    if(a && a.phase==='flash-window' && state.running && state.camOpen && state.camId===10 && Number(d.camId)===10){
       returnActor(a);emit('rift:character-status',{characterId:'lobe',status:'flashed'});
     }
   }
@@ -222,6 +245,7 @@
     suspended.clear();state.actors=actorList();
     Object.values(state.actors).forEach(a=>{removeActorVisual(a);a.timer=a.interval;if(aiFor(a.id)>0)render(a);});
     state.crank=5;state.nokaTimer=0;
+    for(const a of Object.values(state.actors)){a.timer=pace(a.interval);a.bonusCam2=false;}
   }
   window.addEventListener('rift:night-start',reset);
   window.addEventListener('rift:night-six-mutation-attack',e=>{const id=e.detail&&e.detail.characterId;if(state.actors[id]){suspended.add(id);removeActorVisual(state.actors[id]);}});
@@ -237,7 +261,13 @@
   window.addEventListener('rift:character-time-rollback',e=>{
     if(state.night===6)return;
     const hours=Math.max(1,Number(e.detail&&e.detail.hours)||1);
-    emit('rift:night-six-time-rollback',{hours,characterId:'lobe'});
+    emit('rift:night-six-time-rollback',{hours,characterId:'lobe',night:state.night});
+    // A missed CAM10 flash brings Gu onto CAM02 before his usual route resumes.
+    const gu=state.actors.gu;
+    if(gu && aiFor('gu')>0){
+      clearChoice(gu);gu.cam=2;gu.phase='moving';gu.timer=pace(5);gu.deadline=0;gu.threat=0;gu.bonusCam2=true;
+      render(gu);emit('rift:character-appearance',{characterId:'gu',camId:2,source:'lobe-time-rollback'});
+    }
   });
   window.RIFT_SHARED_CHARACTER_AI=Object.freeze({
     getState:()=>({night:state.night,actors:Object.fromEntries(Object.entries(state.actors).map(([id,a])=>[id,{phase:a.phase,cam:a.cam,threat:a.threat}]))}),
