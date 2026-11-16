@@ -85,13 +85,14 @@
     let box=panel.querySelector('[data-device="flash"]');
     if(!box){
       box=document.createElement('div');box.className='rift-n6-device';box.dataset.device='flash';
-      box.innerHTML='<div>CAM 10 // FLASH</div><div>发现耳机时照射</div><button type="button">闪光</button>';
+      box.innerHTML='<div>CAM 10 // FLASH</div><div>耳机出现后5秒内闪光</div><button type="button">闪光</button>';
       panel.appendChild(box);
       box.querySelector('button').addEventListener('click',e=>{
         e.preventDefault();e.stopPropagation();
         if(!state.running||!state.camOpen||state.camId!==10||box.dataset.cooldown==='1')return;
-        box.dataset.cooldown='1';const button=box.querySelector('button');button.disabled=true;button.textContent='冷却 3s';
-        let remaining=3;const cooldown=()=>{remaining--;if(remaining>0){button.textContent='冷却 '+remaining+'s';setTimeout(cooldown,1000);}else{box.dataset.cooldown='0';button.disabled=false;button.textContent='闪光';}};setTimeout(cooldown,1000);
+        const lobeReady=state.actors.lobe&&state.actors.lobe.phase==='flash-window';
+        const button=box.querySelector('button');
+        if(lobeReady){box.dataset.cooldown='1';button.disabled=true;button.textContent='冷却 3s';let remaining=3;const cooldown=()=>{remaining--;if(remaining>0){button.textContent='冷却 '+remaining+'s';setTimeout(cooldown,1000);}else{box.dataset.cooldown='0';button.disabled=false;button.textContent='闪光';}};setTimeout(cooldown,1000);}
         const feed=$('feed-10');if(feed){feed.classList.remove('rift-cam10-flash');void feed.offsetWidth;feed.classList.add('rift-cam10-flash');setTimeout(()=>feed.classList.remove('rift-cam10-flash'),260);}
         emit('rift:night-six-flash',{camId:10,source:'shared-cam10-device'});
       });
