@@ -253,8 +253,8 @@
 <script src="./assets/events/night-transition.js?v=1"></script>
 <script src="./assets/data/data.js?v=7" onerror="console.error('data.js 加载失败：请确认 data.js 与 index.html 在同一目录')"></script>
 <script src="./assets/events/night-six-mutations.js?v=4"></script>
-<script src="./assets/events/night-six-character-system.js?v=21"></script>
-<script src="./assets/events/character-ai-system.js?v=8"></script>
+<script src="./assets/events/night-six-character-system.js?v=22"></script>
+<script src="./assets/events/character-ai-system.js?v=9"></script>
 <!-- Night 6 subtitle test loader temporarily disabled for public play. Restore this script to re-enable test controls. -->
 <script src="assets/characters/taning.js?v=3"></script>
 <script src="assets/characters/taning_fight_load.js"></script>
@@ -971,6 +971,49 @@
     dispatchNightSpecialTimes();
     updateUI();
   });
+  // Developer-only test bridge. All overrides live in memory and never alter NIGHT_SETTINGS.
+  window.RIFT_TEST_BRIDGE = {
+    startNight: n => { mainMenu.style.display='none';gameEl.style.display='block';initAudio();startNight(Math.max(1,Math.min(6,Number(n)||1))); },
+    pause: value => { testPaused=!!value; },
+    setTime: value => {
+      if(!S.running||!value)return false;
+      const parts=value.split(':').map(Number);if(parts.length!==2||parts.some(Number.isNaN))return false;
+      const minutes=Math.max(0,Math.min(S.night===6?555:480,parts[0]*60+parts[1]));
+      S.elapsed=minutes/60*HOUR_MS;S.hour=Math.min(8,Math.floor(minutes/60));processedNightEvents=new Set();
+      setElevenCameraBlackout(false);if(typeof gildedEleven!=='undefined')gildedEleven.startNight(S.night,activeNightSettings,GameContext);
+      dispatchNightSpecialTimes();updateUI();return true;
+    },
+    setAI: (id,level) => {
+      const roster=['gildedEleven','flux','noka','tannin','lobe','gu','chillo','cosmo','transfer'];
+      if(!roster.includes(id))return false;
+      const values={...(window.RIFT_CURRENT_AI_LEVELS||{}),[id]:Math.max(0,Math.min(20,Math.round(Number(level)||0)))};
+      window.RIFT_CURRENT_AI_LEVELS=values;
+      if(activeNightSettings){activeNightSettings={...activeNightSettings,characters:{...(activeNightSettings.characters||{}),[id]:values[id]}};window.RIFT_NIGHT_STATE={night:S.night,settings:activeNightSettings};}
+      if(id==='tannin'&&typeof taning!=='undefined')taning.setAILevel(values[id]);
+      if(id==='gildedEleven'&&typeof gildedEleven!=='undefined')gildedEleven.setAILevel(values[id]);
+      window.dispatchEvent(new CustomEvent('rift:night-ai-levels-changed',{detail:{night:S.night,values,debug:true}}));
+      return true;
+    },
+    setCamera: id => {if(!S.running)return false;if(!isCamOpen)toggleMonitor();const b=document.querySelector('.cam-btn[data-cam="'+Number(id)+'"]');if(b&&!b.classList.contains('locked')){b.click();return true;}return false;},
+    toggleDoor: side => {const b=document.getElementById(side==='left'?'btnLdoor':'btnRdoor');if(b)b.click();},
+    toggleLight: side => {const b=document.getElementById(side==='left'?'btnLlight':'btnRlight');if(b)b.click();},
+    forceEleven: ()=>{if(typeof gildedEleven==='undefined')return false;gildedEleven.setDebugBehind(true,GameContext);if(!isLookingBack)toggleLookBack();return true;},
+    forceTannin: ()=>{if(typeof taning==='undefined')return false;taning.state='WANDER';taning.timer=0;taning.showNode('cam5',GameContext);return true;},
+    forceCharacter: (id,cam) => {
+      if(['flux','lobe','gu','chillo'].includes(id))return !!(window.RIFT_SHARED_CHARACTER_AI&&window.RIFT_SHARED_CHARACTER_AI.force(id,cam,'moving'));
+      if(id==='tannin')return this.forceTannin();
+      if(id==='gildedEleven')return this.forceEleven();
+      if(['tannin','lobe','gu','chillo'].includes(id)&&S.night===6)return !!(window.RIFT_NIGHT6_CHARACTER_SYSTEM&&window.RIFT_NIGHT6_CHARACTER_SYSTEM.forceMutation(id));
+      if(['cosmo','transfer'].includes(id))return !!(window.RIFT_TANNIN_COMPANIONS&&window.RIFT_TANNIN_COMPANIONS.setPosition(id,cam||1,40,15));
+      return false;
+    },
+    forceMutation: id => !!(window.RIFT_NIGHT6_CHARACTER_SYSTEM&&window.RIFT_NIGHT6_CHARACTER_SYSTEM.forceMutation(id)),
+    forceNokaCamera: cam => !!(window.RIFT_NIGHT6_CHARACTER_SYSTEM&&window.RIFT_NIGHT6_CHARACTER_SYSTEM.forceNokaCamera(cam)),
+    setCrank: value => !!(window.RIFT_NIGHT6_CHARACTER_SYSTEM&&window.RIFT_NIGHT6_CHARACTER_SYSTEM.setCrank(value)),
+    flash: ()=>{const b=document.getElementById('rift-n6-flash-btn');if(b)b.click();},
+    jumpscare: name=>triggerJumpscare(name||'测试角色','TEST JUMPSCARE')
+  };
+
   backView.addEventListener('click', () => { if (isLookingBack) toggleLookBack(); });
 
   window.onkeydown = function(e) {
@@ -1217,6 +1260,7 @@
     };
   });
 
+  <script src="./assets/events/developer-test-controls.js?v=1"></script>
   requestAnimationFrame(gameLoop);
 
 })();
