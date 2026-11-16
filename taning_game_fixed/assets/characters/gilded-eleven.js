@@ -149,7 +149,7 @@ class GildedElevenAI {
   }
 
   showNode(node, ctx) {
-    const patrolCamera = this.specialAwakened && /^cam\\d+$/.test(node) ? Number(node.slice(3)) : 0;
+    const patrolCamera = this.specialAwakened && /^cam\d+$/.test(node) ? Number(node.slice(3)) : 0;
     const visualNode = patrolCamera ? 'patrol' : node;
     const el = this.getVisualElement(visualNode, ctx);
     if (!el) return;
@@ -220,7 +220,7 @@ class GildedElevenAI {
     const count = panel.querySelector('#rift-eleven-stage-count');
     const bar = panel.querySelector('#rift-eleven-stage-bar');
     if (name) name.textContent = this.state === 'ATTACKED' ? '十一：攻击阶段' : '第六夜：设施异常阶段';
-    const patrolCam = /^cam\\d+$/.test(currentNode) ? Number(currentNode.slice(3)) : 0;
+    const patrolCam = /^cam\d+$/.test(currentNode) ? Number(currentNode.slice(3)) : 0;
     if (place) place.textContent = '当前位置：' + (patrolCam ? (patrolCam === 1 ? '保安室（CAM 01）' : '监控区域 CAM ' + String(patrolCam).padStart(2,'0')) : (names[currentNode] || '区域未知'));
     const progress = patrolCam ? this.currentNodeIndex + 1 : Math.min(this.stage || 0, this.config.maxStages);
     const total = patrolCam ? 12 : this.config.maxStages;
@@ -251,7 +251,7 @@ class GildedElevenAI {
   }
 
   getNightSixRoomCameras(node) {
-    const cameraMatch = /^cam(\\d+)$/.exec(node);
+    const cameraMatch = /^cam(\d+)$/.exec(node);
     if (cameraMatch) return [Number(cameraMatch[1])];
     const rooms = { stage:[2,3], storage:[12,13], workshop:[10,11], props:[6,7,8,9], mainHall:[1,4,5,14] };
     return rooms[node] || [];
@@ -282,7 +282,7 @@ class GildedElevenAI {
   }
 
   onNightSixRoomEntered(node) {
-    const cameraMatch = /^cam(\\d+)$/.exec(node);
+    const cameraMatch = /^cam(\d+)$/.exec(node);
     const rooms={stage:'排练小舞台',storage:'玩偶储藏舱',workshop:'维修工坊',props:'道具仓库',mainHall:'主走廊'};
     if(cameraMatch) rooms[node] = Number(cameraMatch[1])===1 ? '保安室' : '监控区域 CAM '+String(cameraMatch[1]).padStart(2,'0');
     const names={noka:'诺卡',tannin:'塔宁',lobe:'耳机',gu:'孤',chillo:'寒零',flux:'闪流',cosmo:'小宇宙',transfer:'移交'};
