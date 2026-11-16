@@ -23,6 +23,7 @@
   function place(detail) {
     if (!detail || !Object.prototype.hasOwnProperty.call(defs, detail.characterId)) return;
     const id = detail.characterId;
+    if (aiFor(id) <= 0) { hideCharacter(id); return; }
     const cam = Number(detail.camId);
     if (!Number.isInteger(cam) || cam < 1 || cam > 13) {
       hideCharacter(id);
@@ -64,6 +65,8 @@
     transfer: { wait: 0, visible: 0 }
   };
   let locked = false;
+  function aiFor(id) { return Math.max(0,Math.min(20,Number((window.RIFT_CURRENT_AI_LEVELS||{})[id] ?? ((((window.NIGHT_SETTINGS||{})[Number(window.RIFT_NIGHT_STATE&&window.RIFT_NIGHT_STATE.night)]||{}).characters||{})[id]))||0); }
+  function canMove(id) { const ai=aiFor(id); return ai>0 && (typeof window.riftCanCharacterMove==='function' ? window.riftCanCharacterMove(ai) : Math.random()*100<ai*5); }
   function randomCamera() { return 1 + Math.floor(Math.random() * 13); }
   function scheduleNext(id) { schedule[id].wait = 14 + Math.random() * 18; }
   function appear(id) {
@@ -81,7 +84,7 @@
 
   window.addEventListener('rift:game-frame', event => {
     const d = event.detail || {};
-    if (locked || !d.running) return;
+    if (!d.running) return;
     const dt = Math.min(.1, Math.max(0, Number(d.dt) || 0));
     scareCooldown=Math.max(0,scareCooldown-dt);
     transferHeat=transferInside?Math.min(3,transferHeat+dt*.48):Math.max(0,transferHeat-dt*.18);
@@ -94,8 +97,9 @@
         item.visible -= dt;
         if (item.visible <= 0) { hideCharacter(id); scheduleNext(id); }
       } else {
+        if (aiFor(id) <= 0) { hideCharacter(id); item.wait = 1; continue; }
         item.wait -= dt;
-        if (item.wait <= 0) appear(id);
+        if (item.wait <= 0) { if (canMove(id)) appear(id); else scheduleNext(id); }
       }
     }
   });
@@ -113,7 +117,8 @@
     else Object.keys(defs).forEach(hideCharacter);
   });
   window.addEventListener('rift:night-start', () => { locked=false;transferHeat=0;transferInside=false;scareCooldown=0; Object.keys(defs).forEach(id=>{hideCharacter(id);scheduleNext(id);schedule[id].visible=0;}); });
-  window.addEventListener('rift:night-six-others-return', () => { locked=true; Object.keys(defs).forEach(id=>{hideCharacter(id);schedule[id].visible=0;}); });
+  window.addEventListener('rift:night-six-others-return', () => { Object.keys(defs).forEach(id=>{hideCharacter(id);schedule[id].visible=0;scheduleNext(id);}); });
+  window.addEventListener('rift:night-ai-levels-changed', () => { for (const id of Object.keys(defs)) if (aiFor(id) <= 0) hideCharacter(id); });
 
   window.RIFT_TANNIN_COMPANIONS = Object.freeze({
     getState: () => ({
