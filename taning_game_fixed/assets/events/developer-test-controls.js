@@ -83,7 +83,7 @@
   $('dev-noka-go').addEventListener('click',()=>status(bridge()?.forceNokaCamera($('dev-noka-cam').value)?'诺卡已移动到 CAM '+$('dev-noka-cam').value:'当前夜晚无法移动诺卡'));
   $('dev-crank-go').addEventListener('click',()=>status(bridge()?.setCrank($('dev-crank').value)?'发条已设置为 '+$('dev-crank').value+'/5':'发条设置失败'));
   $('dev-flash').addEventListener('click',()=>{bridge()?.flash();status('已触发闪光测试（需在 CAM 10 监控中）');});
-  $('dev-transfer-scare').addEventListener('click',()=>{const ok=bridge()?.forceMutation('transfer');if(!ok){window.dispatchEvent(new CustomEvent('rift:night-six-mutation-attack',{detail:{characterId:'transfer',mutationId:'debug-transfer'}}));status('已发送移交突变测试事件');}else status('移交突变已触发');});
+  $('dev-transfer-scare').addEventListener('click',()=>status(bridge()?.transferScare()?'已触发移交三阶段惊吓演出':'辅助角色系统尚未加载'));
   $('dev-jumpscare').addEventListener('click',()=>{bridge()?.jumpscare('测试角色');status('已触发测试跳杀');});
   $('dev-state').addEventListener('click',()=>{
     const shared=window.RIFT_SHARED_CHARACTER_AI?.getState?.();
