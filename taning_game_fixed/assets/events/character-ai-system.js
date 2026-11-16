@@ -232,7 +232,11 @@
     const hours=Math.max(1,Number(e.detail&&e.detail.hours)||1);
     emit('rift:night-six-time-rollback',{hours,characterId:'lobe'});
   });
-  window.RIFT_SHARED_CHARACTER_AI=Object.freeze({getState:()=>({night:state.night,actors:Object.fromEntries(Object.entries(state.actors).map(([id,a])=>[id,{phase:a.phase,cam:a.cam,threat:a.threat}]))})});
+  window.RIFT_SHARED_CHARACTER_AI=Object.freeze({
+    getState:()=>({night:state.night,actors:Object.fromEntries(Object.entries(state.actors).map(([id,a])=>[id,{phase:a.phase,cam:a.cam,threat:a.threat}]))}),
+    force:(id,cam,phase='moving')=>{const a=state.actors[id];if(!a||(state.night===6&&id!=='flux'))return false;a.cam=Math.max(1,Math.min(14,Number(cam)||a.home));a.phase=phase==='door'?'door':'moving';a.timer=0;a.deadline=Date.now()+12000;a.threat=0;render(a);return true;},
+    resetActor:id=>{const a=state.actors[id];if(!a)return false;returnActor(a);return true;}
+  });
   window.addEventListener('rift:night-ai-levels-changed',()=>{
     // Re-render idle actors too: their AI can rise from 0 at a timed stage.
     for(const actor of Object.values(state.actors)) render(actor);
