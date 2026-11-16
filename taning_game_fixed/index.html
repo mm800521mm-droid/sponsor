@@ -597,6 +597,7 @@
   function triggerFluxPriorityScare() {
     if (S.ended || fluxScareActive) return;
     fluxScareActive = true;
+    window.RIFT_FLUX_PRIORITY_SCARE_ACTIVE = true;
     const token = ++fluxScareToken;
     const overlay = document.createElement('div');
     overlay.id = 'rift-flux-priority-scare';
@@ -616,6 +617,7 @@
       if (token !== fluxScareToken) return;
       overlay.remove();
       fluxScareActive = false;
+      window.RIFT_FLUX_PRIORITY_SCARE_ACTIVE = false;
       window.dispatchEvent(new CustomEvent('rift:flux-priority-scare-end'));
       const next = pendingJumpscares.shift();
       if (next && !S.ended) triggerJumpscare(next.name, next.quote);
@@ -1191,16 +1193,17 @@
       }
 
       if (S.running) {
-        window.dispatchEvent(new CustomEvent('rift:game-frame',{detail:{night:S.night,elapsed:S.elapsed,dt,running:S.running,camOpen:isCamOpen,camId:currentCamId,leftClosed:dL,rightClosed:dR}}));
+        const characterDt = window.RIFT_FLUX_PRIORITY_SCARE_ACTIVE ? 0 : dt;
+        window.dispatchEvent(new CustomEvent('rift:game-frame',{detail:{night:S.night,elapsed:S.elapsed,dt:characterDt,running:S.running,camOpen:isCamOpen,camId:currentCamId,leftClosed:dL,rightClosed:dR}}));
         if (isLookingBack) {
           lookBackTimer -= dt;
           if (lookBackTimer <= 0 && !backView.classList.contains('warning')) backView.classList.add('warning');
         }
         if (typeof taning !== 'undefined') {
-          try { taning.update(dt, GameContext); } catch (e) { console.error('Taning AI update failed:', e); }
+          try { taning.update(characterDt, GameContext); } catch (e) { console.error('Taning AI update failed:', e); }
         }
         if (typeof gildedEleven !== 'undefined') {
-          try { gildedEleven.update(dt, GameContext); } catch (e) { console.error('Gilded Eleven AI update failed:', e); }
+          try { gildedEleven.update(characterDt, GameContext); } catch (e) { console.error('Gilded Eleven AI update failed:', e); }
         }
       }
       updateUI();
@@ -1223,7 +1226,7 @@
     document.getElementById('clear-title').innerText = '8 AM';
     backView.classList.remove('show', 'warning');
     jumpscareOverlay.classList.remove('show');
-    fluxScareToken++; fluxScareActive = false; pendingJumpscares.length = 0;
+    fluxScareToken++; fluxScareActive = false; window.RIFT_FLUX_PRIORITY_SCARE_ACTIVE = false; pendingJumpscares.length = 0;
     const fluxOverlay = document.getElementById('rift-flux-priority-scare'); if (fluxOverlay) fluxOverlay.remove();
     isLookingBack = false;
     setElevenCameraBlackout(false);
