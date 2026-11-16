@@ -25,3 +25,4 @@ const TANING_CONFIG = {
 TANING_CONFIG.baseTimings = { ...TANING_CONFIG.timings };
 
 const taning = new TaningAI(TANING_CONFIG);
+window.RIFT_TANIN_AI = Object.freeze({getState:()=>{const node=taning.state==='WANDER'?'cam5':(taning.path[taning.currentNodeIndex]||'');const camId=({cam5:5,cam4:4,cam3:3,doorL:1,doorR:1})[node]||0;return {aiLevel:taning.aiLevel,state:taning.state,node,camId};}});
