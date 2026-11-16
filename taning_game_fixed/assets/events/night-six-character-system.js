@@ -53,16 +53,21 @@
       box.innerHTML='<div>CAM 10 // FLASH</div><div>发现耳机时照射</div><button type="button" id="rift-n6-flash-btn">闪光</button>';
       f10.appendChild(box);
       const flashButton=box.querySelector('button');
-      flashButton.addEventListener('click',e=>{
-        e.preventDefault();e.stopPropagation();
+      let lastFlashPress=0;
+      const fireFlash=e=>{
+        if(e){e.preventDefault();e.stopPropagation();}
         const panel=$('camera-panel'),feed=$('feed-10');
         if(!frame.running||!panel||!panel.classList.contains('show')||!feed||!feed.classList.contains('active')||Date.now()<flashReadyAt)return;
+        if(Date.now()-lastFlashPress<350)return;
+        lastFlashPress=Date.now();
         flashReadyAt=Date.now()+3000;
         flashButton.disabled=true;flashButton.textContent='冷却 3s';
         let remaining=3;const cooldown=setInterval(()=>{remaining--;if(remaining>0){flashButton.textContent='冷却 '+remaining+'s';}else{clearInterval(cooldown);flashButton.disabled=false;flashButton.textContent='闪光';}},1000);
         const flashFeed=$('feed-10');if(flashFeed){flashFeed.classList.remove('rift-cam10-flash');void flashFeed.offsetWidth;flashFeed.classList.add('rift-cam10-flash');setTimeout(()=>flashFeed.classList.remove('rift-cam10-flash'),260);}
         window.dispatchEvent(new CustomEvent('rift:night-six-flash',{detail:{camId:10,deviceOnly:true}}));
-      });
+      };
+      flashButton.addEventListener('pointerdown',fireFlash);
+      flashButton.addEventListener('click',fireFlash);
     }
   }
   function aiFor(id){const current=window.RIFT_CURRENT_AI_LEVELS||{};const settings=(((window.NIGHT_SETTINGS||{})[night]||{}).characters||{});return Math.max(0,Math.min(20,Number(current[id] ?? settings[id])||0));}
