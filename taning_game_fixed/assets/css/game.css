@@ -679,3 +679,26 @@ body.rift-debug-unlocked .menu-item-extra{display:block!important;}
  #rift-puppet-stage .rift-puppet small{font-size:6px;}
 }
 @media(prefers-reduced-motion:reduce){#rift-puppet-stage .rift-player-avatar{animation:none;}}
+
+/* Final placement correction: align the puppet stage directly under the
+   small warm pendant lamp on the RIGHT side of the title screen. */
+#rift-puppet-stage{
+  left:66%!important;right:auto!important;top:4%!important;
+  width:min(25vw,440px)!important;height:66%!important;
+}
+#rift-puppet-stage .rift-player-avatar{
+  left:50%;top:43%;width:clamp(112px,10.5vw,166px);
+  height:clamp(218px,24vw,300px);
+}
+#rift-puppet-stage .rift-puppets{
+  left:0!important;right:0!important;top:8%!important;height:48%!important;
+}
+@media(max-width:700px){
+ #rift-puppet-stage{
+   left:57%!important;right:auto!important;top:8%!important;
+   width:40%!important;height:62%!important;
+ }
+ #rift-puppet-stage .rift-player-avatar{
+   top:44%;width:clamp(86px,17vw,122px);height:clamp(170px,34vw,220px);
+ }
+}
