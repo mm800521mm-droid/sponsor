@@ -211,11 +211,15 @@
             if(a.cam===6){a.cam=3;a.timer=pace(7,a.id);render(a);}
             else{a.phase='door';a.deadline=Date.now()+pace(8000,a.id);emit('rift:character-at-door',{characterId:'chillo',side:'right',visualSide:'right'});}
           }else if(a.id==='lobe'){
-            a.phase='flash-window';a.deadline=Date.now()+5000;
+            a.phase='flash-window';
+            const responseSeconds=Math.max(3,8-aiFor('lobe')*0.25);
+            a.deadline=Date.now()+responseSeconds*1000;
+            emit('rift:lobe-warning-start',{seconds:responseSeconds,ai:aiFor('lobe')});
             emit('rift:character-at-door',{characterId:'lobe',side:'cam10'});
           }
         }
       }else if(a.phase==='flash-window' && Date.now()>=a.deadline){
+        emit('rift:lobe-warning-clear',{reason:'timeout'});
         emit('rift:character-time-rollback',{characterId:'lobe',hours:1});
         returnActor(a);
       }
@@ -236,7 +240,7 @@
     const a=state.actors.lobe;
     // The CAM10 flashlight works for Lobe on every night, including Night 6.
     if(a && a.phase==='flash-window' && state.running && state.camOpen && state.camId===10 && Number(d.camId)===10){
-      returnActor(a);emit('rift:character-status',{characterId:'lobe',status:'flashed'});
+      emit('rift:lobe-warning-clear',{reason:'flashed'});returnActor(a);emit('rift:character-status',{characterId:'lobe',status:'flashed'});
     }
   }
   function onDoorChange(e){
