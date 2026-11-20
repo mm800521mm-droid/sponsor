@@ -198,7 +198,9 @@
     if(window.RIFT_FLUX_PRIORITY_SCARE_ACTIVE)return;
     if(active && frame.running){
       const dt=Math.min(.1,Math.max(0,Number(frame.dt)||0));
-      const attackSpeed=typeof window.riftCharacterSpeedMultiplier==='function'\n        ? window.riftCharacterSpeedMultiplier(aiFor(active),night)\n        : Math.min(1.60,1+aiFor(active)*0.02+Math.max(0,night-1)*0.03);
+      const attackSpeed=typeof window.riftCharacterSpeedMultiplier==='function'
+        ? window.riftCharacterSpeedMultiplier(aiFor(active),night)
+        : Math.min(1.60,1+aiFor(active)*0.02+Math.max(0,night-1)*0.03);
       routeClock+=dt*attackSpeed;attackClock+=dt*attackSpeed;
       const route=routes[active]||[defs[active].cam,1];
       if(routeClock>=2.2 && routeIndex<route.length-1){
