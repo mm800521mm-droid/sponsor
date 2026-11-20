@@ -180,7 +180,7 @@
         continue;
       }
       if(a.phase==='delay'){
-        if(Date.now()>=a.deadline){a.phase='moving';a.timer=pace(a.interval);}
+        if(Date.now()>=a.deadline){a.phase='moving';a.timer=pace(a.interval,a.id);}
         continue;
       }
       if(a.id==='flux'){
@@ -197,7 +197,7 @@
         }
         if(a.phase==='approach'){
           a.deadline=a.deadline||Date.now()+pace(16000,a.id);
-          if(Date.now()>=a.deadline){a.phase='door';a.deadline=Date.now()+pace(9000);}
+          if(Date.now()>=a.deadline){a.phase='door';a.deadline=Date.now()+pace(9000,a.id);}
         }
         if(a.phase==='door' && !state.leftClosed && !state.rightClosed && Date.now()>=a.deadline)fail(a,'flux-door-timeout');
       } else if(a.phase==='moving'){
@@ -205,11 +205,11 @@
         if(a.timer<=0){
           if(a.id==='gu'){
             if(a.bonusCam2 && a.cam===2){a.cam=4;a.timer=pace(7,a.id);render(a);}
-            else if(a.cam===4){a.cam=5;a.timer=pace(7);render(a);}
+            else if(a.cam===4){a.cam=5;a.timer=pace(7,a.id);render(a);}
             else{a.bonusCam2=false;a.phase='door';a.deadline=Date.now()+pace(8000,a.id);renderDoorThreat(a);emit('rift:character-at-door',{characterId:'gu',side:'left'});}
           }else if(a.id==='chillo'){
             if(a.cam===6){a.cam=3;a.timer=pace(7);render(a);}
-            else{a.phase='door';a.deadline=Date.now()+pace(8000);emit('rift:character-at-door',{characterId:'chillo',side:'right',visualSide:'left'});}
+            else{a.phase='door';a.deadline=Date.now()+pace(8000,a.id);emit('rift:character-at-door',{characterId:'chillo',side:'right',visualSide:'left'});}
           }else if(a.id==='lobe'){
             a.phase='flash-window';a.deadline=Date.now()+5000;
             emit('rift:character-at-door',{characterId:'lobe',side:'cam10'});
@@ -261,7 +261,7 @@
     if(!Number.isInteger(cam))return;
     for(const a of Object.values(state.actors)){
       if(a.id==='flux'||a.phase==='idle'||a.cam!==cam)continue;
-      if(a.id==='gu'){a.cam=a.cam===4?5:1;a.phase=a.cam===1?'door':'moving';a.timer=pace(7);a.deadline=Date.now()+pace(8000);}
+      if(a.id==='gu'){a.cam=a.cam===4?5:1;a.phase=a.cam===1?'door':'moving';a.timer=pace(7);a.deadline=Date.now()+pace(8000,a.id);}
       else if(a.id==='chillo'){a.cam=a.cam===6?3:1;a.phase=a.cam===1?'door':'moving';a.timer=pace(7);a.deadline=Date.now()+pace(8000);}
       else if(a.id==='lobe'){returnActor(a);continue;}
       render(a);
