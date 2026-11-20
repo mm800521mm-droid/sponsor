@@ -535,3 +535,54 @@ body.rift-debug-unlocked .menu-item-extra{display:block!important;}
  #rift-puppet-stage .rift-player-face{width:clamp(68px,15vw,96px);}
  #rift-puppet-stage .rift-puppet small{font-size:6px;}
 }
+
+/* Player is the largest floating, translucent presence inside the spotlight;
+   the surrounding cast stays visibly smaller and suspended as puppets. */
+#rift-puppet-stage .rift-player-face{
+  left:50%;top:66%;width:clamp(150px,15vw,218px);
+  aspect-ratio: .88;
+  transform:translate(-50%,-50%);
+  opacity:.48;
+  border:1px solid rgba(230,207,181,.34);
+  border-radius:48% 48% 42% 42%;
+  background:
+    radial-gradient(ellipse at 50% 36%,rgba(216,194,173,.42) 0 18%,rgba(104,91,88,.32) 42%,rgba(16,13,15,.08) 72%),
+    radial-gradient(ellipse at 50% 76%,rgba(165,146,136,.26),transparent 68%);
+  box-shadow:0 0 34px rgba(255,218,177,.2),0 0 90px rgba(220,192,164,.1),inset 0 -22px 35px rgba(0,0,0,.28);
+  animation:riftPlayerHover 4.6s ease-in-out infinite;
+}
+#rift-puppet-stage .rift-player-face:before,
+#rift-puppet-stage .rift-player-face:after{
+  top:44%;width:8%;height:3%;
+  background:rgba(235,221,207,.58);
+  box-shadow:0 0 10px rgba(245,218,187,.24);
+}
+#rift-puppet-stage .rift-player-face:before{left:27%;}
+#rift-puppet-stage .rift-player-face:after{right:27%;}
+#rift-puppet-stage .rift-player-face i{
+  top:58%;width:20%;height:1px;background:rgba(230,211,194,.42);
+}
+#rift-puppet-stage .rift-player-face b{
+  top:-48%;height:48%;width:1px;
+  background:linear-gradient(rgba(225,206,184,.35),rgba(225,206,184,.02));
+}
+#rift-puppet-stage .rift-player-face em{
+  top:-53%;width:5%;height:5%;
+  background:rgba(224,203,180,.5);
+  box-shadow:0 0 14px rgba(255,218,177,.38);
+}
+/* Puppet bodies remain dim and subordinate to the player's apparition. */
+#rift-puppet-stage .rift-puppet{opacity:.76;filter:drop-shadow(0 2px 6px rgba(0,0,0,.9));}
+#rift-puppet-stage .rift-puppet i{
+  background:linear-gradient(rgba(218,195,169,.82),rgba(218,195,169,.08));
+}
+@keyframes riftPlayerHover{
+  0%,100%{margin-top:0;filter:blur(.15px);}
+  50%{margin-top:-13px;filter:blur(.45px);}
+}
+@media(max-width:700px){
+ #rift-puppet-stage .rift-player-face{width:clamp(108px,21vw,150px);}
+}
+@media(prefers-reduced-motion:reduce){
+ #rift-puppet-stage .rift-player-face{animation:none;}
+}
