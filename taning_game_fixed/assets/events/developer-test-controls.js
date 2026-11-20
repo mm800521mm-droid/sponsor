@@ -20,6 +20,15 @@
     #rift-dev-panel .dev-note{color:#a99d87;font-size:10px}
     @media(max-width:600px){#rift-dev-toggle{right:8px;bottom:8px;padding:8px 10px}#rift-dev-panel{right:2vw;bottom:48px;width:96vw;max-height:72vh}}
   `;
+  style.textContent += `
+    #debug-skip-bar,#rift-test-controls,#rift-dev-toggle{display:none!important}
+    body.rift-debug-unlocked #debug-skip-bar,body.rift-debug-unlocked #rift-test-controls{display:flex!important}
+    body.rift-debug-unlocked #rift-dev-toggle{display:block!important}
+    #rift-dev-panel .custom-ai-list{display:grid;grid-template-columns:1fr 1fr;gap:5px 10px}
+    #rift-dev-panel .custom-ai-row{display:grid;grid-template-columns:76px 1fr 24px;align-items:center;gap:5px;min-width:0}
+    #rift-dev-panel .custom-ai-row input{width:100%;min-width:0;padding:0}
+    @media(max-width:820px){#debug-skip-bar,#rift-test-controls,#rift-dev-toggle{display:none!important}}
+`;
   document.head.appendChild(style);
   const toggle=document.createElement('button');toggle.id='rift-dev-toggle';toggle.type='button';toggle.textContent='开发测试 ▴';
   const panel=document.createElement('section');panel.id='rift-dev-panel';panel.setAttribute('aria-label','开发测试面板');
@@ -28,6 +37,12 @@
     <div class="dev-row"><label>快速进入</label><select id="dev-night"><option value="1">第一夜</option><option value="2">第二夜</option><option value="3">第三夜</option><option value="4">第四夜</option><option value="5">第五夜</option><option value="6">第六夜</option></select><button id="dev-start">进入／重开</button></div>
     <div class="dev-row"><label>时间跳转</label><input id="dev-time" type="time" value="05:00"><button id="dev-jump">跳转</button></div>
     <div class="dev-row"><button id="dev-pause">暂停</button><button id="dev-resume">继续</button><button id="dev-reload">重开本夜</button></div>
+    
+    <h3>自定义夜 // CUSTOM NIGHT</h3>
+    <div class="dev-row"><label>剧情底板</label><select id="dev-custom-base"><option value="1">第一夜</option><option value="2">第二夜</option><option value="3">第三夜</option><option value="4">第四夜</option><option value="5">第五夜</option><option value="6">第六夜</option></select><button id="dev-custom-defaults">载入该夜默认 AI</button><button id="dev-custom-zero">全部归零</button></div>
+    <div class="dev-note">选择一个夜晚作为剧情与机制底板，再独立调整每名角色 AI（0–20）。0 表示该角色休眠；原夜晚配置不会被覆盖。</div>
+    <div class="custom-ai-list" id="dev-custom-ai-list"></div>
+    <div class="dev-row"><button id="dev-custom-start">开始自定义夜</button></div>
     <h3>AI 数值临时覆盖</h3>
     <div class="dev-row"><label>角色</label><select id="dev-ai-char">
       <option value="gildedEleven">十一</option><option value="flux">闪流</option><option value="noka">诺卡</option><option value="tannin">塔宁</option><option value="lobe">耳机</option><option value="gu">孤</option><option value="chillo">寒零</option><option value="cosmo">小宇宙</option><option value="transfer">移交／一脚</option>
@@ -55,6 +70,49 @@
   `;
   document.body.append(toggle,panel);
   const $=id=>panel.querySelector('#'+id);
+  const customRoster=[
+    ['gildedEleven','十一'],['flux','闪流'],['noka','诺卡'],['tannin','塔宁'],
+    ['lobe','耳机'],['gu','孤'],['chillo','寒零'],['cosmo','小宇宙'],['transfer','移交／一脚']
+  ];
+  const customList=$('dev-custom-ai-list');
+  customRoster.forEach(([id,label])=>{
+    const row=document.createElement('div');row.className='custom-ai-row';
+    row.innerHTML='<label>'+label+'</label><input type="range" min="0" max="20" step="1" value="0" data-custom-ai="'+id+'"><span data-custom-value="'+id+'">0</span>';
+    const slider=row.querySelector('input');
+    slider.addEventListener('input',()=>{row.querySelector('[data-custom-value]').textContent=slider.value;});
+    customList.appendChild(row);
+  });
+  const loadCustomDefaults=()=>{
+    const n=Number($('dev-custom-base').value);
+    const values=window.NIGHT_SETTINGS?.[n]?.characters||{};
+    customRoster.forEach(([id])=>{const slider=customList.querySelector('[data-custom-ai="'+id+'"]');slider.value=Number(values[id])||0;customList.querySelector('[data-custom-value="'+id+'"]').textContent=slider.value;});
+  };
+  $('dev-custom-defaults').addEventListener('click',()=>{loadCustomDefaults();status('已载入第 '+$('dev-custom-base').value+' 夜默认 AI');});
+  $('dev-custom-zero').addEventListener('click',()=>{customRoster.forEach(([id])=>{const slider=customList.querySelector('[data-custom-ai="'+id+'"]');slider.value=0;customList.querySelector('[data-custom-value="'+id+'"]').textContent='0';});status('所有角色 AI 已归零');});
+  $('dev-custom-base').addEventListener('change',loadCustomDefaults);
+  loadCustomDefaults();
+  $('dev-custom-start').addEventListener('click',()=>{
+    const values=Object.fromEntries(customRoster.map(([id])=>[id,Number(customList.querySelector('[data-custom-ai="'+id+'"]').value)]));
+    const ok=bridge()?.startCustomNight(Number($('dev-custom-base').value),values);
+    status(ok?'自定义夜已启动：剧情底板为第 '+$('dev-custom-base').value+' 夜':'自定义夜启动失败');
+    if(ok)panel.classList.remove('open');
+  });
+  const secret='mm800521mm';let typed='';
+  document.addEventListener('keydown',event=>{
+    if(window.innerWidth<=820||event.ctrlKey||event.altKey||event.metaKey)return;
+    const target=event.target;
+    if(target&&(/INPUT|TEXTAREA|SELECT/.test(target.tagName)||target.isContentEditable)){typed='';return;}
+    if(!/^[a-z0-9]$/i.test(event.key)){if(event.key==='Backspace')typed='';return;}
+    typed=(typed+event.key.toLowerCase()).slice(-secret.length);
+    if(typed===secret){
+      document.body.classList.add('rift-debug-unlocked');
+      panel.classList.add('open');
+      toggle.textContent='关闭测试面板 ▾';
+      status('电脑端指令验证通过：开发调试与自定义夜已解锁');
+      typed='';
+    }
+  },true);
+
   const status=message=>{$('dev-status').textContent=message;};
   for(let i=1;i<=14;i++){
     const b=document.createElement('button');b.textContent=String(i);b.type='button';b.addEventListener('click',()=>{const ok=bridge()?.setCamera(i);status(ok?'已切换到 CAM '+i:'请先开始夜晚并打开监控');});$('dev-cameras').appendChild(b);
