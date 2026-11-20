@@ -53,3 +53,11 @@
   .doorway .rift-door-threat{inset:3% 1% 7%;gap:5px}
   .doorway .rift-door-threat-label{font-size:clamp(10px,2.7vw,15px);padding:6px 5px}
 }
+
+
+/* Lobe warning: temporary corrupted clock signal while the player can still flash. */
+#clock.rift-lobe-clock-glitch{
+  color:#f4eeee!important;text-shadow:2px 0 #f00,-2px 0 #20d9ff,0 0 14px #f00;
+  animation:riftLobeClockJitter .095s steps(2,end) infinite;letter-spacing:.12em;
+}
+@keyframes riftLobeClockJitter{0%{transform:translate(0,0) skewX(0)}25%{transform:translate(-2px,1px) skewX(-8deg)}50%{transform:translate(2px,-1px) skewX(7deg)}75%{transform:translate(-1px,0) skewX(-4deg)}100%{transform:translate(0,0) skewX(0)}}
