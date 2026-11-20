@@ -21,7 +21,7 @@
   let fluxPauseStartedAt = 0;
   let frame = { running:false, camOpen:false, camId:1, leftClosed:false, rightClosed:false };
   let crank = 0, nokaCam = 13, nokaMoveTick = 0, transferHeat = 0, transferInside = false, transferTimer = 0;
-  let nokaLastTick = 0, nokaAI = 0, nokaThreatTimer = 0, flashReadyAt = 0, fluxCam = 2, fluxLookSince = 0, fluxTextShown = false, fluxDelay = 0, fluxThreat = 0, fluxAtDoor = false;
+  let nokaLastTick = 0, nokaAI = 0, nokaThreatTimer = 0, flashReadyAt = 0, lobeResponseSeconds = 5, fluxCam = 2, fluxLookSince = 0, fluxTextShown = false, fluxDelay = 0, fluxThreat = 0, fluxAtDoor = false;
   const $ = (id) => document.getElementById(id);
 
   function ensureStatus(){
@@ -153,6 +153,7 @@
     window.dispatchEvent(new CustomEvent(success?'rift:night-six-mutation-defended':'rift:night-six-mutation-resolved',{
       detail:{night:6,characterId:id,success:!!success,reason:reason||'',returnToStart:!!success,stopForNight:!!success}
     }));
+    if(id==='lobe')window.dispatchEvent(new CustomEvent('rift:lobe-warning-clear',{detail:{reason:success?'flashed':'timeout'}}));
     active=null;activeId='';routeClock=0;attackClock=0;routeIndex=0;
     renderSprites();
     if(success)announce(defs[id].name+' 已被防御，返回初始位置并停止行动');
@@ -162,6 +163,7 @@
     // 每个突变事件都必须从独立的路线和计时状态开始，不能继承上一名角色的进度。
     routeIndex=0;routeClock=0;attackClock=0;
     active=detail.characterId;activeId=detail.mutationId||'';
+    if(active==='lobe'){lobeResponseSeconds=Math.max(3,8-aiFor('lobe')*0.25);window.dispatchEvent(new CustomEvent('rift:lobe-warning-start',{detail:{seconds:lobeResponseSeconds,ai:aiFor('lobe')}}));}
     activeCam=(routes[active]&&routes[active][0])||defs[active].cam;
     renderSprites();
     const tips={
@@ -201,7 +203,7 @@
       if(routeClock>=2.2 && routeIndex<route.length-1){
         routeClock=0;routeIndex++;activeCam=route[routeIndex];renderActiveAtCam();
       }
-      if(active!=='transfer' && attackClock>=8.5){
+      if(active!=='transfer' && attackClock>=(active==='lobe'?lobeResponseSeconds*attackSpeed:8.5)){
         if(active==='lobe'){
           window.dispatchEvent(new CustomEvent('rift:night-six-time-rollback',{detail:{hours:1,characterId:'lobe'}}));
           finishAttack(true,'lobe-time-rollback');
