@@ -61,3 +61,39 @@
   animation:riftLobeClockJitter .095s steps(2,end) infinite;letter-spacing:.12em;
 }
 @keyframes riftLobeClockJitter{0%{transform:translate(0,0) skewX(0)}25%{transform:translate(-2px,1px) skewX(-8deg)}50%{transform:translate(2px,-1px) skewX(7deg)}75%{transform:translate(-1px,0) skewX(-4deg)}100%{transform:translate(0,0) skewX(0)}}
+
+
+/* Responsive character scale: desktop gets a larger, clearer CCTV silhouette; touch screens keep compact framing. */
+@media (min-width: 821px) {
+  .rift-shared-character .figure,
+  .rift-n6-sprite .figure,
+  .rift-tannin-companion .glyph {
+    width: clamp(120px, 14vw, 210px);
+    height: clamp(170px, 30vh, 300px);
+  }
+  .rift-shared-character .figure { font-size: clamp(64px, 7vw, 100px); }
+  .rift-shared-character .tag,
+  .rift-n6-sprite .tag { font-size: 12px; padding: 5px 9px; }
+  #rift-n6-office-attacker .figure {
+    width: clamp(150px, 17vw, 240px);
+    height: clamp(190px, 32vh, 340px);
+    font-size: clamp(64px, 9vw, 112px);
+  }
+  .doorway .rift-door-threat-face { width: min(88%, 300px); height: min(64%, 360px); }
+}
+@media (max-width: 820px) {
+  .rift-shared-character .figure,
+  .rift-n6-sprite .figure,
+  .rift-tannin-companion .glyph {
+    width: clamp(48px, 16vw, 105px);
+    height: clamp(72px, 22vh, 155px);
+  }
+  .rift-shared-character .figure { font-size: clamp(34px, 7vw, 58px); }
+  .rift-shared-character .tag,
+  .rift-n6-sprite .tag { font-size: 8px; letter-spacing: .03em; }
+  #rift-n6-office-attacker .figure {
+    width: clamp(60px, 19vw, 112px);
+    height: clamp(82px, 25vh, 160px);
+    font-size: clamp(34px, 8vw, 58px);
+  }
+}
