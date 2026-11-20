@@ -782,3 +782,28 @@ body.rift-debug-unlocked .menu-item-extra{display:block!important;}
     height:clamp(140px,28vw,200px)!important;
   }
 }
+
+
+/* Corrected to the actual pendant lamp position in the user's 1644x854 screenshot. */
+#rift-puppet-stage{
+  position:absolute!important;left:60%!important;right:auto!important;
+  top:34%!important;bottom:auto!important;width:min(36vw,600px)!important;
+  min-width:420px!important;height:61vh!important;max-height:590px!important;
+  inset-inline:auto!important;inset-block:auto!important;overflow:visible!important;z-index:8!important;
+}
+#rift-puppet-stage .rift-stage-backdrop{left:0!important;right:0!important;top:0!important;height:100%!important;background:radial-gradient(ellipse at 50% 50%,rgba(186,124,64,.15),rgba(54,27,16,.07) 52%,transparent 76%)!important;}
+#rift-puppet-stage .rift-puppets{left:0!important;right:0!important;top:0!important;height:100%!important;}
+#rift-puppet-stage .rift-player-avatar{left:50%!important;top:50%!important;width:clamp(190px,19vw,286px)!important;height:clamp(190px,19vw,286px)!important;}
+#rift-puppet-stage .p-eleven{left:4%!important;top:39%!important;}
+#rift-puppet-stage .p-flux{left:16%!important;top:13%!important;}
+#rift-puppet-stage .p-noka{left:34%!important;top:2%!important;}
+#rift-puppet-stage .p-taning{left:56%!important;top:2%!important;}
+#rift-puppet-stage .p-lobe{left:77%!important;top:14%!important;}
+#rift-puppet-stage .p-gu{left:87%!important;top:40%!important;}
+#rift-puppet-stage .p-chillo{left:73%!important;top:73%!important;}
+#rift-puppet-stage .p-cosmo{left:43%!important;top:82%!important;}
+#rift-puppet-stage .p-transfer{left:13%!important;top:72%!important;}
+@media(max-width:700px){
+ #rift-puppet-stage{left:51%!important;top:31%!important;width:47vw!important;min-width:0!important;max-width:none!important;height:64vh!important;max-height:none!important;}
+ #rift-puppet-stage .rift-player-avatar{width:clamp(132px,25vw,190px)!important;height:clamp(132px,25vw,190px)!important;}
+}
