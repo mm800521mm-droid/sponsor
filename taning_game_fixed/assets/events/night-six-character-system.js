@@ -214,30 +214,19 @@
         }
       }
     }
-    if(active==='transfer'){
-      const dt=Math.min(.1,Math.max(0,Number(frame.dt)||0))*(1+aiFor('transfer')*0.075);
-      transferHeat=transferInside?Math.min(3,transferHeat+dt*.48):Math.max(0,transferHeat-dt*.18);
-      const bar=$('rift-n6-transfer-bar'),label=$('rift-n6-transfer-stage');
-      if(bar)bar.style.width=(transferHeat/3*100)+'%';
-      if(label)label.textContent='阶段 '+Math.min(3,Math.floor(transferHeat+0.01))+' / 3';
-      if(transferHeat>=3){hideTransfer();showTransferScare();finishAttack(false,'transfer-stage-three-jumpscare');announce('移交的三阶段已满！');}
+    const transferAttack=(window.RIFT_CHARACTER_ATTACKS||{}).transfer;
+    if(active==='transfer'&&transferAttack&&transferAttack.updateNight6){
+      const ts={heat:transferHeat,inside:transferInside};
+      transferAttack.updateNight6(ts,{frame,ai:aiFor('transfer'),bar:$('rift-n6-transfer-bar'),label:$('rift-n6-transfer-stage'),hide:hideTransfer,scare:showTransferScare,finish:finishAttack,announce});
+      transferHeat=ts.heat;transferInside=ts.inside;
     }
     nokaAI=Math.max(0,Number((window.RIFT_CURRENT_AI_LEVELS||{}).noka ?? ((((window.NIGHT_SETTINGS||{})[night]||{}).characters||{}).noka))||0);
-    // AI 越高，发条自然流失越快；AI=0 时诺卡完全静止，发条不会自行下降。
-    const nokaDrainInterval=Math.max(6,24-nokaAI*0.9)*1000;
-    if(frame.running && nokaAI>0 && Date.now()-nokaLastTick>=nokaDrainInterval){
-      crank=Math.max(0,crank-1);nokaLastTick=Date.now();renderCrank();
-      window.dispatchEvent(new CustomEvent('rift:night-six-noka-wind-level',{detail:{value:crank,max:5,calm:crank>0,ai:nokaAI,interval:nokaDrainInterval}}));
-    }
-    if(night>0 && frame.running && nokaAI>0){
-      if(crank>0){nokaThreatTimer=0;nokaMoveTick=0;}
-      else {
-        nokaThreatTimer+=Math.min(.1,Math.max(0,Number(frame.dt)||0))*(1+nokaAI*0.075);
-        if(nokaThreatTimer>=nokaMoveTick+3.5 && nokaThreatTimer<12){
-          nokaMoveTick+=3.5;if(nokaActionCheck()){let next=1+Math.floor(Math.random()*12);if(next===nokaCam)next=next===12?1:next+1;nokaCam=next;renderSprites();window.dispatchEvent(new CustomEvent('rift:noka-enter-room',{detail:{camId:nokaCam,night}}));}
-        }
-        if(nokaThreatTimer>=12){nokaThreatTimer=0;nokaMoveTick=0;if(nokaActionCheck())window.dispatchEvent(new CustomEvent('rift:character-jumpscare',{detail:{characterId:'noka',name:'诺卡',reason:'music-box-unwound'}}));}
-      }
+    const nokaAttack=(window.RIFT_CHARACTER_ATTACKS||{}).noka;
+    if(nokaAttack&&nokaAttack.updateNight6){
+      const ns={crank,cam:nokaCam,threatTimer:nokaThreatTimer,moveTick:nokaMoveTick,lastTick:nokaLastTick};
+      nokaAttack.updateNight6(ns,{frame,night,ai:nokaAI,now:Date.now,renderCrank,renderSprites,actionCheck:nokaActionCheck,
+        emit:(name,detail)=>window.dispatchEvent(new CustomEvent(name,{detail}))});
+      crank=ns.crank;nokaCam=ns.cam;nokaThreatTimer=ns.threatTimer;nokaMoveTick=ns.moveTick;nokaLastTick=ns.lastTick;
     }
     // Flux is handled by character-ai-system.js on every night.
   }
