@@ -414,3 +414,7 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
 .rift-shared-character .figure{width:clamp(54px,10vw,150px);height:clamp(82px,22vh,250px);display:flex;align-items:flex-end;justify-content:center;}
 .rift-n6-sprite .figure,.rift-tannin-companion .glyph{width:clamp(54px,10vw,150px);height:clamp(82px,22vh,250px);display:flex;align-items:flex-end;justify-content:center;}
 .rift-pixel-figure{max-width:100%;max-height:100%;}
+
+/* Sixth Night and Custom Night are first-class menu entries when unlocked. */
+.menu-item-extra{display:none;}
+body.rift-debug-unlocked .menu-item-extra{display:block!important;}
