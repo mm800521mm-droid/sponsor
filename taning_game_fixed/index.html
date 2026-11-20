@@ -36,6 +36,8 @@
   <div class="menu-items">
     <div class="menu-item" id="menu-new">新游戏</div>
     <div class="menu-item disabled" id="menu-continue">继续</div>
+    <div class="menu-item menu-item-extra" id="menu-night-six">第六夜</div>
+    <div class="menu-item menu-item-extra" id="menu-custom-night">自定义夜</div>
   </div>
 </div>
 
@@ -1363,6 +1365,20 @@
   }
 
   menuNew.onclick = function() { mainMenu.style.display = 'none'; gameEl.style.display = 'block'; initAudio(); startNight(1); };
+
+  const menuNightSix = document.getElementById('menu-night-six');
+  const menuCustomNight = document.getElementById('menu-custom-night');
+  if (highestNight >= 6) { menuNightSix.style.display = 'block'; menuCustomNight.style.display = 'block'; }
+  menuNightSix.onclick = function() { mainMenu.style.display = 'none'; gameEl.style.display = 'block'; initAudio(); startNight(6); };
+  menuCustomNight.onclick = function() {
+    const toggle = document.getElementById('rift-dev-toggle');
+    const panel = document.getElementById('rift-dev-panel');
+    if (!document.body.classList.contains('rift-debug-unlocked') || !panel) return;
+    panel.classList.add('open');
+    if (toggle) toggle.textContent = '关闭测试面板 ▾';
+    const base = panel.querySelector('#dev-custom-base');
+    if (base) base.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
 
   const debugBtns = document.querySelectorAll('.debug-btn');
   debugBtns.forEach(btn => {
