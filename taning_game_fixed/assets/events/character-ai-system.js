@@ -5,7 +5,7 @@
  */
 (() => {
   'use strict';
-  const names = { flux:'闪流', noka:'诺卡', lobe:'耳机', gu:'孤', chillo:'寒零' };
+  const names = { flux:'FLUX', noka:'NOKA', lobe:'LOBE', gu:'GU', chillo:'CHILLO' };
   const suspended = new Set();
   let fluxPauseStartedAt = 0;
   const state = {
@@ -18,8 +18,13 @@
   const aiFor = id => Math.max(0,Math.min(20,Number((window.RIFT_CURRENT_AI_LEVELS||{})[id] ?? ((((window.NIGHT_SETTINGS||{})[state.night]||{}).characters||{})[id]))||0));
   const chance = id => typeof window.riftCanCharacterMove==='function' ? window.riftCanCharacterMove(aiFor(id)) : Math.random()*100 < aiFor(id)*5;
   // Nights 1-5 become progressively more aggressive without changing AI probability.
-  const pace = seconds => seconds / (1 + Math.max(0, state.night - 1) * 0.12);
-  const makeActor = (id, cam, interval) => ({id,cam,home:cam,interval,timer:interval,phase:'idle',threat:0,look:0,deadline:0,clearWord:'',words:[],el:null});
+  const pace = (seconds, id) => {
+    const nightBoost = Math.max(0, state.night - 1) * 0.12;
+    const aiBoost = id ? aiFor(id) * 0.075 : 0;
+    return seconds / (1 + nightBoost + aiBoost);
+  };
+  const initialDelay = actor => Math.max(1.25, pace(actor.interval * 0.7, actor.id));
+  const makeActor = (id, cam, interval) => ({id,cam,home:cam,interval,timer:interval,phase:'idle',threat:0,look:0,deadline:0,clearWord:'',words:[],el:null,doorEl:null});
   function actorList(){
     return {
       flux:makeActor('flux',2,13),
@@ -51,7 +56,7 @@
     const figure=a.el.querySelector('.figure');
     if(window.RIFT_PIXEL_CHARACTERS) window.RIFT_PIXEL_CHARACTERS.mount(figure,a.id);
     else figure.textContent=glyph;
-    a.el.querySelector('.tag').textContent=names[a.id]+' // CAM '+String(cam).padStart(2,'0')+(a.phase==='idle'?' // 待机':'');
+    a.el.querySelector('.tag').textContent=names[a.id]+' // CAM '+String(cam).padStart(2,'0')+(a.phase==='idle'?' // STANDBY':'');
     a.el.style.display=state.night>0?'flex':'none';
     a.el.style.opacity=a.phase==='idle'?'0.72':'1';
   }
@@ -66,12 +71,12 @@
       if(i===correct)button.classList.add('clear');
       button.addEventListener('click',()=>{
         if(i===correct){
-          a.threat=0;a.phase='delay';a.deadline=Date.now()+pace(22000);a.timer=0;a.look=0;
+          a.threat=0;a.phase='delay';a.deadline=Date.now()+pace(22000,a.id);a.timer=0;a.look=0;
           emit('rift:character-status',{characterId:'flux',status:'delayed'});
           const close=$('btnCamClose');if(close)close.click();
         }else{
           a.threat++;a.phase='approach';
-          if(a.threat>=2){a.phase='door';a.deadline=Date.now()+pace(9000);}
+          if(a.threat>=2){a.phase='door';a.deadline=Date.now()+pace(9000,a.id);}
         }
         box.remove();a.choiceEl=null;render(a);
       });
@@ -86,14 +91,14 @@
     let box=panel.querySelector('[data-device="flash"]');
     if(!box){
       box=document.createElement('div');box.className='rift-n6-device';box.dataset.device='flash';
-      box.innerHTML='<div>CAM 10 // FLASH</div><div>耳机出现后5秒内闪光</div><button type="button">闪光</button>';
+      box.innerHTML='<div>CAM 10 // FLASH</div><div>FLASH WHEN LOBE APPEARS // 5 SEC</div><button type="button">FLASH</button>';
       panel.appendChild(box);
       box.querySelector('button').addEventListener('click',e=>{
         e.preventDefault();e.stopPropagation();
         if(!state.running||!state.camOpen||state.camId!==10||box.dataset.cooldown==='1')return;
         const lobeReady=state.actors.lobe&&state.actors.lobe.phase==='flash-window';
         const button=box.querySelector('button');
-        if(lobeReady){box.dataset.cooldown='1';button.disabled=true;button.textContent='冷却 3s';let remaining=3;const cooldown=()=>{remaining--;if(remaining>0){button.textContent='冷却 '+remaining+'s';setTimeout(cooldown,1000);}else{box.dataset.cooldown='0';button.disabled=false;button.textContent='闪光';}};setTimeout(cooldown,1000);}
+        if(lobeReady){box.dataset.cooldown='1';button.disabled=true;button.textContent='COOLDOWN 3s';let remaining=3;const cooldown=()=>{remaining--;if(remaining>0){button.textContent='COOLDOWN '+remaining+'s';setTimeout(cooldown,1000);}else{box.dataset.cooldown='0';button.disabled=false;button.textContent='闪光';}};setTimeout(cooldown,1000);}
         const feed=$('feed-10');if(feed){feed.classList.remove('rift-cam10-flash');void feed.offsetWidth;feed.classList.add('rift-cam10-flash');setTimeout(()=>feed.classList.remove('rift-cam10-flash'),260);}
         emit('rift:night-six-flash',{camId:10,source:'shared-cam10-device'});
       });
@@ -101,7 +106,7 @@
     box.style.display=state.running&&state.camOpen&&state.camId===10?'block':'none';
   }
   function startActor(a){
-    a.phase='moving';a.timer=pace(a.interval);a.threat=0;a.look=0;
+    a.phase='moving';a.timer=pace(a.interval * 0.55,a.id);a.threat=0;a.look=0;
     if(a.id==='flux'){
       const cams=[2,3,4,5,6,7,8,9,11,12];
       a.cam=cams[Math.floor(Math.random()*cams.length)];
@@ -110,7 +115,7 @@
     emit('rift:character-appearance',{characterId:a.id,camId:a.cam});
   }
   function returnActor(a){
-    clearChoice(a);a.phase='idle';a.cam=a.home;a.timer=pace(a.interval);a.threat=0;a.look=0;a.deadline=0;a.bonusCam2=false;
+    clearChoice(a);if(a.doorEl){a.doorEl.remove();a.doorEl=null;}a.phase='idle';a.cam=a.home;a.timer=initialDelay(a);a.threat=0;a.look=0;a.deadline=0;a.bonusCam2=false;
     removeActorVisual(a);
     if(aiFor(a.id)>0)render(a);
     emit('rift:character-returned',{characterId:a.id});
@@ -119,11 +124,30 @@
     emit('rift:character-jumpscare',{characterId:a.id,name:names[a.id],reason});
     returnActor(a);
   }
+  function renderDoorThreat(a){
+    if(!a || !['gu','chillo'].includes(a.id))return;
+    const side=a.id==='gu'?'L':'R';
+    const host=$('doorway'+side);
+    if(!host)return;
+    if(a.doorEl && a.doorEl.parentElement!==host){a.doorEl.remove();a.doorEl=null;}
+    if(!a.doorEl){
+      const el=document.createElement('div');
+      el.className='rift-door-threat rift-door-threat-'+a.id;
+      el.innerHTML='<div class="rift-door-threat-face"></div><div class="rift-door-threat-label"></div>';
+      host.appendChild(el);a.doorEl=el;
+      const face=el.querySelector('.rift-door-threat-face');
+      if(window.RIFT_PIXEL_CHARACTERS)window.RIFT_PIXEL_CHARACTERS.mount(face,a.id);
+      else face.textContent=a.id==='gu'?'▥':'❄';
+    }
+    a.doorEl.querySelector('.rift-door-threat-label').textContent=a.id==='gu'?'GU // CLOSE LEFT DOOR':'CHILLO // CLOSE RIGHT DOOR';
+    a.doorEl.style.display='flex';
+  }
   function handleDoor(){
     const defendedByDoor = a => a.id==='gu' ? state.leftClosed :
       a.id==='chillo' ? state.rightClosed :
       a.id==='flux' ? (state.leftClosed||state.rightClosed) : false;
     for(const a of Object.values(state.actors)){
+      if(a.phase==='door')renderDoorThreat(a);
       if(a.phase==='door' && defendedByDoor(a)){
         returnActor(a);
         emit('rift:shared-defense',{method:'door',side:a.id==='gu'?'left':a.id==='chillo'?'right':'either',source:a.id});
@@ -152,7 +176,7 @@
       if(aiFor(a.id)<=0)continue;
       if(a.phase==='idle'){
         a.timer-=dt;
-        if(a.timer<=0){if(chance(a.id))startActor(a);else a.timer=pace(a.interval);}
+        if(a.timer<=0){if(chance(a.id))startActor(a);else a.timer=pace(a.interval,a.id);}
         continue;
       }
       if(a.phase==='delay'){
@@ -162,7 +186,7 @@
       if(a.id==='flux'){
         if(a.phase==='moving'){
           a.timer-=dt;
-          if(a.timer<=0){a.phase='approach';a.deadline=Date.now()+pace(16000);}
+          if(a.timer<=0){a.phase='approach';a.deadline=Date.now()+pace(16000,a.id);}
         }
         if(a.phase==='moving' && state.camOpen && state.camId===a.cam){
           a.look+=dt;
@@ -172,7 +196,7 @@
           a.look=0;
         }
         if(a.phase==='approach'){
-          a.deadline=a.deadline||Date.now()+pace(16000);
+          a.deadline=a.deadline||Date.now()+pace(16000,a.id);
           if(Date.now()>=a.deadline){a.phase='door';a.deadline=Date.now()+pace(9000);}
         }
         if(a.phase==='door' && !state.leftClosed && !state.rightClosed && Date.now()>=a.deadline)fail(a,'flux-door-timeout');
@@ -180,9 +204,9 @@
         a.timer-=dt;
         if(a.timer<=0){
           if(a.id==='gu'){
-            if(a.bonusCam2 && a.cam===2){a.cam=4;a.timer=pace(7);render(a);}
+            if(a.bonusCam2 && a.cam===2){a.cam=4;a.timer=pace(7,a.id);render(a);}
             else if(a.cam===4){a.cam=5;a.timer=pace(7);render(a);}
-            else{a.bonusCam2=false;a.phase='door';a.deadline=Date.now()+pace(8000);emit('rift:character-at-door',{characterId:'gu',side:'left'});}
+            else{a.bonusCam2=false;a.phase='door';a.deadline=Date.now()+pace(8000,a.id);renderDoorThreat(a);emit('rift:character-at-door',{characterId:'gu',side:'left'});}
           }else if(a.id==='chillo'){
             if(a.cam===6){a.cam=3;a.timer=pace(7);render(a);}
             else{a.phase='door';a.deadline=Date.now()+pace(8000);emit('rift:character-at-door',{characterId:'chillo',side:'right',visualSide:'left'});}
@@ -248,9 +272,9 @@
     state.night=Number(e.detail&&e.detail.night)||0;
     state.running=false;state.camOpen=false;state.camId=1;state.leftClosed=false;state.rightClosed=false;
     suspended.clear();state.actors=actorList();
-    Object.values(state.actors).forEach(a=>{removeActorVisual(a);a.timer=pace(a.interval);a.bonusCam2=false;if(aiFor(a.id)>0)render(a);});
+    Object.values(state.actors).forEach(a=>{removeActorVisual(a);if(a.doorEl){a.doorEl.remove();a.doorEl=null;}a.timer=initialDelay(a);a.bonusCam2=false;if(aiFor(a.id)>0)render(a);});
     state.crank=5;state.nokaTimer=0;
-    for(const a of Object.values(state.actors)){a.timer=pace(a.interval);a.bonusCam2=false;}
+    for(const a of Object.values(state.actors)){a.timer=initialDelay(a);a.bonusCam2=false;}
   }
   window.addEventListener('rift:night-start',reset);
   window.addEventListener('rift:night-six-mutation-attack',e=>{const id=e.detail&&e.detail.characterId;if(state.actors[id]){suspended.add(id);removeActorVisual(state.actors[id]);}});
@@ -282,7 +306,7 @@
   });
   window.RIFT_SHARED_CHARACTER_AI=Object.freeze({
     getState:()=>({night:state.night,actors:Object.fromEntries(Object.entries(state.actors).map(([id,a])=>[id,{phase:a.phase,cam:a.cam,threat:a.threat}]))}),
-    force:(id,cam,phase='moving')=>{const a=state.actors[id];if(!a||(state.night===6&&id!=='flux'))return false;a.cam=Math.max(1,Math.min(14,Number(cam)||a.home));a.phase=phase==='door'?'door':'moving';a.timer=0;a.deadline=Date.now()+pace(12000);a.threat=0;render(a);return true;},
+    force:(id,cam,phase='moving')=>{const a=state.actors[id];if(!a||(state.night===6&&id!=='flux'))return false;a.cam=Math.max(1,Math.min(14,Number(cam)||a.home));a.phase=phase==='door'?'door':'moving';a.timer=0;a.deadline=Date.now()+pace(12000,a.id);a.threat=0;render(a);return true;},
     resetActor:id=>{const a=state.actors[id];if(!a)return false;returnActor(a);return true;}
   });
   window.addEventListener('rift:night-ai-levels-changed',()=>{
