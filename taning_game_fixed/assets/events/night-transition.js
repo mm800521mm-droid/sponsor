@@ -16,7 +16,14 @@
   let card=document.getElementById('rift-next-night-card');
   if(!card){card=document.createElement('div');card.id='rift-next-night-card';card.innerHTML='<div class="rift-next-night-kicker">SHIFT CONTINUES</div><div class="rift-next-night-number"></div>';document.body.appendChild(card);}
   card.querySelector('.rift-next-night-number').textContent='NIGHT '+next;card.classList.remove('active');void card.offsetWidth;card.classList.add('active');
-  await wait(2300);card.classList.remove('active');await wait(350);startNight(next);
+  await wait(2300);card.classList.remove('active');await wait(350);
+  if(Number(night)===5){
+   let message=document.getElementById('rift-fifth-night-message');
+   if(!message){message=document.createElement('div');message.id='rift-fifth-night-message';message.innerHTML='<div class="rift-fifth-night-text">午安，我想跟你玩玩</div>';document.body.appendChild(message);}
+   message.classList.remove('active');void message.offsetWidth;message.classList.add('active');
+   await wait(4200);message.classList.remove('active');await wait(250);
+  }
+  startNight(next);
  }
  window.RIFT_NIGHT_TRANSITIONS=Object.freeze({getHighestNight,completeNight});
 })();
