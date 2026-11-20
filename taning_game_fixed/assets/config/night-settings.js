@@ -57,7 +57,14 @@
 
   // 自定义行动概率曲线：AI 1-11 每级 +5%；AI 12 起进入高概率区。
   const AI_CHANCES = [0, 10, 20, 30, 40, 50, 60, 70, 80, 88, 94, 97, 99, 99, 99, 100, 100, 100, 100, 100, 100];
-  // Speed grows gently with AI and night number. High AI acts sooner, but never at the old 2-4x pace.\n  window.riftCharacterSpeedMultiplier = function (ai, night) {\n    const level = Math.max(0, Math.min(MAX_AI, Number(ai) || 0));\n    const nightIndex = Math.max(1, Math.min(6, Number(night) || 1));\n    return Math.min(1.60, 1 + level * 0.02 + (nightIndex - 1) * 0.03);\n  };\n\n  window.RIFT_AI_CHANCES = AI_CHANCES.slice();
+  // Speed grows gently with AI and night number. High AI acts sooner, but never at the old 2-4x pace.
+  window.riftCharacterSpeedMultiplier = function (ai, night) {
+    const level = Math.max(0, Math.min(MAX_AI, Number(ai) || 0));
+    const nightIndex = Math.max(1, Math.min(6, Number(night) || 1));
+    return Math.min(1.60, 1 + level * 0.02 + (nightIndex - 1) * 0.03);
+  };
+
+  window.RIFT_AI_CHANCES = AI_CHANCES.slice();
   window.riftCanCharacterMove = function (ai) {
     const level = Math.max(0, Math.min(20, Math.floor(Number(ai) || 0)));
     return Math.random() * 100 < AI_CHANCES[level];
