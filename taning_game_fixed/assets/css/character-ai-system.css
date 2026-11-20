@@ -31,3 +31,25 @@
 .cam-scene .rift-shared-character,.cam-scene .rift-n6-sprite,.cam-scene .rift-tannin-companion{z-index:130!important;visibility:visible!important;}
 .cam-scene .rift-shared-character{display:flex;}
 .cam-scene .rift-n6-sprite{display:flex;}
+
+
+/* Clear office-door warning: visible character face and exact defense instruction. */
+.doorway .rift-door-threat{
+  position:absolute;inset:4% 3% 8%;z-index:8;display:none;flex-direction:column;
+  align-items:center;justify-content:center;gap:8px;pointer-events:none;
+  background:radial-gradient(ellipse at center,rgba(0,0,0,.12),rgba(0,0,0,.78));
+  animation:riftDoorThreatPulse .42s steps(2,end) infinite;
+}
+.doorway .rift-door-threat-face{width:min(78%,230px);height:min(58%,300px);display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 20px #d9e8ec);}
+.doorway .rift-door-threat-face canvas{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;}
+.doorway .rift-door-threat-label{
+  max-width:96%;padding:8px 12px;background:#080808ed;border:2px solid #f3d27c;
+  color:#fff;font:900 clamp(13px,1.7vw,22px)/1.3 'Courier New',monospace;
+  letter-spacing:.06em;text-align:center;text-shadow:0 0 8px #f00;
+}
+.rift-door-threat-chillo .rift-door-threat-label{border-color:#9deaff;text-shadow:0 0 8px #38bce8;}
+@keyframes riftDoorThreatPulse{0%,100%{opacity:1}50%{opacity:.78}}
+@media(max-width:700px){
+  .doorway .rift-door-threat{inset:3% 1% 7%;gap:5px}
+  .doorway .rift-door-threat-label{font-size:clamp(10px,2.7vw,15px);padding:6px 5px}
+}
