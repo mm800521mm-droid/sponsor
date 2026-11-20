@@ -90,7 +90,7 @@
     return; // Flux is rendered and controlled by the shared character AI module.
     const feed=$('feed-'+fluxCam);if(!feed)return;
     let el=feed.querySelector('[data-rift-character="flux"]');
-    if(!el){el=document.createElement('div');el.className='rift-n6-sprite rift-flux-tv';el.dataset.riftCharacter='flux';el.innerHTML='<div class="figure">▣</div><div class="tag">闪流 // TV DIRECTOR</div>';feed.appendChild(el);}
+    if(!el){el=document.createElement('div');el.className='rift-n6-sprite rift-flux-tv';el.dataset.riftCharacter='flux';el.innerHTML='<div class="figure">▣</div><div class="tag">闪流 // 电视导演</div>';feed.appendChild(el);}
     el.style.display=night===6&&!locked&&!fluxAtDoor?'flex':'none';
   }
   function renderSprites(){
@@ -134,7 +134,7 @@
   function showFluxChoices(){
     if(fluxTextShown)return;fluxTextShown=true;
     const feed=$('feed-'+fluxCam);if(!feed)return;
-    const clearIndex=Math.floor(Math.random()*3), words=['ACT','CUT','TAKE'];
+    const clearIndex=Math.floor(Math.random()*3), words=['行动','切断','接管'];
     const box=document.createElement('div');box.className='rift-flux-choice';box.id='rift-flux-choice';
     words.forEach((word,index)=>{const b=document.createElement('button');b.type='button';b.textContent=word;if(index===clearIndex)b.classList.add('clear');b.addEventListener('click',()=>{
       if(index===clearIndex){fluxDelay=Date.now()+25000;fluxThreat=Math.max(0,fluxThreat-1);announce('辨认成功：闪流抵达门口的时间被延缓');const close=$('btnCamClose');if(close)close.click();}
