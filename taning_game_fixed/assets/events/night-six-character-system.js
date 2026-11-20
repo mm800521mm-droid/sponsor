@@ -8,7 +8,7 @@
   const defs = {
     noka: { name: '诺卡', cam: 13, glyph: '♫', kind: 'music' },
     tannin: { name: '塔宁', cam: 5, glyph: '◉', kind: 'eyes' },
-    lobe: { name: '耳机', cam: 10, glyph: '▤', kind: 'headphones' },
+    lobe: { name: 'LOBE', cam: 10, glyph: '▤', kind: 'headphones' },
     gu: { name: '孤', cam: 4, glyph: '▥', kind: 'report' },
     chillo: { name: '寒零', cam: 6, glyph: '❄', kind: 'cold' },
     transfer: { name: '移交', cam: 1, glyph: '⌁', kind: 'transfer' }
@@ -57,18 +57,18 @@
     }
     if(!panel.querySelector('[data-device="flash"]')){
       const box=document.createElement('div');box.className='rift-n6-device';box.dataset.device='flash';
-      box.innerHTML='<div>CAM 10 // FLASH</div><div>发现耳机时照射</div><button type="button" id="rift-n6-flash-btn">闪光</button>';
+      box.innerHTML='<div>CAM 10 // FLASH</div><div>FLASH WHEN LOBE APPEARS</div><button type="button" id="rift-n6-flash-btn">FLASH</button>';
       panel.appendChild(box);
       const flashButton=box.querySelector('button');
       flashButton.addEventListener('click',e=>{
         e.preventDefault();e.stopPropagation();
         if(!frame.running||!frame.camOpen||Number(frame.camId)!==10||Date.now()<flashReadyAt)return;
         flashReadyAt=Date.now()+3000;
-        flashButton.disabled=true;flashButton.textContent='冷却 3s';
+        flashButton.disabled=true;flashButton.textContent='COOLDOWN 3s';
         let remaining=3;
         const cooldown=setInterval(()=>{
           remaining--;
-          if(remaining>0){flashButton.textContent='冷却 '+remaining+'s';}
+          if(remaining>0){flashButton.textContent='COOLDOWN '+remaining+'s';}
           else{clearInterval(cooldown);flashButton.disabled=false;flashButton.textContent='闪光';}
         },1000);
         const feed=$('feed-10');
@@ -100,13 +100,13 @@
       let el=feed.querySelector('[data-rift-character="'+id+'"]');
       if(!el){el=document.createElement('div');el.className='rift-n6-sprite';el.dataset.riftCharacter=id;el.innerHTML='<div class="figure"></div><div class="tag"></div>';feed.appendChild(el);}
       const baseAI=Math.max(0,Number((window.RIFT_CURRENT_AI_LEVELS||{})[id] ?? ((((window.NIGHT_SETTINGS||{})[night]||{}).characters||{})[id]))||0);
-      const visible=(id==='noka' && nokaAI>0) || (night===6 && active===id && baseAI>0);
-      el.style.display=(visible && (id==='noka'||(active===id&&Number(cam)===activeCam)))?'flex':'none';
+      const visible=(id==='noka' && nokaAI>0) || (night===6 && active===id && baseAI>0) || (id==='lobe' && night===6 && !locked && active!=='lobe' && !defended.has('lobe') && baseAI>0);
+      el.style.display=(visible && (id==='noka'||(active===id&&Number(cam)===activeCam)||(id==='lobe'&&active!=='lobe'&&Number(cam)===10)))?'flex':'none';
       el.classList.toggle('active',active===id);
       const figure=el.querySelector('.figure');
       if(window.RIFT_PIXEL_CHARACTERS) window.RIFT_PIXEL_CHARACTERS.mount(figure,id);
       else figure.textContent=d.glyph;
-      el.querySelector('.tag').textContent=d.name+' // CAM '+String(cam).padStart(2,'0');
+      el.querySelector('.tag').textContent=d.name+' // CAM '+String(cam).padStart(2,'0')+(id==='lobe'&&active!=='lobe'?' // STANDBY':'');
     });
     renderFlux();
   }
@@ -195,7 +195,8 @@
     if(window.RIFT_FLUX_PRIORITY_SCARE_ACTIVE)return;
     if(active && frame.running){
       const dt=Math.min(.1,Math.max(0,Number(frame.dt)||0));
-      routeClock+=dt;attackClock+=dt;
+      const attackSpeed=1+aiFor(active)*0.075;
+      routeClock+=dt*attackSpeed;attackClock+=dt*attackSpeed;
       const route=routes[active]||[defs[active].cam,1];
       if(routeClock>=2.2 && routeIndex<route.length-1){
         routeClock=0;routeIndex++;activeCam=route[routeIndex];renderActiveAtCam();
@@ -211,7 +212,7 @@
       }
     }
     if(active==='transfer'){
-      const dt=Math.min(.1,Math.max(0,Number(frame.dt)||0));
+      const dt=Math.min(.1,Math.max(0,Number(frame.dt)||0))*(1+aiFor('transfer')*0.075);
       transferHeat=transferInside?Math.min(3,transferHeat+dt*.48):Math.max(0,transferHeat-dt*.18);
       const bar=$('rift-n6-transfer-bar'),label=$('rift-n6-transfer-stage');
       if(bar)bar.style.width=(transferHeat/3*100)+'%';
@@ -228,7 +229,7 @@
     if(night>0 && frame.running && nokaAI>0){
       if(crank>0){nokaThreatTimer=0;nokaMoveTick=0;}
       else {
-        nokaThreatTimer+=Math.min(.1,Math.max(0,Number(frame.dt)||0));
+        nokaThreatTimer+=Math.min(.1,Math.max(0,Number(frame.dt)||0))*(1+nokaAI*0.075);
         if(nokaThreatTimer>=nokaMoveTick+3.5 && nokaThreatTimer<12){
           nokaMoveTick+=3.5;if(nokaActionCheck()){let next=1+Math.floor(Math.random()*12);if(next===nokaCam)next=next===12?1:next+1;nokaCam=next;renderSprites();window.dispatchEvent(new CustomEvent('rift:noka-enter-room',{detail:{camId:nokaCam,night}}));}
         }
