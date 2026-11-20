@@ -1040,6 +1040,15 @@
   });
   // Developer-only test bridge. All overrides live in memory and never alter NIGHT_SETTINGS.
   window.RIFT_TEST_BRIDGE = {
+    unlockAllNights: () => { try { localStorage.setItem('riftAsh.highestNight','6'); highestNight=6; menuCont.classList.remove('disabled'); menuCont.innerText='继续（第 6 夜）'; return true; } catch(e) { console.warn('Could not unlock nights:',e); return false; } },
+    triggerSpecialTime: id => {
+      if(!S.running||!activeNightSettings||!Array.isArray(activeNightSettings.specialTimes))return false;
+      const event=activeNightSettings.specialTimes.find(item=>item.id===id);
+      if(!event)return false;
+      processedNightEvents.add(event.id);
+      window.dispatchEvent(new CustomEvent('rift:night-special-time',{detail:{night:S.night,...event,debug:true}}));
+      return true;
+    },
     startNight: n => { mainMenu.style.display='none';gameEl.style.display='block';initAudio();startNight(Math.max(1,Math.min(6,Number(n)||1))); },
     startCustomNight: (baseNight, characters) => {
       const n=Math.max(1,Math.min(6,Math.round(Number(baseNight)||1)));
