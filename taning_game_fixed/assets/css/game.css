@@ -435,3 +435,28 @@ body.rift-debug-unlocked .menu-item-extra{display:block!important;}
 #main-menu.rift-night-six-hover .menu-item#menu-night-six{color:#e4caca;text-shadow:0 0 10px rgba(150,18,28,.48);}
 @keyframes riftNightSixMenuPulse{0%,100%{opacity:.62;transform:translateX(0)}48%{opacity:.96;transform:translateX(-3px)}52%{opacity:.72;transform:translateX(4px)}}
 @media(prefers-reduced-motion:reduce){#main-menu.rift-night-six-hover #bg-environment::after{animation:none}}
+
+/* The Night 6 hover keeps the corrupted room and reveals its puppet theatre together. */
+#rift-puppet-stage{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0;visibility:hidden;overflow:hidden;transition:opacity .8s ease,visibility .8s ease;}
+#main-menu.rift-night-six-hover #rift-puppet-stage{opacity:1;visibility:visible;}
+.rift-stage-backdrop{position:absolute;left:17%;right:13%;top:13%;height:57%;background:radial-gradient(ellipse at 50% 45%,rgba(75,8,14,.25),rgba(0,0,0,.76) 70%);border-top:1px solid rgba(155,105,83,.22);box-shadow:0 0 65px rgba(95,0,12,.24) inset;}
+.rift-stage-curtain{position:absolute;top:0;bottom:25%;width:19%;background:linear-gradient(90deg,#080304,#26090d 45%,#090304);opacity:.9;box-shadow:0 0 30px #000;}
+.rift-stage-curtain-left{left:0;clip-path:polygon(0 0,100% 0,77% 100%,0 88%);}
+.rift-stage-curtain-right{right:0;clip-path:polygon(0 0,100% 0,100% 88%,23% 100%);}
+.rift-stage-floor{position:absolute;left:12%;right:10%;bottom:19%;height:16%;background:linear-gradient(180deg,rgba(65,20,22,.45),rgba(5,3,4,.95));transform:perspective(300px) rotateX(12deg);border-top:2px solid rgba(174,121,92,.2);box-shadow:0 -12px 38px rgba(90,0,8,.16);}
+.rift-stage-controller{position:absolute;top:1%;left:50%;width:170px;height:90px;transform:translateX(-50%);opacity:.6;}
+.rift-stage-controller span{position:absolute;left:50%;top:0;width:38px;height:38px;border-radius:50%;background:#020202;transform:translateX(-50%);box-shadow:0 0 18px #160509;}
+.rift-stage-controller i{position:absolute;left:50%;top:30px;width:82px;height:58px;transform:translateX(-50%);background:linear-gradient(#080607,#010101);clip-path:polygon(28% 0,72% 0,100% 100%,0 100%);}
+.rift-stage-controller b{position:absolute;left:50%;top:54px;width:2px;height:180px;background:linear-gradient(rgba(175,130,110,.55),transparent);box-shadow:-34px 0 rgba(175,130,110,.25),34px 0 rgba(175,130,110,.25);}
+.rift-puppets{position:absolute;left:20%;right:16%;top:19%;height:56%;display:flex;align-items:flex-end;justify-content:space-around;gap:1%;perspective:700px;}
+.rift-puppet{--puppet:#65504b;position:relative;flex:1;max-width:82px;height:72%;min-width:22px;transform-origin:50% 0;animation:riftPuppetSway 4.8s ease-in-out infinite alternate;filter:drop-shadow(0 0 9px rgba(95,15,20,.25));}
+.rift-puppet:nth-child(2n){animation-delay:-1.7s;animation-duration:5.6s;}
+.rift-puppet i{position:absolute;top:0;left:50%;width:2px;height:38%;background:linear-gradient(rgba(180,145,128,.6),rgba(180,145,128,.05));transform:translateX(-50%);}
+.rift-puppet b{position:absolute;top:34%;left:50%;width:38%;height:28%;min-width:13px;transform:translateX(-50%);border-radius:45% 45% 25% 25%;background:linear-gradient(90deg,#080607,var(--puppet),#090607);box-shadow:0 0 12px rgba(0,0,0,.8);}
+.rift-puppet em{position:absolute;top:20%;left:50%;width:24%;aspect-ratio:1;border-radius:50%;transform:translateX(-50%);background:radial-gradient(circle at 40% 35%,#4a3937,var(--puppet) 60%,#050405 75%);box-shadow:0 0 8px rgba(130,20,28,.2);}
+.rift-puppet small{position:absolute;bottom:-17%;left:50%;transform:translateX(-50%);white-space:nowrap;color:rgba(205,177,157,.68);font:10px "Courier New",monospace;text-shadow:0 1px 4px #000;}
+.p-eleven{--puppet:#987d58;height:85%;}.p-flux{--puppet:#4d6875;height:68%;}.p-noka{--puppet:#7a4d4b;height:74%;}.p-taning{--puppet:#87706b;height:90%;}.p-lobe{--puppet:#756d87;height:72%;}.p-gu{--puppet:#6c7470;height:80%;}.p-chillo{--puppet:#64818a;height:76%;}.p-cosmo{--puppet:#77658b;height:65%;}.p-transfer{--puppet:#856f50;height:82%;}
+.rift-stage-caption{position:absolute;top:7%;right:7%;color:rgba(180,130,115,.55);font:12px "Courier New",monospace;letter-spacing:.35em;writing-mode:vertical-rl;}
+@keyframes riftPuppetSway{0%{transform:rotate(-2deg) translateY(0)}50%{transform:rotate(1.5deg) translateY(-4px)}100%{transform:rotate(-1deg) translateY(2px)}}
+@media(max-width:700px){.rift-puppets{left:15%;right:12%;top:24%;height:48%;}.rift-puppet small{font-size:8px}.rift-stage-controller{transform:translateX(-50%) scale(.7);transform-origin:top center}.rift-stage-caption{font-size:9px;right:3%}}
+@media(prefers-reduced-motion:reduce){.rift-puppet{animation:none}}
