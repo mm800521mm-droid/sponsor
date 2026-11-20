@@ -460,3 +460,43 @@ body.rift-debug-unlocked .menu-item-extra{display:block!important;}
 @keyframes riftPuppetSway{0%{transform:rotate(-2deg) translateY(0)}50%{transform:rotate(1.5deg) translateY(-4px)}100%{transform:rotate(-1deg) translateY(2px)}}
 @media(max-width:700px){.rift-puppets{left:15%;right:12%;top:24%;height:48%;}.rift-puppet small{font-size:8px}.rift-stage-controller{transform:translateX(-50%) scale(.7);transform-origin:top center}.rift-stage-caption{font-size:9px;right:3%}}
 @media(prefers-reduced-motion:reduce){.rift-puppet{animation:none}}
+
+/* Compact left-side crescent puppet tableau. The controller is only a large face;
+   all other cast members remain small, with strings visibly behind them. */
+#rift-puppet-stage{left:0;right:auto;top:10%;bottom:9%;width:min(43vw,520px);height:auto;inset-block:auto;overflow:visible;}
+#rift-puppet-stage .rift-stage-backdrop{left:5%;right:0;top:14%;height:72%;border:0;border-radius:50%;background:radial-gradient(ellipse at 48% 55%,rgba(64,9,16,.22),rgba(0,0,0,.72) 72%);box-shadow:inset 0 0 48px rgba(80,0,12,.18);}
+#rift-puppet-stage .rift-stage-curtain{top:12%;bottom:14%;width:13%;opacity:.55;}
+#rift-puppet-stage .rift-stage-curtain-left{left:0;}
+#rift-puppet-stage .rift-stage-curtain-right{right:0;}
+#rift-puppet-stage .rift-stage-floor{left:8%;right:5%;bottom:10%;height:13%;border-radius:50%;opacity:.55;}
+#rift-puppet-stage .rift-stage-controller{display:none;}
+#rift-puppet-stage .rift-puppets{left:29%;right:4%;top:17%;height:66%;display:block;perspective:700px;}
+#rift-puppet-stage .rift-puppet{position:absolute;left:50%;bottom:0;flex:none;width:36px;min-width:0;height:42%;max-width:none;transform-origin:50% 0;animation:riftPuppetSway 5.5s ease-in-out infinite alternate;}
+#rift-puppet-stage .rift-puppet i{top:-48%;height:52%;width:1px;background:linear-gradient(rgba(190,160,145,.58),rgba(190,160,145,.06));}
+#rift-puppet-stage .rift-puppet b{top:45%;width:42%;height:30%;min-width:12px;}
+#rift-puppet-stage .rift-puppet em{top:29%;width:33%;min-width:10px;}
+#rift-puppet-stage .rift-puppet small{bottom:-22%;font-size:9px;}
+/* Nine small figures follow a crescent around the main face. */
+#rift-puppet-stage .p-eleven{left:8%;bottom:29%;height:31%;width:28px;}
+#rift-puppet-stage .p-flux{left:22%;bottom:48%;height:27%;width:25px;}
+#rift-puppet-stage .p-noka{left:39%;bottom:60%;height:25%;width:24px;}
+#rift-puppet-stage .p-taning{left:57%;bottom:64%;height:26%;width:25px;}
+#rift-puppet-stage .p-lobe{left:74%;bottom:52%;height:27%;width:25px;}
+#rift-puppet-stage .p-gu{left:88%;bottom:32%;height:30%;width:27px;}
+#rift-puppet-stage .p-chillo{left:68%;bottom:18%;height:25%;width:23px;}
+#rift-puppet-stage .p-cosmo{left:39%;bottom:13%;height:24%;width:22px;}
+#rift-puppet-stage .p-transfer{left:17%;bottom:16%;height:25%;width:23px;}
+/* The player's face is foregrounded; no hands or full body are drawn. */
+.rift-player-face{position:absolute;z-index:5;left:8%;top:42%;width:clamp(78px,10vw,128px);aspect-ratio:1;border-radius:48% 48% 43% 43%;background:radial-gradient(circle at 35% 28%,#62545b 0%,#30252c 43%,#090709 76%);border:1px solid rgba(190,155,145,.48);box-shadow:0 0 24px rgba(110,20,28,.24),inset 0 -10px 20px rgba(0,0,0,.8);transform:translateY(-50%);}
+.rift-player-face:before,.rift-player-face:after{content:"";position:absolute;top:47%;width:10%;height:5%;border-radius:50%;background:rgba(205,175,164,.7);box-shadow:0 0 8px rgba(200,140,130,.25);}
+.rift-player-face:before{left:25%;}.rift-player-face:after{right:25%;}
+.rift-player-face i{position:absolute;left:50%;top:62%;width:24%;height:2px;background:rgba(190,150,145,.55);transform:translateX(-50%);}
+.rift-player-face b{position:absolute;left:50%;top:-24%;height:28%;width:1px;background:linear-gradient(rgba(205,175,164,.65),transparent);}
+.rift-player-face em{position:absolute;left:50%;top:-31%;height:8%;width:8%;border-radius:50%;background:#b69b8d;box-shadow:0 0 10px rgba(190,150,130,.4);transform:translateX(-50%);}
+.rift-stage-caption{top:6%;right:5%;font-size:9px;opacity:.55;}
+@media(max-width:700px){
+ #rift-puppet-stage{width:54vw;top:14%;bottom:12%;}
+ #rift-puppet-stage .rift-puppets{left:30%;right:2%;}
+ .rift-player-face{width:clamp(58px,13vw,86px);left:5%;top:46%;}
+ #rift-puppet-stage .rift-puppet small{font-size:7px;}
+}
