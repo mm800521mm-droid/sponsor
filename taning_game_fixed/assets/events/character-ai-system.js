@@ -228,7 +228,7 @@
     const flux=state.actors.flux;
     if(flux && !state.camOpen && flux.phase==='moving' && flux.look>0){
       if(flux.choiceEl){clearChoice(flux);flux.threat++;flux.phase=flux.threat>=2?'door':'approach';flux.deadline=Date.now()+(flux.phase==='door'?9000:12000);}
-      else{flux.look=0;flux.phase='delay';flux.deadline=Date.now()+pace(20000);}
+      else{flux.look=0;flux.phase='delay';flux.deadline=Date.now()+pace(20000,flux.id);}
     }
   }
   function onFlash(e){
@@ -261,7 +261,7 @@
     if(!Number.isInteger(cam))return;
     for(const a of Object.values(state.actors)){
       if(a.id==='flux'||a.phase==='idle'||a.cam!==cam)continue;
-      if(a.id==='gu'){a.cam=a.cam===4?5:1;a.phase=a.cam===1?'door':'moving';a.timer=pace(7);a.deadline=Date.now()+pace(8000,a.id);}
+      if(a.id==='gu'){a.cam=a.cam===4?5:1;a.phase=a.cam===1?'door':'moving';a.timer=pace(7,a.id);a.deadline=Date.now()+pace(8000,a.id);}
       else if(a.id==='chillo'){a.cam=a.cam===6?3:1;a.phase=a.cam===1?'door':'moving';a.timer=pace(7,a.id);a.deadline=Date.now()+pace(8000,a.id);}
       else if(a.id==='lobe'){returnActor(a);continue;}
       render(a);
@@ -300,7 +300,7 @@
     // A missed CAM10 flash brings Gu onto CAM02 before his usual route resumes.
     const gu=state.actors.gu;
     if(gu && aiFor('gu')>0){
-      clearChoice(gu);gu.cam=2;gu.phase='moving';gu.timer=pace(5);gu.deadline=0;gu.threat=0;gu.bonusCam2=true;
+      clearChoice(gu);gu.cam=2;gu.phase='moving';gu.timer=pace(5,gu.id);gu.deadline=0;gu.threat=0;gu.bonusCam2=true;
       render(gu);emit('rift:character-appearance',{characterId:'gu',camId:2,source:'lobe-time-rollback'});
     }
   });
