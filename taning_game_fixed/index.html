@@ -1041,6 +1041,15 @@
   // Developer-only test bridge. All overrides live in memory and never alter NIGHT_SETTINGS.
   window.RIFT_TEST_BRIDGE = {
     startNight: n => { mainMenu.style.display='none';gameEl.style.display='block';initAudio();startNight(Math.max(1,Math.min(6,Number(n)||1))); },
+    startCustomNight: (baseNight, characters) => {
+      const n=Math.max(1,Math.min(6,Math.round(Number(baseNight)||1)));
+      const roster=['gildedEleven','flux','noka','tannin','lobe','gu','chillo','cosmo','transfer'];
+      if(!characters||!roster.every(id=>Number.isFinite(Number(characters[id]))))return false;
+      const values=Object.fromEntries(roster.map(id=>[id,Math.max(0,Math.min(20,Math.round(Number(characters[id]))))]));
+      const base=(window.NIGHT_SETTINGS&&window.NIGHT_SETTINGS[n])||{characters:{},specialTimes:[],alwaysPresent:[]};
+      const custom={...base,characters:values,specialTimes:(base.specialTimes||[]).slice(),alwaysPresent:(base.alwaysPresent||[]).slice()};
+      mainMenu.style.display='none';gameEl.style.display='block';initAudio();startNight(n,custom,'自定义夜 // 基于第 '+n+' 夜');return true;
+    },
     pause: value => { testPaused=!!value; },
     setTime: value => {
       if(!S.running||!value)return false;
@@ -1247,7 +1256,7 @@
     rafHandle = requestAnimationFrame(gameLoop);
   }
 
-  function startNight(nightNum) {
+  function startNight(nightNum, customSettings=null, customLabel='') {
     if (window.speechSynthesis) window.speechSynthesis.cancel();
     currentTapePlayId++;
     const tapeAudio = document.getElementById('tape-audio');
@@ -1267,7 +1276,8 @@
     releaseAllLights();
     
     S.night = nightNum;
-    activeNightSettings = (window.NIGHT_SETTINGS && window.NIGHT_SETTINGS[nightNum]) || { characters: {}, alwaysPresent: ['noka'], specialTimes: [] };
+    activeNightSettings = customSettings || (window.NIGHT_SETTINGS && window.NIGHT_SETTINGS[nightNum]) || { characters: {}, alwaysPresent: ['noka'], specialTimes: [] };
+    window.RIFT_CURRENT_AI_LEVELS = customSettings ? { ...(customSettings.characters || {}) } : null;
     processedNightEvents = new Set();
     window.RIFT_NIGHT_STATE = { night: nightNum, settings: activeNightSettings };
     window.dispatchEvent(new CustomEvent('rift:night-start', { detail: { night: nightNum, settings: activeNightSettings } }));
@@ -1302,7 +1312,7 @@
       currentNightData = { nightName: 'NIGHT ' + nightNum, tape: ["（系统提示：电话字幕数据未加载，请检查 data.js 文件及其路径。）"] };
     }
     
-    let nightTitle = currentNightData.nightName;
+    let nightTitle = customLabel || currentNightData.nightName;
     nightLabels.forEach(el => el.innerText = nightTitle);
     
     if (typeof taning !== 'undefined') {
