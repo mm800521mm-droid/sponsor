@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Five Nights at Rift Ash</title>
-<link rel="stylesheet" href="./assets/css/game.css?v=6">
+<link rel="stylesheet" href="./assets/css/game.css?v=7">
 <link rel="stylesheet" href="./assets/css/mobile.css?v=2">
 <link rel="stylesheet" href="./assets/css/desktop-layout.css?v=1">
 </style>
@@ -1370,7 +1370,22 @@
   const menuNightSix = document.getElementById('menu-night-six');
   const menuCustomNight = document.getElementById('menu-custom-night');
   if (highestNight >= 6) { menuNightSix.style.display = 'block'; menuCustomNight.style.display = 'block'; }
-  menuNightSix.onclick = function() { mainMenu.style.display = 'none'; gameEl.style.display = 'block'; initAudio(); startNight(6); };
+  // The first Night 6 visit is entered normally. Its return arms the menu hover reveal.
+  try {
+    if (localStorage.getItem('riftAsh.night6VisitPending') === '1') {
+      localStorage.removeItem('riftAsh.night6VisitPending');
+      localStorage.setItem('riftAsh.night6Returned', '1');
+    }
+  } catch (_) {}
+  menuNightSix.addEventListener('mouseenter', function() {
+    try { if (localStorage.getItem('riftAsh.night6Returned') === '1') mainMenu.classList.add('rift-night-six-hover'); } catch (_) {}
+  });
+  menuNightSix.addEventListener('mouseleave', function() { mainMenu.classList.remove('rift-night-six-hover'); });
+  menuNightSix.onclick = function() {
+    try { if (localStorage.getItem('riftAsh.night6Returned') !== '1') localStorage.setItem('riftAsh.night6VisitPending', '1'); } catch (_) {}
+    mainMenu.classList.remove('rift-night-six-hover');
+    mainMenu.style.display = 'none'; gameEl.style.display = 'block'; initAudio(); startNight(6);
+  };
   menuCustomNight.onclick = function() {
     const toggle = document.getElementById('rift-dev-toggle');
     const panel = document.getElementById('rift-dev-panel');
