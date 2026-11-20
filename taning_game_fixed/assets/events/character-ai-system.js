@@ -133,8 +133,9 @@
     returnActor(a);
   }
   function renderDoorThreat(a){
-    if(!a || !['gu','chillo'].includes(a.id))return;
-    const side=a.id==='gu'?'L':'R';
+    // 寒零不在办公室门口直接显示；他只出现在对侧的 CAM06 监控画面。
+    if(!a || a.id!=='gu')return;
+    const side='L';
     const host=$('doorway'+side);
     if(!host)return;
     if(a.doorEl && a.doorEl.parentElement!==host){a.doorEl.remove();a.doorEl=null;}
@@ -147,12 +148,12 @@
       if(window.RIFT_PIXEL_CHARACTERS)window.RIFT_PIXEL_CHARACTERS.mount(face,a.id);
       else face.textContent=a.id==='gu'?'▥':'❄';
     }
-    a.doorEl.querySelector('.rift-door-threat-label').textContent=a.id==='gu'?'孤 // 关闭左门':'寒零 // 关闭右门';
+    a.doorEl.querySelector('.rift-door-threat-label').textContent='孤 // 关闭左门';
     a.doorEl.style.display='flex';
   }
   function handleDoor(){
     const defendedByDoor = a => a.id==='gu' ? state.leftClosed :
-      a.id==='chillo' ? state.rightClosed :
+      a.id==='chillo' ? state.leftClosed :
       a.id==='flux' ? (state.leftClosed||state.rightClosed) : false;
     for(const a of Object.values(state.actors)){
       if(a.phase==='door')renderDoorThreat(a);
