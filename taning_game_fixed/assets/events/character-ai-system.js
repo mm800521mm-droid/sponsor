@@ -5,7 +5,7 @@
  */
 (() => {
   'use strict';
-  const names = { flux:'FLUX', noka:'NOKA', lobe:'LOBE', gu:'GU', chillo:'CHILLO' };
+  const names = { flux:'闪流', noka:'诺卡', lobe:'耳机', gu:'孤', chillo:'寒零' };
   const suspended = new Set();
   let fluxPauseStartedAt = 0;
   const state = {
@@ -42,6 +42,8 @@
   }
   function render(a,camOverride){
     if(!a)return;
+    // 第六夜的耳机由第六夜专属系统统一显示，避免共享 AI 再生成一个重叠人影。
+    if(state.night===6&&a.id==='lobe'){removeActorVisual(a);return;}
     
     if(aiFor(a.id)<=0){removeActorVisual(a);return;}
     const cam=Number(camOverride||a.cam);
@@ -66,7 +68,7 @@
   function showFluxChoice(a){
     if(a.choiceEl || !state.camOpen || state.camId!==a.cam)return;
     const feed=$('feed-'+a.cam); if(!feed)return;
-    const words=['ACT','CUT','TAKE'];
+    const words=['行动','切断','接管'];
     const correct=Math.floor(Math.random()*words.length);
     const box=document.createElement('div');box.className='rift-flux-choice';box.dataset.riftFluxShared='true';
     words.forEach((word,i)=>{
@@ -94,14 +96,14 @@
     let box=panel.querySelector('[data-device="flash"]');
     if(!box){
       box=document.createElement('div');box.className='rift-n6-device';box.dataset.device='flash';
-      box.innerHTML='<div>CAM 10 // FLASH</div><div>FLASH WHEN LOBE APPEARS // 5 SEC</div><button type="button">FLASH</button>';
+      box.innerHTML='<div>10号监控 // 闪光灯</div><div>耳机出现时立即闪光</div><button type="button">闪光</button>';
       panel.appendChild(box);
       box.querySelector('button').addEventListener('click',e=>{
         e.preventDefault();e.stopPropagation();
         if(!state.running||!state.camOpen||state.camId!==10||box.dataset.cooldown==='1')return;
         const lobeReady=state.actors.lobe&&state.actors.lobe.phase==='flash-window';
         const button=box.querySelector('button');
-        if(lobeReady){box.dataset.cooldown='1';button.disabled=true;button.textContent='COOLDOWN 3s';let remaining=3;const cooldown=()=>{remaining--;if(remaining>0){button.textContent='COOLDOWN '+remaining+'s';setTimeout(cooldown,1000);}else{box.dataset.cooldown='0';button.disabled=false;button.textContent='闪光';}};setTimeout(cooldown,1000);}
+        if(lobeReady){box.dataset.cooldown='1';button.disabled=true;button.textContent='冷却中 3秒';let remaining=3;const cooldown=()=>{remaining--;if(remaining>0){button.textContent='冷却中 '+remaining+'秒';setTimeout(cooldown,1000);}else{box.dataset.cooldown='0';button.disabled=false;button.textContent='闪光';}};setTimeout(cooldown,1000);}
         const feed=$('feed-10');if(feed){feed.classList.remove('rift-cam10-flash');void feed.offsetWidth;feed.classList.add('rift-cam10-flash');setTimeout(()=>feed.classList.remove('rift-cam10-flash'),260);}
         emit('rift:night-six-flash',{camId:10,source:'shared-cam10-device'});
       });
@@ -142,7 +144,7 @@
       if(window.RIFT_PIXEL_CHARACTERS)window.RIFT_PIXEL_CHARACTERS.mount(face,a.id);
       else face.textContent=a.id==='gu'?'▥':'❄';
     }
-    a.doorEl.querySelector('.rift-door-threat-label').textContent=a.id==='gu'?'GU // CLOSE LEFT DOOR':'CHILLO // CLOSE RIGHT DOOR';
+    a.doorEl.querySelector('.rift-door-threat-label').textContent=a.id==='gu'?'孤 // 关闭左门':'寒零 // 关闭右门';
     a.doorEl.style.display='flex';
   }
   function handleDoor(){
