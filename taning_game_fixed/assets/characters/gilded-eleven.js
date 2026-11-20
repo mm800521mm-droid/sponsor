@@ -26,8 +26,7 @@ class GildedElevenAI {
 
   getStageDuration() {
     // 行动检查间隔固定；AI 等级只影响每次检查通过的概率。
-    const base = Math.max(0.1, Number(this.config.timings && this.config.timings.stage) || 20);
-    return base / (1 + this.aiLevel * 0.075);
+    return Math.max(0.1, Number(this.config.timings && this.config.timings.stage) || 20);
   }
 
   canTakeAction() {
@@ -414,7 +413,7 @@ class GildedElevenAI {
     dt = Math.max(0, Math.min(Number(dt) || 0, 0.1));
     // Nights 1-5 progressively shorten action phases; Night 6 keeps its authored special timing.
     const night = Number(ctx.getNight && ctx.getNight()) || 1;
-    if (night >= 1 && night <= 5) dt *= 1 + (night - 1) * 0.12;
+    if (night >= 1) dt *= (1 + Math.max(0, night - 1) * 0.12) * (1 + this.aiLevel * 0.075);
     this.ensureVisualNodes(ctx);
     if (this.aiLevel <= 0) { this.state = 'DORMANT'; this.hideAll(ctx); this.updateStageStatus('behind'); return; }
     if (this.specialAwakened) {
