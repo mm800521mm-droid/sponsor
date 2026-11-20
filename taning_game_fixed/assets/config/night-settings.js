@@ -1,7 +1,7 @@
 /*
  * Rift Ash - Night settings
  * 每个夜晚都完整列出全部角色；0 = 本夜不出场、不行动，1-20 = 本夜 AI 等级。
- * AI 数字只影响每次行动检查的成功概率；行动检查间隔由角色自身 timings 决定。
+ * AI 数字同时影响行动检查成功概率与行动节奏；AI 越高，检查越频繁、行动越快。
  * 第六夜特殊时间表由 night-six-special-times.js 独立提供。
  */
 (function () {
@@ -56,7 +56,7 @@
   };
 
   // 自定义行动概率曲线：AI 1-11 每级 +5%；AI 12 起进入高概率区。
-  const AI_CHANCES = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 90, 92, 94, 95, 96, 97, 98, 99, 100];
+  const AI_CHANCES = [0, 10, 20, 30, 40, 50, 60, 70, 80, 88, 94, 97, 99, 99, 99, 100, 100, 100, 100, 100, 100];
   window.RIFT_AI_CHANCES = AI_CHANCES.slice();
   window.riftCanCharacterMove = function (ai) {
     const level = Math.max(0, Math.min(20, Math.floor(Number(ai) || 0)));
