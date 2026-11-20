@@ -15,7 +15,8 @@
   };
   // Tannin keeps its own original AI route and office defense; only the other three use mutation attacks.
   const mutationOrder = ['lobe','gu','chillo'];
-  const routes = { lobe:[10], gu:[4,5,1], chillo:[6,3,1] };
+  const attackDefs=window.RIFT_CHARACTER_ATTACKS||{};
+  const routes = { lobe:attackDefs.lobe?.route||[10], gu:attackDefs.gu?.route||[4,5,1], chillo:attackDefs.chillo?.route||[6,3,1] };
   let activeCam = 1, routeIndex = 0, routeClock = 0, attackClock = 0;
   let night = 0, locked = false, active = null, activeId = '', defended = new Set();
   let fluxPauseStartedAt = 0;
@@ -78,8 +79,8 @@
     }
     syncDeviceVisibility();
   }
-  function aiFor(id){const current=window.RIFT_CURRENT_AI_LEVELS||{};const settings=(((window.NIGHT_SETTINGS||{})[night]||{}).characters||{});return Math.max(0,Math.min(20,Number(current[id] ?? settings[id])||0));}
-  function nokaActionCheck(){return nokaAI>0 && (typeof window.riftCanCharacterMove==='function'?window.riftCanCharacterMove(nokaAI):Math.random()*100<nokaAI*5);}
+  function aiFor(id){const current=window.RIFT_CURRENT_AI_LEVELS||{};const settings=(((window.NIGHT_SETTINGS||{})[night]||{}).characters||{});const policy=(window.RIFT_CHARACTER_AI_POLICIES||{})[id];return Math.max(0,Math.min(20,Number(current[id] ?? (policy&&policy.getLevel?policy.getLevel():settings[id]))||0));}
+  function nokaActionCheck(){const p=(window.RIFT_CHARACTER_AI_POLICIES||{}).noka;return nokaAI>0&&(p&&p.canAct?p.canAct(nokaAI):(typeof window.riftCanCharacterMove==='function'?window.riftCanCharacterMove(nokaAI):Math.random()*100<nokaAI*5));}
   function renderCrank(){
     const label=$('rift-n6-crank-count'), bar=$('rift-n6-crank-meter');
     if(label)label.textContent='发条：'+crank+' / 5';
@@ -163,7 +164,7 @@
     // 每个突变事件都必须从独立的路线和计时状态开始，不能继承上一名角色的进度。
     routeIndex=0;routeClock=0;attackClock=0;
     active=detail.characterId;activeId=detail.mutationId||'';
-    if(active==='lobe'){lobeResponseSeconds=Math.max(3,8-aiFor('lobe')*0.25);window.dispatchEvent(new CustomEvent('rift:lobe-warning-start',{detail:{seconds:lobeResponseSeconds,ai:aiFor('lobe')}}));}
+    if(active==='lobe'){const lobePolicy=(window.RIFT_CHARACTER_AI_POLICIES||{}).lobe;lobeResponseSeconds=lobePolicy&&lobePolicy.responseSeconds?lobePolicy.responseSeconds(aiFor('lobe')):Math.max(3,8-aiFor('lobe')*0.25);window.dispatchEvent(new CustomEvent('rift:lobe-warning-start',{detail:{seconds:lobeResponseSeconds,ai:aiFor('lobe')}}));}
     activeCam=(routes[active]&&routes[active][0])||defs[active].cam;
     renderSprites();
     const tips={
