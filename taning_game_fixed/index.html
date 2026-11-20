@@ -746,6 +746,7 @@
     const hours = Math.max(1, Number(event.detail && event.detail.hours) || 1);
     S.elapsed = Math.max(0, S.elapsed - hours * HOUR_MS);
     S.hour = Math.min(8, Math.floor(S.elapsed / HOUR_MS));
+    updateUI(); // Refresh the visible clock immediately after Lobe's one-hour rollback.
     processedNightEvents = new Set(
       (activeNightSettings && activeNightSettings.specialTimes || [])
         .filter(item => {
