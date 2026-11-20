@@ -10,7 +10,7 @@ window.RIFT_CHARACTER_ATTACKS.noka=Object.freeze({
 window.RIFT_CHARACTER_ATTACKS.noka=Object.freeze({...window.RIFT_CHARACTER_ATTACKS.noka,
  updateNight6(s,api){
   const ai=Math.max(0,Number(api.ai)||0);
-  const drainSeconds=Math.max(6,24-ai*.9);
+  const drainSeconds=Math.max(16,24-ai*.3);
   if(api.frame.running&&ai>0&&api.now()-s.lastTick>=drainSeconds*1000){
    s.crank=Math.max(0,s.crank-1);s.lastTick=api.now();api.renderCrank();
    api.emit('rift:night-six-noka-wind-level',{value:s.crank,max:5,calm:s.crank>0,ai,interval:drainSeconds*1000});
