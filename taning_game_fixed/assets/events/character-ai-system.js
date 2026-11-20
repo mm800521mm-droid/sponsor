@@ -23,8 +23,11 @@
     return Math.max(0,Math.min(20,Number(value)||0));
   };
   const chance = id => { const level=aiFor(id), policy=(window.RIFT_CHARACTER_AI_POLICIES||{})[id]; if(level<=0)return false; return policy&&policy.canAct?policy.canAct(level):(typeof window.riftCanCharacterMove==='function'?window.riftCanCharacterMove(level):Math.random()*100<level*5); };
-  // Nights 1-5 become progressively more aggressive without changing AI probability.
-  const pace = (seconds, id) => { const level=id?aiFor(id):0, policy=id&&(window.RIFT_CHARACTER_AI_POLICIES||{})[id]; return policy&&policy.pace?policy.pace(seconds,level,state.night):seconds/(1+Math.max(0,state.night-1)*0.12+level*0.075); };
+  // AI and night level shorten waits gradually; the same curve is shared by all characters.
+  const speedMultiplier = id => typeof window.riftCharacterSpeedMultiplier==='function'
+    ? window.riftCharacterSpeedMultiplier(id?aiFor(id):0,state.night)
+    : Math.min(1.60,1+(id?aiFor(id):0)*0.02+Math.max(0,state.night-1)*0.03);
+  const pace = (seconds, id) => { const level=id?aiFor(id):0, policy=id&&(window.RIFT_CHARACTER_AI_POLICIES||{})[id]; return policy&&policy.pace?policy.pace(seconds,level,state.night):seconds/speedMultiplier(id); };
   const initialDelay = actor => Math.max(1.25, pace(actor.interval * 0.7, actor.id));
   const makeActor = (id, cam, interval) => ({id,cam,home:cam,interval,timer:interval,phase:'idle',threat:0,look:0,deadline:0,clearWord:'',words:[],el:null,doorEl:null});
   function actorList(){
