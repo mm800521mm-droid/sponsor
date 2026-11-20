@@ -36,7 +36,7 @@ class GildedElevenAI {
     if (typeof window.riftCanCharacterMove === 'function') {
       return window.riftCanCharacterMove(level);
     }
-    const chances = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 90, 92, 94, 95, 96, 97, 98, 99, 100];
+    const chances = [0, 10, 20, 30, 40, 50, 60, 70, 80, 88, 94, 97, 99, 99, 99, 100, 100, 100, 100, 100, 100];
     return Math.random() * 100 < chances[level];
   }
 
