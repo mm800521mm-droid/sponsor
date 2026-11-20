@@ -164,7 +164,7 @@
     // 每个突变事件都必须从独立的路线和计时状态开始，不能继承上一名角色的进度。
     routeIndex=0;routeClock=0;attackClock=0;
     active=detail.characterId;activeId=detail.mutationId||'';
-    if(active==='lobe'){const lobePolicy=(window.RIFT_CHARACTER_AI_POLICIES||{}).lobe;lobeResponseSeconds=lobePolicy&&lobePolicy.responseSeconds?lobePolicy.responseSeconds(aiFor('lobe')):Math.max(3,8-aiFor('lobe')*0.25);window.dispatchEvent(new CustomEvent('rift:lobe-warning-start',{detail:{seconds:lobeResponseSeconds,ai:aiFor('lobe')}}));}
+    if(active==='lobe'){const lobePolicy=(window.RIFT_CHARACTER_AI_POLICIES||{}).lobe;lobeResponseSeconds=lobePolicy&&lobePolicy.responseSeconds?lobePolicy.responseSeconds(aiFor('lobe')):Math.max(7,12-aiFor('lobe')*0.25);window.dispatchEvent(new CustomEvent('rift:lobe-warning-start',{detail:{seconds:lobeResponseSeconds,ai:aiFor('lobe')}}));}
     activeCam=(routes[active]&&routes[active][0])||defs[active].cam;
     renderSprites();
     const tips={
