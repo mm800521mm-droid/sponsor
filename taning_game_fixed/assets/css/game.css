@@ -500,3 +500,38 @@ body.rift-debug-unlocked .menu-item-extra{display:block!important;}
  .rift-player-face{width:clamp(58px,13vw,86px);left:5%;top:46%;}
  #rift-puppet-stage .rift-puppet small{font-size:7px;}
 }
+
+/* Reposition the puppet tableau INSIDE the existing warm spotlight cone. */
+#rift-puppet-stage{
+  left:49%;right:auto;top:13%;bottom:auto;width:31%;height:75%;
+  inset-inline:auto;inset-block:auto;overflow:visible;
+}
+#rift-puppet-stage .rift-stage-backdrop{left:0;right:0;top:4%;height:90%;border:0;background:radial-gradient(ellipse at 50% 54%,rgba(85,22,17,.13),rgba(0,0,0,.12) 67%,transparent 78%);box-shadow:none;}
+#rift-puppet-stage .rift-stage-curtain,#rift-puppet-stage .rift-stage-floor{display:none;}
+#rift-puppet-stage .rift-puppets{left:0;right:0;top:10%;height:75%;display:block;}
+#rift-puppet-stage .rift-puppet{position:absolute;bottom:auto;left:50%;width:25px;max-width:none;min-width:0;height:31%;transform-origin:50% 0;filter:drop-shadow(0 2px 5px rgba(0,0,0,.85));}
+#rift-puppet-stage .rift-puppet i{z-index:0;top:-65%;height:70%;width:1px;background:linear-gradient(rgba(215,190,164,.8),rgba(215,190,164,.12));}
+#rift-puppet-stage .rift-puppet b,#rift-puppet-stage .rift-puppet em{z-index:1;}
+#rift-puppet-stage .rift-puppet b{top:39%;width:45%;height:34%;min-width:11px;}
+#rift-puppet-stage .rift-puppet em{top:21%;width:33%;min-width:9px;}
+#rift-puppet-stage .rift-puppet small{bottom:-18%;font-size:8px;color:rgba(235,214,190,.88);text-shadow:0 1px 4px #000;}
+/* Small cast in a shallow arc, all contained by the spotlight. */
+#rift-puppet-stage .p-eleven{left:4%;top:41%;height:25%;width:21px;}
+#rift-puppet-stage .p-flux{left:15%;top:25%;height:23%;width:20px;}
+#rift-puppet-stage .p-noka{left:27%;top:15%;height:22%;width:19px;}
+#rift-puppet-stage .p-taning{left:40%;top:9%;height:24%;width:21px;}
+#rift-puppet-stage .p-lobe{left:54%;top:14%;height:22%;width:19px;}
+#rift-puppet-stage .p-gu{left:67%;top:25%;height:24%;width:20px;}
+#rift-puppet-stage .p-chillo{left:79%;top:40%;height:22%;width:19px;}
+#rift-puppet-stage .p-cosmo{left:90%;top:49%;height:20%;width:18px;}
+#rift-puppet-stage .p-transfer{left:1%;top:58%;height:20%;width:18px;}
+/* Main controller face, large and forward, without hands or torso. */
+#rift-puppet-stage .rift-player-face{left:50%;top:69%;width:clamp(92px,10vw,142px);transform:translate(-50%,-50%);z-index:6;background:radial-gradient(circle at 35% 28%,#76615a 0%,#392b2b 43%,#090708 78%);border-color:rgba(221,187,151,.62);box-shadow:0 0 22px rgba(255,185,111,.18),inset 0 -10px 20px rgba(0,0,0,.8);}
+#rift-puppet-stage .rift-player-face b{top:-31%;height:34%;background:linear-gradient(rgba(230,204,174,.82),transparent);}
+#rift-puppet-stage .rift-player-face em{top:-39%;background:#d1b99a;box-shadow:0 0 8px rgba(255,204,145,.45);}
+#rift-puppet-stage .rift-stage-caption{top:2%;right:2%;font-size:8px;color:rgba(240,213,181,.6);}
+@media(max-width:700px){
+ #rift-puppet-stage{left:46%;top:16%;width:43%;height:68%;}
+ #rift-puppet-stage .rift-player-face{width:clamp(68px,15vw,96px);}
+ #rift-puppet-stage .rift-puppet small{font-size:6px;}
+}
