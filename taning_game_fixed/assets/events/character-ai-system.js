@@ -15,7 +15,13 @@
   };
   const $ = id => document.getElementById(id);
   const emit = (name, detail={}) => window.dispatchEvent(new CustomEvent(name,{detail}));
-  const aiFor = id => { const policy=(window.RIFT_CHARACTER_AI_POLICIES||{})[id]; return Math.max(0,Math.min(20,Number((window.RIFT_CURRENT_AI_LEVELS||{})[id] ?? (policy&&policy.getLevel?policy.getLevel():((((window.NIGHT_SETTINGS||{})[state.night]||{}).characters||{})[id])))||0); };
+  const aiFor = id => {
+    const policy=(window.RIFT_CHARACTER_AI_POLICIES||{})[id];
+    const configured=(((window.NIGHT_SETTINGS||{})[state.night]||{}).characters||{})[id];
+    const current=(window.RIFT_CURRENT_AI_LEVELS||{})[id];
+    const value=current ?? (policy&&policy.getLevel ? policy.getLevel() : configured);
+    return Math.max(0,Math.min(20,Number(value)||0));
+  };
   const chance = id => { const level=aiFor(id), policy=(window.RIFT_CHARACTER_AI_POLICIES||{})[id]; if(level<=0)return false; return policy&&policy.canAct?policy.canAct(level):(typeof window.riftCanCharacterMove==='function'?window.riftCanCharacterMove(level):Math.random()*100<level*5); };
   // Nights 1-5 become progressively more aggressive without changing AI probability.
   const pace = (seconds, id) => { const level=id?aiFor(id):0, policy=id&&(window.RIFT_CHARACTER_AI_POLICIES||{})[id]; return policy&&policy.pace?policy.pace(seconds,level,state.night):seconds/(1+Math.max(0,state.night-1)*0.12+level*0.075); };
