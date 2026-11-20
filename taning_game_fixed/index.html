@@ -247,12 +247,12 @@
 <link rel="stylesheet" href="./assets/css/night-six-mutations.css?v=1">
 <link rel="stylesheet" href="./assets/css/night-six-character-system.css?v=12">
 <link rel="stylesheet" href="./assets/css/character-ai-system.css?v=11">
-<link rel="stylesheet" href="./assets/css/night-transition.css?v=1">
+<link rel="stylesheet" href="./assets/css/night-transition.css?v=2">
 <script src="./assets/config/night-six-special-times.js?v=6"></script>
 <script src="./assets/config/night-settings.js?v=11"></script>
 <script src="./assets/events/night-ai-progression.js?v=3"></script>
 <script src="./assets/events/night-six-events.js?v=1"></script>
-<script src="./assets/events/night-transition.js?v=1"></script>
+<script src="./assets/events/night-transition.js?v=2"></script>
 <script src="./assets/data/data.js?v=7" onerror="console.error('data.js 加载失败：请确认 data.js 与 index.html 在同一目录')"></script>
 <script src="./assets/events/night-six-mutations.js?v=5"></script>
 <script src="./assets/characters/monitor-pixel-characters.js?v=1"></script>
@@ -1042,7 +1042,7 @@
   });
   // Developer-only test bridge. All overrides live in memory and never alter NIGHT_SETTINGS.
   window.RIFT_TEST_BRIDGE = {
-    unlockAllNights: () => { try { localStorage.setItem('riftAsh.highestNight','6'); highestNight=6; menuCont.classList.remove('disabled'); menuCont.innerText='继续（第 6 夜）'; menuCont.onclick=function(){ mainMenu.style.display='none'; gameEl.style.display='block'; initAudio(); startNight(6); }; return true; } catch(e) { console.warn('Could not unlock nights:',e); return false; } },
+    unlockAllNights: () => { try { localStorage.setItem('riftAsh.highestNight','6'); highestNight=6; menuCont.classList.remove('disabled'); menuCont.innerText='继续（第 5 夜）'; menuCont.onclick=function(){ mainMenu.style.display='none'; gameEl.style.display='block'; initAudio(); startNight(5); }; menuNightSix.style.display='block'; menuCustomNight.style.display='block'; return true; } catch(e) { console.warn('Could not unlock nights:',e); return false; } },
     triggerSpecialTime: id => {
       if(!S.running||!activeNightSettings||!Array.isArray(activeNightSettings.specialTimes))return false;
       const event=activeNightSettings.specialTimes.find(item=>item.id===id);
@@ -1358,9 +1358,10 @@
 
   if (highestNight > 1) {
     menuCont.classList.remove('disabled');
-    menuCont.innerText = `继续（第 ${highestNight} 夜）`;
+    const continueNight = Math.min(highestNight, 5);
+    menuCont.innerText = `继续（第 ${continueNight} 夜）`;
     menuCont.onclick = function() {
-      mainMenu.style.display = 'none'; gameEl.style.display = 'block'; initAudio(); startNight(highestNight);
+      mainMenu.style.display = 'none'; gameEl.style.display = 'block'; initAudio(); startNight(continueNight);
     };
   }
 
