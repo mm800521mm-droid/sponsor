@@ -15,22 +15,19 @@
   };
   const $ = id => document.getElementById(id);
   const emit = (name, detail={}) => window.dispatchEvent(new CustomEvent(name,{detail}));
-  const aiFor = id => Math.max(0,Math.min(20,Number((window.RIFT_CURRENT_AI_LEVELS||{})[id] ?? ((((window.NIGHT_SETTINGS||{})[state.night]||{}).characters||{})[id]))||0));
-  const chance = id => typeof window.riftCanCharacterMove==='function' ? window.riftCanCharacterMove(aiFor(id)) : Math.random()*100 < aiFor(id)*5;
+  const aiFor = id => { const policy=(window.RIFT_CHARACTER_AI_POLICIES||{})[id]; return Math.max(0,Math.min(20,Number((window.RIFT_CURRENT_AI_LEVELS||{})[id] ?? (policy&&policy.getLevel?policy.getLevel():((((window.NIGHT_SETTINGS||{})[state.night]||{}).characters||{})[id])))||0); };
+  const chance = id => { const level=aiFor(id), policy=(window.RIFT_CHARACTER_AI_POLICIES||{})[id]; if(level<=0)return false; return policy&&policy.canAct?policy.canAct(level):(typeof window.riftCanCharacterMove==='function'?window.riftCanCharacterMove(level):Math.random()*100<level*5); };
   // Nights 1-5 become progressively more aggressive without changing AI probability.
-  const pace = (seconds, id) => {
-    const nightBoost = Math.max(0, state.night - 1) * 0.12;
-    const aiBoost = id ? aiFor(id) * 0.075 : 0;
-    return seconds / (1 + nightBoost + aiBoost);
-  };
+  const pace = (seconds, id) => { const level=id?aiFor(id):0, policy=id&&(window.RIFT_CHARACTER_AI_POLICIES||{})[id]; return policy&&policy.pace?policy.pace(seconds,level,state.night):seconds/(1+Math.max(0,state.night-1)*0.12+level*0.075); };
   const initialDelay = actor => Math.max(1.25, pace(actor.interval * 0.7, actor.id));
   const makeActor = (id, cam, interval) => ({id,cam,home:cam,interval,timer:interval,phase:'idle',threat:0,look:0,deadline:0,clearWord:'',words:[],el:null,doorEl:null});
   function actorList(){
+    const attacks=window.RIFT_CHARACTER_ATTACKS||{};
     return {
-      flux:makeActor('flux',2,13),
-      lobe:makeActor('lobe',10,17),
-      gu:makeActor('gu',4,16),
-      chillo:makeActor('chillo',6,18)
+      flux:makeActor('flux',attacks.flux?.homeCam||2,attacks.flux?.interval||13),
+      lobe:makeActor('lobe',attacks.lobe?.homeCam||10,attacks.lobe?.interval||17),
+      gu:makeActor('gu',attacks.gu?.homeCam||4,attacks.gu?.interval||16),
+      chillo:makeActor('chillo',attacks.chillo?.homeCam||6,attacks.chillo?.interval||18)
     };
   }
   function removeActorVisual(a){
@@ -108,7 +105,7 @@
   function startActor(a){
     a.phase='moving';a.timer=pace(a.interval * 0.55,a.id);a.threat=0;a.look=0;
     if(a.id==='flux'){
-      const cams=[2,3,4,5,6,7,8,9,11,12];
+      const cams=(window.RIFT_CHARACTER_ATTACKS||{}).flux?.night6Route||[2,3,4,5,6,7,8,9,11,12];
       a.cam=cams[Math.floor(Math.random()*cams.length)];
     } else a.cam=a.home;
     render(a);
@@ -212,7 +209,8 @@
             else{a.phase='door';a.deadline=Date.now()+pace(8000,a.id);emit('rift:character-at-door',{characterId:'chillo',side:'right',visualSide:'right'});}
           }else if(a.id==='lobe'){
             a.phase='flash-window';
-            const responseSeconds=Math.max(3,8-aiFor('lobe')*0.25);
+            const lobePolicy=(window.RIFT_CHARACTER_AI_POLICIES||{}).lobe;
+            const responseSeconds=lobePolicy&&lobePolicy.responseSeconds?lobePolicy.responseSeconds(aiFor('lobe')):Math.max(3,8-aiFor('lobe')*0.25);
             a.deadline=Date.now()+responseSeconds*1000;
             emit('rift:lobe-warning-start',{seconds:responseSeconds,ai:aiFor('lobe')});
             emit('rift:character-at-door',{characterId:'lobe',side:'cam10'});
