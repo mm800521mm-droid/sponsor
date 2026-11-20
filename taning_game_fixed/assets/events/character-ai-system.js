@@ -180,46 +180,12 @@
         if(Date.now()>=a.deadline){a.phase='moving';a.timer=pace(a.interval,a.id);}
         continue;
       }
-      if(a.id==='flux'){
-        if(a.phase==='moving'){
-          a.timer-=dt;
-          if(a.timer<=0){a.phase='approach';a.deadline=Date.now()+pace(16000,a.id);}
-        }
-        if(a.phase==='moving' && state.camOpen && state.camId===a.cam){
-          a.look+=dt;
-          if(a.look>=1.25)showFluxChoice(a);
-        }
-        if(a.phase==='moving' && a.look>=1.25 && !a.choiceEl && (!state.camOpen||state.camId!==a.cam)){
-          a.look=0;
-        }
-        if(a.phase==='approach'){
-          a.deadline=a.deadline||Date.now()+pace(16000,a.id);
-          if(Date.now()>=a.deadline){a.phase='door';a.deadline=Date.now()+pace(9000,a.id);}
-        }
-        if(a.phase==='door' && !state.leftClosed && !state.rightClosed && Date.now()>=a.deadline)fail(a,'flux-door-timeout');
-      } else if(a.phase==='moving'){
-        a.timer-=dt;
-        if(a.timer<=0){
-          if(a.id==='gu'){
-            if(a.bonusCam2 && a.cam===2){a.cam=4;a.timer=pace(7,a.id);render(a);}
-            else if(a.cam===4){a.cam=5;a.timer=pace(7,a.id);render(a);}
-            else{a.bonusCam2=false;a.phase='door';a.deadline=Date.now()+pace(8000,a.id);renderDoorThreat(a);emit('rift:character-at-door',{characterId:'gu',side:'left'});}
-          }else if(a.id==='chillo'){
-            if(a.cam===6){a.cam=3;a.timer=pace(7,a.id);render(a);}
-            else{a.phase='door';a.deadline=Date.now()+pace(8000,a.id);emit('rift:character-at-door',{characterId:'chillo',side:'right',visualSide:'right'});}
-          }else if(a.id==='lobe'){
-            a.phase='flash-window';
-            const lobePolicy=(window.RIFT_CHARACTER_AI_POLICIES||{}).lobe;
-            const responseSeconds=lobePolicy&&lobePolicy.responseSeconds?lobePolicy.responseSeconds(aiFor('lobe')):Math.max(3,8-aiFor('lobe')*0.25);
-            a.deadline=Date.now()+responseSeconds*1000;
-            emit('rift:lobe-warning-start',{seconds:responseSeconds,ai:aiFor('lobe')});
-            emit('rift:character-at-door',{characterId:'lobe',side:'cam10'});
-          }
-        }
-      }else if(a.phase==='flash-window' && Date.now()>=a.deadline){
-        emit('rift:lobe-warning-clear',{reason:'timeout'});
-        emit('rift:character-time-rollback',{characterId:'lobe',hours:1});
-        returnActor(a);
+      const attack=(window.RIFT_CHARACTER_ATTACKS||{})[a.id];
+      if(attack&&typeof attack.update==='function'){
+        attack.update(a,dt,{
+          state,pace,ai:aiFor,render,renderDoorThreat,emit,fail,returnActor,
+          showChoice:showFluxChoice
+        });
       }
     }
     handleDoor();
