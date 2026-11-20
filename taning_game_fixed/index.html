@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Five Nights at Rift Ash</title>
-<link rel="stylesheet" href="./assets/css/game.css?v=18">
+<link rel="stylesheet" href="./assets/css/game.css?v=19">
 <link rel="stylesheet" href="./assets/css/mobile.css?v=2">
 <link rel="stylesheet" href="./assets/css/desktop-layout.css?v=1">
 </style>
@@ -1295,6 +1295,14 @@
   }
 
   function startNight(nightNum, customSettings=null, customLabel='') {
+      if (Number(nightNum) === 6) {
+        try {
+          if (localStorage.getItem('riftAsh.night6Returned') !== '1') {
+            localStorage.setItem('riftAsh.night6VisitPending', '1');
+          }
+        } catch (_) {}
+      }
+
     if (window.speechSynthesis) window.speechSynthesis.cancel();
     currentTapePlayId++;
     const tapeAudio = document.getElementById('tape-audio');
