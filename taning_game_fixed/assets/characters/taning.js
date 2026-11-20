@@ -131,9 +131,12 @@ class TaningAI {
       return;
     }
     dt = Math.max(0, Math.min(dt, 0.1));
-    // Nights 1-5 progressively shorten action phases; Night 6 keeps its authored special timing.
+    // Higher AI and later nights act sooner, using the shared gentle speed curve.
     const night = Number(ctx.getNight && ctx.getNight()) || 1;
-    if (night >= 1) dt *= (1 + Math.max(0, night - 1) * 0.12) * (1 + this.aiLevel * 0.075);
+    const speed = typeof window.riftCharacterSpeedMultiplier === 'function'
+      ? window.riftCharacterSpeedMultiplier(this.aiLevel, night)
+      : Math.min(1.60, 1 + this.aiLevel * 0.02 + Math.max(0, night - 1) * 0.03);
+    dt *= speed;
 
     switch (this.state) {
       case 'WANDER': {
