@@ -1121,9 +1121,28 @@
   window.addEventListener('blur', releaseAllLights);
   document.addEventListener('visibilitychange', () => { if (document.hidden) releaseAllLights(); });
 
+  let lobeClockGlitchUntil=0, lobeClockGlitchInterval=null;
+  const glitchClockText=()=>['#? AM','1# A?','!2 A#','0@ AM','A? #M','##:##'][Math.floor(Math.random()*6)];
+  function stopLobeClockGlitch(){
+    lobeClockGlitchUntil=0;
+    if(lobeClockGlitchInterval){clearInterval(lobeClockGlitchInterval);lobeClockGlitchInterval=null;}
+    clockEls.forEach(el=>{el.classList.remove('rift-lobe-clock-glitch');el.innerText=S.hour===0?'12 AM':S.hour+' AM';});
+  }
+  function startLobeClockGlitch(seconds){
+    stopLobeClockGlitch();
+    const duration=Math.max(3,Number(seconds)||3)*1000;
+    lobeClockGlitchUntil=Date.now()+duration;
+    clockEls.forEach(el=>el.classList.add('rift-lobe-clock-glitch'));
+    const paint=()=>{if(Date.now()>=lobeClockGlitchUntil){stopLobeClockGlitch();return;}clockEls.forEach(el=>el.innerText=glitchClockText());};
+    paint();lobeClockGlitchInterval=setInterval(paint,95);
+  }
+  window.addEventListener('rift:lobe-warning-start',event=>startLobeClockGlitch(event.detail&&event.detail.seconds));
+  window.addEventListener('rift:lobe-warning-clear',stopLobeClockGlitch);
+
   function updateUI() {
     let hourStr = S.hour === 0 ? '12 AM' : S.hour + ' AM';
-    clockEls.forEach(el => el.innerText = hourStr);
+    if(Date.now()<lobeClockGlitchUntil){clockEls.forEach(el=>el.innerText=glitchClockText());}
+    else{clockEls.forEach(el => {el.classList.remove('rift-lobe-clock-glitch');el.innerText = hourStr;});}
     let powerPercent = Math.ceil(S.power);
     powerTexts.forEach(el => el.innerText = powerPercent + '%');
     powerBoxes.forEach(el => el.classList.toggle('low', S.power <= 20));
