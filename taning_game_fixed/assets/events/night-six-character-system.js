@@ -8,7 +8,7 @@
   const defs = {
     noka: { name: '诺卡', cam: 13, glyph: '♫', kind: 'music' },
     tannin: { name: '塔宁', cam: 5, glyph: '◉', kind: 'eyes' },
-    lobe: { name: 'LOBE', cam: 10, glyph: '▤', kind: 'headphones' },
+    lobe: { name: '耳机', cam: 10, glyph: '▤', kind: 'headphones' },
     gu: { name: '孤', cam: 4, glyph: '▥', kind: 'report' },
     chillo: { name: '寒零', cam: 6, glyph: '❄', kind: 'cold' },
     transfer: { name: '移交', cam: 1, glyph: '⌁', kind: 'transfer' }
@@ -43,7 +43,7 @@
     if(!panel)return;
     if(!panel.querySelector('[data-device="crank"]')){
       const box=document.createElement('div');box.className='rift-n6-device';box.dataset.device='crank';
-      box.innerHTML='<div>CAM 13 // MUSIC BOX</div><div id="rift-n6-crank-count">发条：0 / 5</div><div class="rift-n6-meter"><i id="rift-n6-crank-meter"></i></div><button type="button" id="rift-n6-crank-btn">上发条</button>';
+      box.innerHTML='<div>13号监控 // 音乐盒</div><div id="rift-n6-crank-count">发条：0 / 5</div><div class="rift-n6-meter"><i id="rift-n6-crank-meter"></i></div><button type="button" id="rift-n6-crank-btn">上发条</button>';
       panel.appendChild(box);
       box.querySelector('button').addEventListener('click',e=>{
         e.preventDefault();e.stopPropagation();
@@ -58,18 +58,18 @@
     }
     if(!panel.querySelector('[data-device="flash"]')){
       const box=document.createElement('div');box.className='rift-n6-device';box.dataset.device='flash';
-      box.innerHTML='<div>CAM 10 // FLASH</div><div>FLASH WHEN LOBE APPEARS</div><button type="button" id="rift-n6-flash-btn">FLASH</button>';
+      box.innerHTML='<div>10号监控 // 闪光灯</div><div>耳机出现时立即闪光</div><button type="button" id="rift-n6-flash-btn">闪光</button>';
       panel.appendChild(box);
       const flashButton=box.querySelector('button');
       flashButton.addEventListener('click',e=>{
         e.preventDefault();e.stopPropagation();
         if(!frame.running||!frame.camOpen||Number(frame.camId)!==10||Date.now()<flashReadyAt)return;
         flashReadyAt=Date.now()+3000;
-        flashButton.disabled=true;flashButton.textContent='COOLDOWN 3s';
+        flashButton.disabled=true;flashButton.textContent='冷却中 3秒';
         let remaining=3;
         const cooldown=setInterval(()=>{
           remaining--;
-          if(remaining>0){flashButton.textContent='COOLDOWN '+remaining+'s';}
+          if(remaining>0){flashButton.textContent='冷却中 '+remaining+'秒';}
           else{clearInterval(cooldown);flashButton.disabled=false;flashButton.textContent='闪光';}
         },1000);
         const feed=$('feed-10');
@@ -107,7 +107,7 @@
       const figure=el.querySelector('.figure');
       if(window.RIFT_PIXEL_CHARACTERS) window.RIFT_PIXEL_CHARACTERS.mount(figure,id);
       else figure.textContent=d.glyph;
-      el.querySelector('.tag').textContent=d.name+' // CAM '+String(cam).padStart(2,'0')+(id==='lobe'&&active!=='lobe'?' // STANDBY':'');
+      el.querySelector('.tag').textContent=d.name+' // 监控 '+String(cam).padStart(2,'0')+(id==='lobe'&&active!=='lobe'?' // 待机':'');
     });
     renderFlux();
   }
@@ -124,12 +124,12 @@
     const figure=el.querySelector('.figure');
     if(window.RIFT_PIXEL_CHARACTERS) window.RIFT_PIXEL_CHARACTERS.mount(figure,active);
     else figure.textContent=d.glyph;
-    el.querySelector('.tag').textContent=d.name+' // CAM '+String(activeCam).padStart(2,'0');
+    el.querySelector('.tag').textContent=d.name+' // 监控 '+String(activeCam).padStart(2,'0');
     if(activeCam===1)ensureOfficeAttacker();
   }
   function ensureOfficeAttacker(){
     let el=$('rift-n6-office-attacker');if(!el){el=document.createElement('div');el.id='rift-n6-office-attacker';el.innerHTML='<div class="figure"></div><div class="tag"></div>';($('game')||document.body).appendChild(el);}
-    el.style.display=active?'flex':'none';el.querySelector('.figure').textContent=defs[active].glyph;el.querySelector('.tag').textContent=defs[active].name+' // ATTACK';
+    el.style.display=active?'flex':'none';el.querySelector('.figure').textContent=defs[active].glyph;el.querySelector('.tag').textContent=defs[active].name+' // 正在攻击';
   }
   function showFluxChoices(){
     if(fluxTextShown)return;fluxTextShown=true;
@@ -191,7 +191,7 @@
     el.classList.add('show');
   }
   function hideTransfer(){const el=$('rift-n6-transfer');if(el)el.classList.remove('show');transferInside=false;}
-  function showTransferScare(){let el=$('rift-n6-transfer-scare');if(!el){el=document.createElement('div');el.id='rift-n6-transfer-scare';el.textContent='TRANSFER // SIGNAL OVERRUN';el.style.cssText='position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:#050303;color:#f2ddd0;font:bold clamp(24px,7vw,72px) Courier New,monospace;text-shadow:0 0 18px #b00;letter-spacing:.12em;pointer-events:none;';document.body.appendChild(el);}el.style.display='flex';setTimeout(()=>{el.style.display='none';},1100);}
+  function showTransferScare(){let el=$('rift-n6-transfer-scare');if(!el){el=document.createElement('div');el.id='rift-n6-transfer-scare';el.textContent='移交 // 信号失控';el.style.cssText='position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:#050303;color:#f2ddd0;font:bold clamp(24px,7vw,72px) Courier New,monospace;text-shadow:0 0 18px #b00;letter-spacing:.12em;pointer-events:none;';document.body.appendChild(el);}el.style.display='flex';setTimeout(()=>{el.style.display='none';},1100);}
   function onFrame(e){
     frame={...frame,...(e.detail||{})};
     syncDeviceVisibility();
