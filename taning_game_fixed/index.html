@@ -1219,7 +1219,9 @@
         if (btnRlight.classList.contains('on')) usage += COST.light;
         if (isCamOpen) usage += COST.cam;
 
-        S.power = Math.max(0, S.power - usage * dt);
+        // Night 6 lasts 9.25 in-game minutes and includes Lobe's time rollback; ease the drain so the longer shift remains survivable.
+        const nightPowerMultiplier = S.night === 6 ? 0.80 : 1;
+        S.power = Math.max(0, S.power - usage * dt * nightPowerMultiplier);
         if (S.power <= 0) {
           S.running = false;
           releaseAllLights();
