@@ -6,3 +6,14 @@ window.RIFT_CHARACTER_ATTACKS.flux=Object.freeze({
  approachSeconds:16,doorSeconds:9,defense:'either-door',choiceFailureThreshold:2,
  night6ControlledBy:'shared-character-ai'
 });
+window.RIFT_CHARACTER_ATTACKS.flux=Object.freeze({...window.RIFT_CHARACTER_ATTACKS.flux,
+ update(a,dt,api){
+  if(a.phase==='moving'){
+   a.timer-=dt;if(a.timer<=0){a.phase='approach';a.deadline=Date.now()+api.pace(16000,a.id);}
+  }
+  if(a.phase==='moving'&&api.state.camOpen&&api.state.camId===a.cam){a.look+=dt;if(a.look>=1.25)api.showChoice(a);}
+  if(a.phase==='moving'&&a.look>=1.25&&!a.choiceEl&&(!api.state.camOpen||api.state.camId!==a.cam))a.look=0;
+  if(a.phase==='approach'){a.deadline=a.deadline||Date.now()+api.pace(16000,a.id);if(Date.now()>=a.deadline){a.phase='door';a.deadline=Date.now()+api.pace(9000,a.id);}}
+  if(a.phase==='door'&&!api.state.leftClosed&&!api.state.rightClosed&&Date.now()>=a.deadline)api.fail(a,'flux-door-timeout');
+ }
+});
