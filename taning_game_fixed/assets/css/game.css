@@ -746,3 +746,39 @@ body.rift-debug-unlocked .menu-item-extra{display:block!important;}
 @keyframes riftGoldenHeadFloat{0%,100%{margin-top:0;transform:translate(-50%,-50%) rotate(-.7deg)}50%{margin-top:-12px;transform:translate(-50%,-50%) rotate(.7deg)}}
 @media(max-width:700px){#rift-puppet-stage{left:8%!important;top:28%!important;width:84%!important;height:56%!important;}#rift-puppet-stage .rift-player-avatar{width:clamp(142px,29vw,196px)!important;height:clamp(142px,29vw,196px)!important;}#rift-puppet-stage .rift-puppet{width:clamp(23px,5vw,32px)!important;height:clamp(65px,13vw,84px)!important;}#rift-puppet-stage .rift-puppet small{font-size:8px!important;}}
 @media(prefers-reduced-motion:reduce){#rift-puppet-stage .rift-player-avatar{animation:none;}}
+
+
+/* FINAL FIX: place the complete Night 6 puppet circle under the RIGHT pendant lamp.
+   The stage is a child of #bg-environment, which fills the viewport. */
+#rift-puppet-stage{
+  position:absolute!important;
+  left:64%!important;right:auto!important;
+  top:24%!important;bottom:auto!important;
+  width:31vw!important;max-width:520px!important;min-width:360px!important;
+  height:68vh!important;max-height:650px!important;
+  inset-inline:auto!important;inset-block:auto!important;
+  overflow:visible!important;
+}
+#rift-puppet-stage .rift-stage-backdrop{
+  left:0!important;right:0!important;top:0!important;height:100%!important;
+}
+#rift-puppet-stage .rift-puppets{
+  left:0!important;right:0!important;top:0!important;height:100%!important;
+}
+#rift-puppet-stage .rift-player-avatar{
+  left:50%!important;top:52%!important;
+  width:clamp(180px,18vw,270px)!important;
+  height:clamp(180px,18vw,270px)!important;
+}
+@media(max-width:700px){
+  #rift-puppet-stage{
+    left:52%!important;right:auto!important;top:22%!important;
+    width:45vw!important;min-width:0!important;max-width:none!important;
+    height:70vh!important;max-height:none!important;
+  }
+  #rift-puppet-stage .rift-player-avatar{
+    left:50%!important;top:52%!important;
+    width:clamp(140px,28vw,200px)!important;
+    height:clamp(140px,28vw,200px)!important;
+  }
+}
