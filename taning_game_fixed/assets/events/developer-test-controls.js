@@ -110,6 +110,7 @@
     typed=(typed+event.key.toLowerCase()).slice(-secret.length);
     if(typed===secret){
       document.body.classList.add('rift-debug-unlocked');
+      bridge()?.unlockAllNights();
       panel.classList.add('open');
       toggle.textContent='关闭测试面板 ▾';
       status('电脑端指令验证通过：开发调试与自定义夜已解锁');
