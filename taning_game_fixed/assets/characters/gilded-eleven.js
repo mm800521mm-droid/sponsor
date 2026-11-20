@@ -26,7 +26,8 @@ class GildedElevenAI {
 
   getStageDuration() {
     // 行动检查间隔固定；AI 等级只影响每次检查通过的概率。
-    return Math.max(0.1, Number(this.config.timings && this.config.timings.stage) || 20);
+    const base = Math.max(0.1, Number(this.config.timings && this.config.timings.stage) || 20);
+    return base / (1 + this.aiLevel * 0.075);
   }
 
   canTakeAction() {
