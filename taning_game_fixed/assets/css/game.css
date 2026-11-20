@@ -418,3 +418,287 @@ body{font-family:"Courier New",Courier,monospace;color:#c9b79a;user-select:none;
 /* Sixth Night and Custom Night are first-class menu entries when unlocked. */
 .menu-item-extra{display:none;}
 body.rift-debug-unlocked .menu-item-extra{display:block!important;}
+
+/* Night 6 menu hover reveal: the familiar room slips into a colder, altered state. */
+#main-menu.rift-night-six-hover #bg-environment{
+  background:radial-gradient(ellipse at 78% 72%,rgba(74,8,12,.30) 0%,transparent 35%),radial-gradient(ellipse at 52% 42%,rgba(22,3,6,.62) 0%,transparent 58%),linear-gradient(110deg,#030303 0%,#100608 52%,#080304 100%) !important;
+  filter:saturate(.58) contrast(1.18);transition:background .7s ease,filter .7s ease;
+}
+#main-menu.rift-night-six-hover #bg-environment::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,transparent 0 48%,rgba(120,12,18,.10) 49%,transparent 51%),repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 4px),radial-gradient(ellipse at 78% 48%,transparent 0 22%,rgba(0,0,0,.58) 72%);
+  opacity:.9;animation:riftNightSixMenuPulse 3.8s ease-in-out infinite;
+}
+#main-menu.rift-night-six-hover .curtain{opacity:.78;filter:brightness(.42) sepia(.35) hue-rotate(315deg) drop-shadow(-14px 0 24px rgba(70,0,8,.5));transition:opacity .7s ease,filter .7s ease;}
+#main-menu.rift-night-six-hover .gear{opacity:.18;filter:brightness(.45);transition:opacity .7s ease,filter .7s ease;}
+#main-menu.rift-night-six-hover .spotlight{opacity:.12;transition:opacity .7s ease;}
+#main-menu.rift-night-six-hover .menu-item#menu-night-six{color:#e4caca;text-shadow:0 0 10px rgba(150,18,28,.48);}
+@keyframes riftNightSixMenuPulse{0%,100%{opacity:.62;transform:translateX(0)}48%{opacity:.96;transform:translateX(-3px)}52%{opacity:.72;transform:translateX(4px)}}
+@media(prefers-reduced-motion:reduce){#main-menu.rift-night-six-hover #bg-environment::after{animation:none}}
+
+/* The Night 6 hover keeps the corrupted room and reveals its puppet theatre together. */
+#rift-puppet-stage{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0;visibility:hidden;overflow:hidden;transition:opacity .8s ease,visibility .8s ease;}
+#main-menu.rift-night-six-hover #rift-puppet-stage{opacity:1;visibility:visible;}
+.rift-stage-backdrop{position:absolute;left:17%;right:13%;top:13%;height:57%;background:radial-gradient(ellipse at 50% 45%,rgba(75,8,14,.25),rgba(0,0,0,.76) 70%);border-top:1px solid rgba(155,105,83,.22);box-shadow:0 0 65px rgba(95,0,12,.24) inset;}
+.rift-stage-curtain{position:absolute;top:0;bottom:25%;width:19%;background:linear-gradient(90deg,#080304,#26090d 45%,#090304);opacity:.9;box-shadow:0 0 30px #000;}
+.rift-stage-curtain-left{left:0;clip-path:polygon(0 0,100% 0,77% 100%,0 88%);}
+.rift-stage-curtain-right{right:0;clip-path:polygon(0 0,100% 0,100% 88%,23% 100%);}
+.rift-stage-floor{position:absolute;left:12%;right:10%;bottom:19%;height:16%;background:linear-gradient(180deg,rgba(65,20,22,.45),rgba(5,3,4,.95));transform:perspective(300px) rotateX(12deg);border-top:2px solid rgba(174,121,92,.2);box-shadow:0 -12px 38px rgba(90,0,8,.16);}
+.rift-stage-controller{position:absolute;top:1%;left:50%;width:170px;height:90px;transform:translateX(-50%);opacity:.6;}
+.rift-stage-controller span{position:absolute;left:50%;top:0;width:38px;height:38px;border-radius:50%;background:#020202;transform:translateX(-50%);box-shadow:0 0 18px #160509;}
+.rift-stage-controller i{position:absolute;left:50%;top:30px;width:82px;height:58px;transform:translateX(-50%);background:linear-gradient(#080607,#010101);clip-path:polygon(28% 0,72% 0,100% 100%,0 100%);}
+.rift-stage-controller b{position:absolute;left:50%;top:54px;width:2px;height:180px;background:linear-gradient(rgba(175,130,110,.55),transparent);box-shadow:-34px 0 rgba(175,130,110,.25),34px 0 rgba(175,130,110,.25);}
+.rift-puppets{position:absolute;left:20%;right:16%;top:19%;height:56%;display:flex;align-items:flex-end;justify-content:space-around;gap:1%;perspective:700px;}
+.rift-puppet{--puppet:#65504b;position:relative;flex:1;max-width:82px;height:72%;min-width:22px;transform-origin:50% 0;animation:riftPuppetSway 4.8s ease-in-out infinite alternate;filter:drop-shadow(0 0 9px rgba(95,15,20,.25));}
+.rift-puppet:nth-child(2n){animation-delay:-1.7s;animation-duration:5.6s;}
+.rift-puppet i{position:absolute;top:0;left:50%;width:2px;height:38%;background:linear-gradient(rgba(180,145,128,.6),rgba(180,145,128,.05));transform:translateX(-50%);}
+.rift-puppet b{position:absolute;top:34%;left:50%;width:38%;height:28%;min-width:13px;transform:translateX(-50%);border-radius:45% 45% 25% 25%;background:linear-gradient(90deg,#080607,var(--puppet),#090607);box-shadow:0 0 12px rgba(0,0,0,.8);}
+.rift-puppet em{position:absolute;top:20%;left:50%;width:24%;aspect-ratio:1;border-radius:50%;transform:translateX(-50%);background:radial-gradient(circle at 40% 35%,#4a3937,var(--puppet) 60%,#050405 75%);box-shadow:0 0 8px rgba(130,20,28,.2);}
+.rift-puppet small{position:absolute;bottom:-17%;left:50%;transform:translateX(-50%);white-space:nowrap;color:rgba(205,177,157,.68);font:10px "Courier New",monospace;text-shadow:0 1px 4px #000;}
+.p-eleven{--puppet:#987d58;height:85%;}.p-flux{--puppet:#4d6875;height:68%;}.p-noka{--puppet:#7a4d4b;height:74%;}.p-taning{--puppet:#87706b;height:90%;}.p-lobe{--puppet:#756d87;height:72%;}.p-gu{--puppet:#6c7470;height:80%;}.p-chillo{--puppet:#64818a;height:76%;}.p-cosmo{--puppet:#77658b;height:65%;}.p-transfer{--puppet:#856f50;height:82%;}
+.rift-stage-caption{position:absolute;top:7%;right:7%;color:rgba(180,130,115,.55);font:12px "Courier New",monospace;letter-spacing:.35em;writing-mode:vertical-rl;}
+@keyframes riftPuppetSway{0%{transform:rotate(-2deg) translateY(0)}50%{transform:rotate(1.5deg) translateY(-4px)}100%{transform:rotate(-1deg) translateY(2px)}}
+@media(max-width:700px){.rift-puppets{left:15%;right:12%;top:24%;height:48%;}.rift-puppet small{font-size:8px}.rift-stage-controller{transform:translateX(-50%) scale(.7);transform-origin:top center}.rift-stage-caption{font-size:9px;right:3%}}
+@media(prefers-reduced-motion:reduce){.rift-puppet{animation:none}}
+
+/* Compact left-side crescent puppet tableau. The controller is only a large face;
+   all other cast members remain small, with strings visibly behind them. */
+#rift-puppet-stage{left:0;right:auto;top:10%;bottom:9%;width:min(43vw,520px);height:auto;inset-block:auto;overflow:visible;}
+#rift-puppet-stage .rift-stage-backdrop{left:5%;right:0;top:14%;height:72%;border:0;border-radius:50%;background:radial-gradient(ellipse at 48% 55%,rgba(64,9,16,.22),rgba(0,0,0,.72) 72%);box-shadow:inset 0 0 48px rgba(80,0,12,.18);}
+#rift-puppet-stage .rift-stage-curtain{top:12%;bottom:14%;width:13%;opacity:.55;}
+#rift-puppet-stage .rift-stage-curtain-left{left:0;}
+#rift-puppet-stage .rift-stage-curtain-right{right:0;}
+#rift-puppet-stage .rift-stage-floor{left:8%;right:5%;bottom:10%;height:13%;border-radius:50%;opacity:.55;}
+#rift-puppet-stage .rift-stage-controller{display:none;}
+#rift-puppet-stage .rift-puppets{left:29%;right:4%;top:17%;height:66%;display:block;perspective:700px;}
+#rift-puppet-stage .rift-puppet{position:absolute;left:50%;bottom:0;flex:none;width:36px;min-width:0;height:42%;max-width:none;transform-origin:50% 0;animation:riftPuppetSway 5.5s ease-in-out infinite alternate;}
+#rift-puppet-stage .rift-puppet i{top:-48%;height:52%;width:1px;background:linear-gradient(rgba(190,160,145,.58),rgba(190,160,145,.06));}
+#rift-puppet-stage .rift-puppet b{top:45%;width:42%;height:30%;min-width:12px;}
+#rift-puppet-stage .rift-puppet em{top:29%;width:33%;min-width:10px;}
+#rift-puppet-stage .rift-puppet small{bottom:-22%;font-size:9px;}
+/* Nine small figures follow a crescent around the main face. */
+#rift-puppet-stage .p-eleven{left:8%;bottom:29%;height:31%;width:28px;}
+#rift-puppet-stage .p-flux{left:22%;bottom:48%;height:27%;width:25px;}
+#rift-puppet-stage .p-noka{left:39%;bottom:60%;height:25%;width:24px;}
+#rift-puppet-stage .p-taning{left:57%;bottom:64%;height:26%;width:25px;}
+#rift-puppet-stage .p-lobe{left:74%;bottom:52%;height:27%;width:25px;}
+#rift-puppet-stage .p-gu{left:88%;bottom:32%;height:30%;width:27px;}
+#rift-puppet-stage .p-chillo{left:68%;bottom:18%;height:25%;width:23px;}
+#rift-puppet-stage .p-cosmo{left:39%;bottom:13%;height:24%;width:22px;}
+#rift-puppet-stage .p-transfer{left:17%;bottom:16%;height:25%;width:23px;}
+/* The player's face is foregrounded; no hands or full body are drawn. */
+.rift-player-face{position:absolute;z-index:5;left:8%;top:42%;width:clamp(78px,10vw,128px);aspect-ratio:1;border-radius:48% 48% 43% 43%;background:radial-gradient(circle at 35% 28%,#62545b 0%,#30252c 43%,#090709 76%);border:1px solid rgba(190,155,145,.48);box-shadow:0 0 24px rgba(110,20,28,.24),inset 0 -10px 20px rgba(0,0,0,.8);transform:translateY(-50%);}
+.rift-player-face:before,.rift-player-face:after{content:"";position:absolute;top:47%;width:10%;height:5%;border-radius:50%;background:rgba(205,175,164,.7);box-shadow:0 0 8px rgba(200,140,130,.25);}
+.rift-player-face:before{left:25%;}.rift-player-face:after{right:25%;}
+.rift-player-face i{position:absolute;left:50%;top:62%;width:24%;height:2px;background:rgba(190,150,145,.55);transform:translateX(-50%);}
+.rift-player-face b{position:absolute;left:50%;top:-24%;height:28%;width:1px;background:linear-gradient(rgba(205,175,164,.65),transparent);}
+.rift-player-face em{position:absolute;left:50%;top:-31%;height:8%;width:8%;border-radius:50%;background:#b69b8d;box-shadow:0 0 10px rgba(190,150,130,.4);transform:translateX(-50%);}
+.rift-stage-caption{top:6%;right:5%;font-size:9px;opacity:.55;}
+@media(max-width:700px){
+ #rift-puppet-stage{width:54vw;top:14%;bottom:12%;}
+ #rift-puppet-stage .rift-puppets{left:30%;right:2%;}
+ .rift-player-face{width:clamp(58px,13vw,86px);left:5%;top:46%;}
+ #rift-puppet-stage .rift-puppet small{font-size:7px;}
+}
+
+/* Reposition the puppet tableau INSIDE the existing warm spotlight cone. */
+#rift-puppet-stage{
+  left:49%;right:auto;top:13%;bottom:auto;width:31%;height:75%;
+  inset-inline:auto;inset-block:auto;overflow:visible;
+}
+#rift-puppet-stage .rift-stage-backdrop{left:0;right:0;top:4%;height:90%;border:0;background:radial-gradient(ellipse at 50% 54%,rgba(85,22,17,.13),rgba(0,0,0,.12) 67%,transparent 78%);box-shadow:none;}
+#rift-puppet-stage .rift-stage-curtain,#rift-puppet-stage .rift-stage-floor{display:none;}
+#rift-puppet-stage .rift-puppets{left:0;right:0;top:10%;height:75%;display:block;}
+#rift-puppet-stage .rift-puppet{position:absolute;bottom:auto;left:50%;width:25px;max-width:none;min-width:0;height:31%;transform-origin:50% 0;filter:drop-shadow(0 2px 5px rgba(0,0,0,.85));}
+#rift-puppet-stage .rift-puppet i{z-index:0;top:-65%;height:70%;width:1px;background:linear-gradient(rgba(215,190,164,.8),rgba(215,190,164,.12));}
+#rift-puppet-stage .rift-puppet b,#rift-puppet-stage .rift-puppet em{z-index:1;}
+#rift-puppet-stage .rift-puppet b{top:39%;width:45%;height:34%;min-width:11px;}
+#rift-puppet-stage .rift-puppet em{top:21%;width:33%;min-width:9px;}
+#rift-puppet-stage .rift-puppet small{bottom:-18%;font-size:8px;color:rgba(235,214,190,.88);text-shadow:0 1px 4px #000;}
+/* Small cast in a shallow arc, all contained by the spotlight. */
+#rift-puppet-stage .p-eleven{left:4%;top:41%;height:25%;width:21px;}
+#rift-puppet-stage .p-flux{left:15%;top:25%;height:23%;width:20px;}
+#rift-puppet-stage .p-noka{left:27%;top:15%;height:22%;width:19px;}
+#rift-puppet-stage .p-taning{left:40%;top:9%;height:24%;width:21px;}
+#rift-puppet-stage .p-lobe{left:54%;top:14%;height:22%;width:19px;}
+#rift-puppet-stage .p-gu{left:67%;top:25%;height:24%;width:20px;}
+#rift-puppet-stage .p-chillo{left:79%;top:40%;height:22%;width:19px;}
+#rift-puppet-stage .p-cosmo{left:90%;top:49%;height:20%;width:18px;}
+#rift-puppet-stage .p-transfer{left:1%;top:58%;height:20%;width:18px;}
+/* Main controller face, large and forward, without hands or torso. */
+#rift-puppet-stage .rift-player-face{left:50%;top:69%;width:clamp(92px,10vw,142px);transform:translate(-50%,-50%);z-index:6;background:radial-gradient(circle at 35% 28%,#76615a 0%,#392b2b 43%,#090708 78%);border-color:rgba(221,187,151,.62);box-shadow:0 0 22px rgba(255,185,111,.18),inset 0 -10px 20px rgba(0,0,0,.8);}
+#rift-puppet-stage .rift-player-face b{top:-31%;height:34%;background:linear-gradient(rgba(230,204,174,.82),transparent);}
+#rift-puppet-stage .rift-player-face em{top:-39%;background:#d1b99a;box-shadow:0 0 8px rgba(255,204,145,.45);}
+#rift-puppet-stage .rift-stage-caption{top:2%;right:2%;font-size:8px;color:rgba(240,213,181,.6);}
+@media(max-width:700px){
+ #rift-puppet-stage{left:46%;top:16%;width:43%;height:68%;}
+ #rift-puppet-stage .rift-player-face{width:clamp(68px,15vw,96px);}
+ #rift-puppet-stage .rift-puppet small{font-size:6px;}
+}
+
+/* Player is the largest floating, translucent presence inside the spotlight;
+   the surrounding cast stays visibly smaller and suspended as puppets. */
+#rift-puppet-stage .rift-player-face{
+  left:50%;top:66%;width:clamp(150px,15vw,218px);
+  aspect-ratio: .88;
+  transform:translate(-50%,-50%);
+  opacity:.48;
+  border:1px solid rgba(230,207,181,.34);
+  border-radius:48% 48% 42% 42%;
+  background:
+    radial-gradient(ellipse at 50% 36%,rgba(216,194,173,.42) 0 18%,rgba(104,91,88,.32) 42%,rgba(16,13,15,.08) 72%),
+    radial-gradient(ellipse at 50% 76%,rgba(165,146,136,.26),transparent 68%);
+  box-shadow:0 0 34px rgba(255,218,177,.2),0 0 90px rgba(220,192,164,.1),inset 0 -22px 35px rgba(0,0,0,.28);
+  animation:riftPlayerHover 4.6s ease-in-out infinite;
+}
+#rift-puppet-stage .rift-player-face:before,
+#rift-puppet-stage .rift-player-face:after{
+  top:44%;width:8%;height:3%;
+  background:rgba(235,221,207,.58);
+  box-shadow:0 0 10px rgba(245,218,187,.24);
+}
+#rift-puppet-stage .rift-player-face:before{left:27%;}
+#rift-puppet-stage .rift-player-face:after{right:27%;}
+#rift-puppet-stage .rift-player-face i{
+  top:58%;width:20%;height:1px;background:rgba(230,211,194,.42);
+}
+#rift-puppet-stage .rift-player-face b{
+  top:-48%;height:48%;width:1px;
+  background:linear-gradient(rgba(225,206,184,.35),rgba(225,206,184,.02));
+}
+#rift-puppet-stage .rift-player-face em{
+  top:-53%;width:5%;height:5%;
+  background:rgba(224,203,180,.5);
+  box-shadow:0 0 14px rgba(255,218,177,.38);
+}
+/* Puppet bodies remain dim and subordinate to the player's apparition. */
+#rift-puppet-stage .rift-puppet{opacity:.76;filter:drop-shadow(0 2px 6px rgba(0,0,0,.9));}
+#rift-puppet-stage .rift-puppet i{
+  background:linear-gradient(rgba(218,195,169,.82),rgba(218,195,169,.08));
+}
+@keyframes riftPlayerHover{
+  0%,100%{margin-top:0;filter:blur(.15px);}
+  50%{margin-top:-13px;filter:blur(.45px);}
+}
+@media(max-width:700px){
+ #rift-puppet-stage .rift-player-face{width:clamp(108px,21vw,150px);}
+}
+@media(prefers-reduced-motion:reduce){
+ #rift-puppet-stage .rift-player-face{animation:none;}
+}
+
+/* Optional visible upper body and puppet-controlling arms: kept translucent,
+   with the face remaining the dominant focal point. */
+#rift-puppet-stage .rift-player-body{
+  position:absolute;z-index:5;left:50%;top:70%;width:clamp(138px,14vw,198px);height:22%;
+  transform:translateX(-50%);opacity:.38;pointer-events:none;
+  animation:riftPlayerBodyHover 4.6s ease-in-out infinite;
+}
+#rift-puppet-stage .rift-player-body:before{
+  content:"";position:absolute;left:34%;top:0;width:32%;height:100%;
+  background:linear-gradient(180deg,rgba(220,202,185,.44),rgba(116,98,96,.2) 62%,transparent);
+  clip-path:polygon(35% 0,65% 0,100% 34%,78% 100%,22% 100%,0 34%);
+  filter:drop-shadow(0 0 12px rgba(238,205,173,.18));
+}
+#rift-puppet-stage .rift-player-body i,
+#rift-puppet-stage .rift-player-body b{
+  position:absolute;top:18%;width:43%;height:3px;border-radius:100%;
+  background:linear-gradient(90deg,rgba(225,207,188,.08),rgba(235,216,194,.7),rgba(225,207,188,.08));
+  box-shadow:0 0 9px rgba(245,214,184,.22);
+}
+#rift-puppet-stage .rift-player-body i{left:0;transform:rotate(-29deg);transform-origin:right center;}
+#rift-puppet-stage .rift-player-body b{right:0;transform:rotate(29deg);transform-origin:left center;}
+#rift-puppet-stage .rift-player-body em{
+  position:absolute;left:50%;top:8%;width:8px;height:8px;border-radius:50%;
+  transform:translateX(-50%);background:rgba(236,216,193,.72);
+  box-shadow:-66px 27px 0 -1px rgba(220,197,177,.55),66px 27px 0 -1px rgba(220,197,177,.55),0 0 12px rgba(255,220,185,.45);
+}
+@keyframes riftPlayerBodyHover{
+  0%,100%{margin-top:0}
+  50%{margin-top:-13px}
+}
+@media(max-width:700px){
+ #rift-puppet-stage .rift-player-body{width:clamp(104px,20vw,146px);height:19%;}
+}
+@media(prefers-reduced-motion:reduce){
+ #rift-puppet-stage .rift-player-body{animation:none;}
+}
+
+/* Correct composition: place the entire puppet tableau in the warm lamp beam
+   on the RIGHT, and use the user's golden long-eared rabbit as the controller. */
+#rift-puppet-stage{
+  left:54%!important;right:auto!important;top:11%!important;bottom:auto!important;
+  width:min(30vw,570px)!important;height:76%!important;
+  inset-inline:auto!important;inset-block:auto!important;overflow:visible!important;
+}
+#rift-puppet-stage .rift-stage-backdrop{left:0;right:0;top:3%;height:91%;background:radial-gradient(ellipse at 50% 50%,rgba(255,187,91,.10),rgba(80,30,15,.07) 48%,transparent 76%);border:0;box-shadow:none;}
+#rift-puppet-stage .rift-stage-curtain,#rift-puppet-stage .rift-stage-floor{display:none!important;}
+#rift-puppet-stage .rift-puppets{left:0!important;right:0!important;top:12%!important;height:54%!important;z-index:2;}
+#rift-puppet-stage .rift-puppet{opacity:.78;height:25%;width:20px;filter:drop-shadow(0 0 5px rgba(255,190,112,.22));}
+#rift-puppet-stage .rift-puppet i{top:-72%;height:78%;background:linear-gradient(rgba(231,202,160,.9),rgba(231,202,160,.08));}
+#rift-puppet-stage .rift-puppet b{background:linear-gradient(90deg,#33271e,#887052 48%,#241c17);border:1px solid rgba(190,151,99,.35);border-radius:7px 7px 5px 5px;}
+#rift-puppet-stage .rift-puppet em{background:radial-gradient(circle at 35% 30%,#bda47b,#30251d 75%);border:1px solid rgba(205,172,121,.35);}
+#rift-puppet-stage .rift-puppet small{font-size:8px;color:rgba(255,224,184,.82);}
+#rift-puppet-stage .p-eleven{left:2%;top:49%;height:24%;width:19px;}
+#rift-puppet-stage .p-flux{left:14%;top:29%;height:23%;width:18px;}
+#rift-puppet-stage .p-noka{left:27%;top:16%;height:22%;width:18px;}
+#rift-puppet-stage .p-taning{left:40%;top:8%;height:22%;width:18px;}
+#rift-puppet-stage .p-lobe{left:54%;top:9%;height:22%;width:18px;}
+#rift-puppet-stage .p-gu{left:68%;top:19%;height:23%;width:18px;}
+#rift-puppet-stage .p-chillo{left:81%;top:36%;height:22%;width:18px;}
+#rift-puppet-stage .p-cosmo{left:92%;top:51%;height:20%;width:17px;}
+#rift-puppet-stage .p-transfer{left:1%;top:69%;height:19%;width:17px;}
+/* Golden rabbit controller: translucent, floating, recognizably matching the reference. */
+#rift-puppet-stage .rift-player-face,#rift-puppet-stage .rift-player-body{display:none!important;}
+#rift-puppet-stage .rift-player-avatar{
+  position:absolute;z-index:5;left:50%;top:60%;width:clamp(118px,12vw,190px);height:clamp(230px,27vw,340px);
+  transform:translate(-50%,-50%);opacity:.62;filter:drop-shadow(0 0 18px rgba(255,174,67,.42));
+  animation:riftGoldenRabbitHover 5.2s ease-in-out infinite;
+}
+#rift-puppet-stage .rabbit-ear{position:absolute;top:0;width:24%;height:31%;border-radius:42% 42% 12% 12%;background:linear-gradient(90deg,rgba(68,47,27,.68),rgba(185,139,72,.72) 48%,rgba(61,43,27,.7));border:2px solid rgba(207,165,99,.55);box-shadow:0 0 13px rgba(255,181,78,.22);}
+#rift-puppet-stage .ear-left{left:17%;transform:rotate(-12deg);}
+#rift-puppet-stage .ear-right{right:17%;transform:rotate(12deg);}
+#rift-puppet-stage .rabbit-head{position:absolute;top:19%;left:15%;width:70%;height:34%;border-radius:45% 45% 42% 42%;background:radial-gradient(ellipse at 35% 25%,rgba(214,169,91,.9),rgba(109,77,39,.82) 58%,rgba(32,25,19,.88));border:4px solid rgba(34,27,20,.9);box-shadow:0 0 0 3px rgba(195,151,82,.48),0 0 24px rgba(255,173,65,.3),inset 0 -10px 14px rgba(0,0,0,.48);}
+#rift-puppet-stage .rabbit-eye{position:absolute;top:43%;width:20%;height:7%;background:#ffc45b;box-shadow:0 0 8px 3px rgba(255,171,50,.8),0 0 22px rgba(255,157,37,.55);}
+#rift-puppet-stage .eye-left{left:20%;}.eye-right{right:20%;}
+#rift-puppet-stage .rabbit-muzzle{position:absolute;left:36%;bottom:12%;width:28%;height:20%;border-radius:50%;background:linear-gradient(145deg,#9c8055,#33271d);border:2px solid rgba(25,20,16,.9);}
+#rift-puppet-stage .rabbit-neck{position:absolute;left:42%;top:51%;width:16%;height:9%;background:rgba(130,96,51,.72);border:2px solid rgba(39,29,19,.8);}
+#rift-puppet-stage .rabbit-torso{position:absolute;left:22%;top:57%;width:56%;height:27%;border-radius:14% 14% 9% 9%;background:repeating-linear-gradient(90deg,rgba(35,27,20,.9) 0 17%,rgba(174,132,70,.88) 18% 28%,rgba(35,27,20,.9) 29% 45%);border:4px solid rgba(35,27,18,.92);box-shadow:0 0 0 2px rgba(190,145,75,.4),inset 0 0 14px rgba(0,0,0,.5);}
+#rift-puppet-stage .rabbit-torso i{position:absolute;left:50%;width:7%;height:7%;border-radius:50%;background:#d7b16a;box-shadow:0 0 5px rgba(255,202,107,.5);transform:translateX(-50%);}
+#rift-puppet-stage .rabbit-torso i:first-child{top:22%;}#rift-puppet-stage .rabbit-torso i:nth-child(2){top:48%;}
+#rift-puppet-stage .rabbit-torso b{position:absolute;left:50%;top:70%;width:7%;height:7%;border-radius:50%;background:#d7b16a;transform:translateX(-50%);}
+#rift-puppet-stage .rabbit-arm{position:absolute;top:59%;width:19%;height:27%;border-radius:25%;background:linear-gradient(90deg,rgba(53,39,24,.9),rgba(171,126,62,.8),rgba(48,35,23,.9));border:2px solid rgba(40,29,19,.9);box-shadow:0 0 12px rgba(255,173,70,.18);}
+#rift-puppet-stage .arm-left{left:5%;transform:rotate(8deg);}#rift-puppet-stage .arm-right{right:5%;transform:rotate(-8deg);}
+#rift-puppet-stage .rabbit-leg{position:absolute;top:82%;width:24%;height:16%;background:linear-gradient(90deg,rgba(49,34,20,.92),rgba(165,116,53,.8),rgba(42,30,20,.9));border:2px solid rgba(35,26,18,.9);border-radius:4px 4px 8px 8px;}
+#rift-puppet-stage .leg-left{left:23%;}#rift-puppet-stage .leg-right{right:23%;}
+#rift-puppet-stage .rabbit-control-thread{position:absolute;left:50%;top:-8%;height:29%;width:2px;background:linear-gradient(rgba(245,203,143,.8),rgba(245,203,143,.05));box-shadow:0 0 8px rgba(255,184,87,.35);}
+@keyframes riftGoldenRabbitHover{0%,100%{margin-top:0;transform:translate(-50%,-50%) rotate(-1deg)}50%{margin-top:-12px;transform:translate(-50%,-50%) rotate(1deg)}}
+@media(max-width:700px){
+ #rift-puppet-stage{left:48%!important;top:16%!important;width:45%!important;height:70%!important;}
+ #rift-puppet-stage .rift-player-avatar{width:clamp(88px,19vw,130px);height:clamp(180px,40vw,250px);}
+ #rift-puppet-stage .rift-puppet small{font-size:6px;}
+}
+@media(prefers-reduced-motion:reduce){#rift-puppet-stage .rift-player-avatar{animation:none;}}
+
+/* Final placement correction: align the puppet stage directly under the
+   small warm pendant lamp on the RIGHT side of the title screen. */
+#rift-puppet-stage{
+  left:66%!important;right:auto!important;top:4%!important;
+  width:min(25vw,440px)!important;height:66%!important;
+}
+#rift-puppet-stage .rift-player-avatar{
+  left:50%;top:43%;width:clamp(112px,10.5vw,166px);
+  height:clamp(218px,24vw,300px);
+}
+#rift-puppet-stage .rift-puppets{
+  left:0!important;right:0!important;top:8%!important;height:48%!important;
+}
+@media(max-width:700px){
+ #rift-puppet-stage{
+   left:57%!important;right:auto!important;top:8%!important;
+   width:40%!important;height:62%!important;
+ }
+ #rift-puppet-stage .rift-player-avatar{
+   top:44%;width:clamp(86px,17vw,122px);height:clamp(170px,34vw,220px);
+ }
+}
