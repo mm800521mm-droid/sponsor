@@ -586,3 +586,40 @@ body.rift-debug-unlocked .menu-item-extra{display:block!important;}
 @media(prefers-reduced-motion:reduce){
  #rift-puppet-stage .rift-player-face{animation:none;}
 }
+
+/* Optional visible upper body and puppet-controlling arms: kept translucent,
+   with the face remaining the dominant focal point. */
+#rift-puppet-stage .rift-player-body{
+  position:absolute;z-index:5;left:50%;top:70%;width:clamp(138px,14vw,198px);height:22%;
+  transform:translateX(-50%);opacity:.38;pointer-events:none;
+  animation:riftPlayerBodyHover 4.6s ease-in-out infinite;
+}
+#rift-puppet-stage .rift-player-body:before{
+  content:"";position:absolute;left:34%;top:0;width:32%;height:100%;
+  background:linear-gradient(180deg,rgba(220,202,185,.44),rgba(116,98,96,.2) 62%,transparent);
+  clip-path:polygon(35% 0,65% 0,100% 34%,78% 100%,22% 100%,0 34%);
+  filter:drop-shadow(0 0 12px rgba(238,205,173,.18));
+}
+#rift-puppet-stage .rift-player-body i,
+#rift-puppet-stage .rift-player-body b{
+  position:absolute;top:18%;width:43%;height:3px;border-radius:100%;
+  background:linear-gradient(90deg,rgba(225,207,188,.08),rgba(235,216,194,.7),rgba(225,207,188,.08));
+  box-shadow:0 0 9px rgba(245,214,184,.22);
+}
+#rift-puppet-stage .rift-player-body i{left:0;transform:rotate(-29deg);transform-origin:right center;}
+#rift-puppet-stage .rift-player-body b{right:0;transform:rotate(29deg);transform-origin:left center;}
+#rift-puppet-stage .rift-player-body em{
+  position:absolute;left:50%;top:8%;width:8px;height:8px;border-radius:50%;
+  transform:translateX(-50%);background:rgba(236,216,193,.72);
+  box-shadow:-66px 27px 0 -1px rgba(220,197,177,.55),66px 27px 0 -1px rgba(220,197,177,.55),0 0 12px rgba(255,220,185,.45);
+}
+@keyframes riftPlayerBodyHover{
+  0%,100%{margin-top:0}
+  50%{margin-top:-13px}
+}
+@media(max-width:700px){
+ #rift-puppet-stage .rift-player-body{width:clamp(104px,20vw,146px);height:19%;}
+}
+@media(prefers-reduced-motion:reduce){
+ #rift-puppet-stage .rift-player-body{animation:none;}
+}
