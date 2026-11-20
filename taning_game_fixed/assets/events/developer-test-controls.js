@@ -34,6 +34,7 @@
   const panel=document.createElement('section');panel.id='rift-dev-panel';panel.setAttribute('aria-label','开发测试面板');
   panel.innerHTML=`
     <h3>RIFT ASH // TEST CONSOLE</h3>
+    <div class="dev-row"><button id="dev-unlock-all">解锁全部六夜</button><button id="dev-open-all">打开完整调试面板</button></div>
     <div class="dev-row"><label>快速进入</label><select id="dev-night"><option value="1">第一夜</option><option value="2">第二夜</option><option value="3">第三夜</option><option value="4">第四夜</option><option value="5">第五夜</option><option value="6">第六夜</option></select><button id="dev-start">进入／重开</button></div>
     <div class="dev-row"><label>时间跳转</label><input id="dev-time" type="time" value="05:00"><button id="dev-jump">跳转</button></div>
     <div class="dev-row"><button id="dev-pause">暂停</button><button id="dev-resume">继续</button><button id="dev-reload">重开本夜</button></div>
@@ -55,9 +56,12 @@
     <div class="dev-row"><button id="dev-light-l">左灯</button><button id="dev-light-r">右灯</button><button id="dev-monitor">监控开／关</button></div>
     <h3>强制角色出现</h3>
     <div class="dev-row"><label>角色</label><select id="dev-character">
-      <option value="flux">闪流</option><option value="lobe">耳机</option><option value="gu">孤</option><option value="chillo">寒零</option><option value="tannin">塔宁</option><option value="gildedEleven">十一</option><option value="cosmo">小宇宙</option><option value="transfer">移交／一脚</option>
+      <option value="flux">闪流</option><option value="noka">诺卡</option><option value="lobe">耳机</option><option value="gu">孤</option><option value="chillo">寒零</option><option value="tannin">塔宁</option><option value="gildedEleven">十一</option><option value="cosmo">小宇宙</option><option value="transfer">移交／一脚</option>
     </select><label>摄像头</label><select id="dev-char-cam"></select><button id="dev-force-character">出现</button></div>
     <div class="dev-row"><button id="dev-reset-actor">重置共享角色</button><button id="dev-behind">显示十一在身后</button></div>
+    <h3>第六夜剧情事件</h3>
+    <div class="dev-row"><label>事件</label><select id="dev-special-event"></select><button id="dev-special-go">触发事件</button></div>
+    <div class="dev-row"><button id="dev-all-subtitles">播放全部突变剧情字幕</button><button id="dev-all-mutations">依次触发突变（危险）</button></div>
     <h3>第六夜机制测试</h3>
     <div class="dev-row"><label>突变角色</label><select id="dev-mutation"><option value="tannin">塔宁突变</option><option value="lobe">耳机突变</option><option value="gu">孤突变</option><option value="chillo">寒零突变</option></select><button id="dev-mutation-go">触发突变</button></div>
     <div class="dev-row"><label>诺卡位置</label><select id="dev-noka-cam"></select><button id="dev-noka-go">移动诺卡</button></div>
@@ -122,6 +126,13 @@
     const n=o.cloneNode(true);if(i===13)n.selected=true;$('dev-noka-cam').appendChild(n);
   }
   toggle.addEventListener('click',()=>{panel.classList.toggle('open');toggle.textContent=panel.classList.contains('open')?'关闭测试面板 ▾':'开发测试 ▴';});
+  $('dev-unlock-all').addEventListener('click',()=>status(bridge()?.unlockAllNights()?'已解锁全部六夜；进度仅保存在本机':'解锁失败'));
+  $('dev-open-all').addEventListener('click',()=>{panel.classList.add('open');toggle.textContent='关闭测试面板 ▾';status('完整调试功能已展开');});
+  const specialSelect=$('dev-special-event');
+  (window.NIGHT_SETTINGS?.[6]?.specialTimes||[]).forEach(item=>{const o=document.createElement('option');o.value=item.id;o.textContent=(item.at||'')+' // '+item.id;specialSelect.appendChild(o);});
+  $('dev-special-go').addEventListener('click',()=>status(bridge()?.triggerSpecialTime(specialSelect.value)?'已触发事件：'+specialSelect.value:'请先进入第六夜，并选择有效事件'));
+  $('dev-all-subtitles').addEventListener('click',()=>status(window.RIFT_NIGHT6_MUTATION_TEST?.playAllCharacterSubtitles()?'已开始播放全部突变剧情字幕':'第六夜剧情数据尚未加载'));
+  $('dev-all-mutations').addEventListener('click',async()=>{const ids=['lobe','gu','chillo'];for(const id of ids){if(window.RIFT_NIGHT6_CHARACTER_SYSTEM?.forceMutation(id)){status('已触发 '+id+'；请完成当前机制后再继续');break;}}});
   $('dev-start').addEventListener('click',()=>{bridge()?.startNight(Number($('dev-night').value));status('已重新进入第 '+$('dev-night').value+' 夜');});
   $('dev-jump').addEventListener('click',()=>status(bridge()?.setTime($('dev-time').value)?'时间已跳转到 '+$('dev-time').value:'请先开始游戏，并输入有效时间'));
   $('dev-pause').addEventListener('click',()=>{bridge()?.pause(true);status('游戏已暂停');});
