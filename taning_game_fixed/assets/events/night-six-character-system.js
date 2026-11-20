@@ -16,7 +16,7 @@
   // Tannin keeps its own original AI route and office defense; only the other three use mutation attacks.
   const mutationOrder = ['lobe','gu','chillo'];
   const attackDefs=window.RIFT_CHARACTER_ATTACKS||{};
-  const routes = { lobe:attackDefs.lobe?.route||[10], gu:attackDefs.gu?.route||[4,5,1], chillo:attackDefs.chillo?.route||[6,3,1] };
+  const routes = { lobe:attackDefs.lobe?.route||[10], gu:attackDefs.gu?.route||[4,5,1], chillo:[6] };
   let activeCam = 1, routeIndex = 0, routeClock = 0, attackClock = 0;
   let night = 0, locked = false, active = null, activeId = '', defended = new Set();
   let fluxPauseStartedAt = 0;
@@ -171,12 +171,12 @@
       noka:'诺卡突变：立即查看13号监控并持续上发条。十一事件期间可额外尝试关闭右门。',
       lobe:'耳机突变：切换10号监控并使用专属闪光灯。',
       gu:'孤突变：关闭左门防御。',
-      chillo:'寒零突变：通过监控判断位置，关闭右门防御。',
+      chillo:'寒零突变：只能在右门监控看见他；他实际冲击左门，关闭左门防御。',
       transfer:'移交突变：不要点击他，也不要让鼠标停留在他身上。'
     };
     announce(tips[active]);
     if(active==='transfer')showTransfer();
-    if((active==='gu'&&frame.leftClosed)||(active==='chillo'&&frame.rightClosed)||(active==='tannin'&&(frame.leftClosed||frame.rightClosed)))finishAttack(true,'door-already-closed');
+    if((active==='gu'&&frame.leftClosed)||(active==='chillo'&&frame.leftClosed)||(active==='tannin'&&(frame.leftClosed||frame.rightClosed)))finishAttack(true,'door-already-closed');
     if(active==='noka')onCrank();
   }
   function showTransfer(){
@@ -236,7 +236,7 @@
     if(nokaAI>0&&nokaThreatTimer>0&&d.elevenEventActive&&(d.rightClosed||frame.rightClosed)){nokaThreatTimer=0;nokaMoveTick=0;nokaCam=13;crank=Math.max(1,crank);nokaLastTick=Date.now();renderCrank();renderSprites();announce('十一的异常期间，右门暂时挡住了诺卡');}
     if(fluxAtDoor&&(d.leftClosed||d.rightClosed||frame.leftClosed||frame.rightClosed)){fluxAtDoor=false;fluxThreat=0;fluxDelay=0;announce('闪流被门挡住，暂时退开');renderFlux();}
     const closedLeft=!!(d.leftClosed||frame.leftClosed), closedRight=!!(d.rightClosed||frame.rightClosed);
-    const doorDefense={gu:closedLeft,chillo:closedRight};
+    const doorDefense={gu:closedLeft,chillo:closedLeft};
     if(active && doorDefense[active])finishAttack(true,'shared-door-defense');
   }
   function onCrank(e){const d=e&&e.detail||{};crank=Math.max(0,Math.min(5,Number(d.value)||0));nokaThreatTimer=0;nokaMoveTick=0;nokaCam=13;nokaLastTick=Date.now();renderCrank();renderSprites();}
