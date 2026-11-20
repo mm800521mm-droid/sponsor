@@ -209,7 +209,7 @@
             else{a.bonusCam2=false;a.phase='door';a.deadline=Date.now()+pace(8000,a.id);renderDoorThreat(a);emit('rift:character-at-door',{characterId:'gu',side:'left'});}
           }else if(a.id==='chillo'){
             if(a.cam===6){a.cam=3;a.timer=pace(7,a.id);render(a);}
-            else{a.phase='door';a.deadline=Date.now()+pace(8000,a.id);emit('rift:character-at-door',{characterId:'chillo',side:'right',visualSide:'left'});}
+            else{a.phase='door';a.deadline=Date.now()+pace(8000,a.id);emit('rift:character-at-door',{characterId:'chillo',side:'right',visualSide:'right'});}
           }else if(a.id==='lobe'){
             a.phase='flash-window';a.deadline=Date.now()+5000;
             emit('rift:character-at-door',{characterId:'lobe',side:'cam10'});
