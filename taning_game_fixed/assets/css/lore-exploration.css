@@ -191,3 +191,93 @@
 /* Pre-shift map identity and 45-second handoff */
 .rift-map-topline .rift-current-location{font:12px "Noto Sans SC",sans-serif;color:#c5d8c5;letter-spacing:.1em;text-shadow:0 0 8px #8aaa8a55}
 .rift-countdown{color:#d1dfce;font-weight:bold}
+
+
+/* FNAF backstage scene palette: warm curtain, wood and low amber light */
+#rift-exploration{
+ background:radial-gradient(ellipse at 50% 36%,rgba(95,43,27,.22),transparent 52%),linear-gradient(110deg,#080706,#17100c 48%,#070605)!important;
+ color:#d7c3a6!important;
+ font-family:Georgia,"Noto Serif SC",serif!important;
+}
+#rift-exploration:before{
+ opacity:.16!important;
+ background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,220,180,.035) 4px)!important;
+}
+.rift-explore-shell{max-width:980px!important}
+.rift-map-frame{
+ border:1px solid #4b3424!important;
+ background:linear-gradient(180deg,rgba(22,14,10,.96),rgba(5,5,4,.98))!important;
+ box-shadow:0 18px 60px #000b,inset 0 0 50px #000!important;
+}
+.rift-map-topline{color:#a58a6b!important}
+.rift-walk-scene{
+ border:1px solid #38271b!important;
+ background:
+   linear-gradient(180deg,transparent 0 49%,rgba(0,0,0,.1) 49% 100%),
+   repeating-linear-gradient(90deg,#32140f 0 9%,#170a08 10% 13%,#2b110d 14% 23%,#120907 24% 27%)!important;
+ background-size:100% 100%!important;
+ box-shadow:inset 0 0 80px #000!important;
+}
+.rift-map-board:before{
+ content:"";position:absolute;left:0;right:0;top:49%;height:19%;
+ background:linear-gradient(180deg,#795638 0,#4b3422 12%,#24180f 82%,#0d0906 100%);
+ border-top:3px solid #9a7149;border-bottom:2px solid #5b3b24;
+ box-shadow:0 0 30px #a56b3522;
+ z-index:0;pointer-events:none;
+}
+.rift-map-board:after{
+ content:"";position:absolute;inset:0;
+ background:linear-gradient(90deg,rgba(0,0,0,.68),transparent 17% 83%,rgba(0,0,0,.68)),linear-gradient(180deg,rgba(0,0,0,.08),transparent 50%,rgba(0,0,0,.58));
+ z-index:0;pointer-events:none;
+}
+.rift-map-lines{z-index:1}
+.rift-map-lines path{
+ stroke:#806044!important;stroke-width:4!important;opacity:.78!important;
+ filter:drop-shadow(0 0 3px #a16f3a33);
+}
+.rift-map-nodes{z-index:2}
+.rift-map-node{
+ border:1px solid #60462f!important;
+ border-radius:1px!important;
+ background:linear-gradient(145deg,#21170f,#090807)!important;
+ color:#bba486!important;
+ box-shadow:0 3px 12px #000d,inset 0 0 12px #6b472322!important;
+ font-family:"Courier New",monospace!important;
+}
+.rift-map-node:hover,.rift-map-node.is-active{
+ border-color:#c09a68!important;
+ background:linear-gradient(145deg,#60452d,#21160e)!important;
+ color:#fff0d7!important;
+ box-shadow:0 0 16px #b17b4355,inset 0 0 13px #c18a4a33!important;
+}
+.rift-map-node.is-entry{
+ border-color:#d0a878!important;
+ background:linear-gradient(180deg,#705238,#2a1b11)!important;
+ color:#fff0d8!important;
+ box-shadow:0 0 18px #b17b4355,inset 0 0 15px #d29c5c44!important;
+}
+.rift-map-node.is-danger{
+ background:linear-gradient(#27100d,#0d0706)!important;
+ border-color:#6b3025!important;color:#bd6656!important;
+}
+.rift-room-view{
+ border-color:#4b3424!important;
+ background:linear-gradient(145deg,#17110c,#080706)!important;
+}
+.rift-room-heading{color:#e1c9a8!important}
+.rift-room-desc,.rift-empty-room{color:#ad987d!important}
+.rift-find-item{
+ background:linear-gradient(145deg,#24190f,#0d0a07)!important;
+ border-color:#60462f!important;color:#e2c9a5!important;
+}
+.rift-find-item:hover{background:#382617!important;border-color:#b28a5d!important}
+.rift-item-mark{border-color:#98734e!important;color:#d5b58a!important}
+.rift-countdown{color:#e0b57e!important}
+.rift-explore-actions button{
+ border-color:#8d6845!important;background:#17100b!important;color:#e7d2b1!important;
+}
+.rift-explore-actions .rift-map-return{background:#392719!important;border-color:#b18a5c!important}
+@media(max-width:600px){
+ .rift-map-board:before{height:16%}
+ .rift-map-node{font-size:11px}
+}
