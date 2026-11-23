@@ -131,3 +131,9 @@
 .rift-explore-scare.active{opacity:1;animation:riftScareFlash .85s steps(2,end)}
 .rift-scare-shape{width:58%;height:94%;background:radial-gradient(ellipse at 50% 34%,#4b1712 0 7%,#0b0706 23%,transparent 24%),linear-gradient(90deg,transparent 5%,#160b09 28%,#080505 50%,#160b09 72%,transparent 95%);clip-path:polygon(35% 0,65% 0,75% 20%,100% 43%,83% 100%,17% 100%,0 43%,25% 20%);filter:drop-shadow(0 0 20px #761a13)}
 @keyframes riftScareFlash{0%{opacity:0;transform:scale(.7)}15%,55%{opacity:1;transform:scale(1.18)}100%{opacity:0;transform:scale(1.5)}}
+
+.rift-room-caption{position:absolute;z-index:7;left:5%;right:5%;top:12%;padding:12px 15px;background:rgba(8,6,5,.82);border-left:2px solid #98704a;box-shadow:0 8px 24px #0009;pointer-events:none}
+.rift-room-caption[hidden]{display:none}
+.rift-room-caption b,.rift-room-caption span{display:block}
+.rift-room-caption b{font:16px "Noto Serif SC",serif;letter-spacing:.12em;color:#e0c7a4;margin-bottom:6px}
+.rift-room-caption span{font:12px/1.8 "Noto Serif SC",serif;color:#b6a18a}
