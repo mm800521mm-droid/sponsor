@@ -88,3 +88,31 @@
 .rift-collect-status{font:10px "Courier New",monospace;color:#8f7a63}
 #rift-exploration .rift-enter-office{display:none}
 @media(max-width:700px){.rift-walk-scene{height:38vh;min-height:240px}.rift-scene-hotspots{left:3%;right:3%;gap:5px}.rift-walk-action{padding:9px 10px;font-size:11px}.rift-corridor-doors{max-height:70px;overflow:auto}.rift-room-view{padding:12px}}
+
+.rift-explore-shell>header{display:none!important}
+.rift-room-view{display:none!important}
+.rift-walk-scene{height:clamp(360px,68vh,720px);position:relative;overflow:hidden;background:#080604;border:1px solid #38291d;touch-action:none;outline:none}
+.rift-walk-world{position:absolute;inset:0 auto 0 0;width:220%;height:100%;transition:transform .08s linear}
+.rift-world-art{position:absolute;inset:0;background:linear-gradient(#090806 0 53%,#20170f 54% 72%,#090706 73%);overflow:hidden}
+.rift-world-art:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 7%,rgba(0,0,0,.42) 7.2% 7.8%),radial-gradient(ellipse at 50% 30%,rgba(160,105,53,.18),transparent 48%)}
+.rift-world-backdrop{position:absolute;left:6%;right:6%;top:8%;height:52%;border:8px solid #24130f;background:repeating-linear-gradient(90deg,#37150f 0 9%,#160907 10% 14%);box-shadow:0 0 40px #000}
+.rift-world-stage{position:absolute;left:8%;right:8%;top:55%;height:13%;background:linear-gradient(#60442b,#160e08);border-top:5px solid #87633e}
+.rift-world-furniture{position:absolute;left:0;right:0;bottom:0;height:28%;background:repeating-linear-gradient(90deg,transparent 0 7%,#140e0a 7.5% 11%,transparent 11.5% 15%);border-top:2px solid #3d2a1b}
+.rift-world-name{position:absolute;left:3%;top:3%;font:18px Georgia,serif;letter-spacing:.25em;color:#a68c6a;opacity:.42}
+.rift-walk-player{position:absolute;z-index:5;left:12%;bottom:14%;width:4.2%;height:27%;min-width:24px;max-width:48px;transform:translateX(-50%);filter:drop-shadow(0 0 12px #000)}
+.rift-walk-player i{position:absolute;top:0;left:24%;width:52%;aspect-ratio:1;border-radius:48% 48% 42% 42%;background:linear-gradient(90deg,#090909,#39302a,#080808);border:1px solid #695b4b}
+.rift-walk-player b{position:absolute;top:34%;left:12%;width:76%;height:66%;border-radius:35% 35% 8% 8%;background:linear-gradient(90deg,#090909,#30251d,#080808);border:1px solid #554433}
+.rift-world-object,.rift-world-door{position:absolute;bottom:17%;transform:translateX(-50%);width:6%;height:25%;min-width:32px;background:transparent;border:0;cursor:pointer}
+.rift-world-object span{display:block;width:100%;height:70%;background:linear-gradient(90deg,#17100b,#59432d,#120c08);border:1px solid #796044;box-shadow:0 0 12px #000}
+.rift-world-object small{display:none}
+.rift-world-door{bottom:12%;height:50%;width:8%;border:4px solid #37271b;background:linear-gradient(90deg,#080604,#21170f,#080604)}
+.rift-walk-interact{position:absolute;z-index:8;left:50%;bottom:16%;transform:translateX(-50%);font:12px monospace;color:#d6b789;text-shadow:0 1px 5px #000;pointer-events:none;min-height:18px}
+.rift-walk-controls{position:absolute;z-index:10;left:14px;right:14px;bottom:14px;display:flex;justify-content:space-between;pointer-events:none}
+.rift-walk-controls button{pointer-events:auto;width:54px;height:48px;border:1px solid #71563a;background:#100c09cc;color:#d9c29f;font-size:18px;touch-action:none}
+.rift-walk-controls button:last-child{margin-left:auto;margin-right:10px;font-size:14px}
+.rift-walk-vignette{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 100px 35px #000}
+.rift-walk-scene[data-place="corridor"] .rift-world-backdrop{background:repeating-linear-gradient(90deg,#130e09 0 18%,#302216 18.5% 19%,#090705 19.5% 38%)}
+.rift-walk-scene[data-place="corridor"] .rift-world-stage{display:none}
+.rift-walk-scene[data-place="security"] .rift-world-backdrop{background:repeating-linear-gradient(90deg,#080807 0 17%,#3b3022 17.5% 18%,#0a0908 18.5% 36%)}
+@media(min-width:701px){.rift-walk-controls{opacity:.3}.rift-walk-controls:hover{opacity:1}}
+@media(max-width:700px){.rift-walk-scene{height:65vh;min-height:340px}.rift-walk-controls button{width:62px;height:58px}.rift-walk-player{width:7%}}
