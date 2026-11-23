@@ -71,11 +71,11 @@
   renderMap();bindWalkControls();renderWalkDoors();renderStatus();
  }
  const walkDoors=[
-  {id:'lobby',label:'后台入口',x:7,n:9},{id:'archive',label:'档案室',x:18,n:7},
-  {id:'promo',label:'宣传部',x:29,n:5},{id:'props',label:'道具仓库',x:40,n:4},
-  {id:'music',label:'音乐室',x:52,n:3},{id:'repair',label:'维修车间',x:64,n:6},
-  {id:'office',label:'主管办公室外',x:76,n:8},{id:'hall',label:'后台深处',x:87,n:10},
-  {id:'theater',label:'剧院大厅',x:95,n:11},{id:'security',label:'保安室',x:50,n:1,security:true}
+  {id:'lobby',label:'后台入口',x:4,n:9},{id:'archive',label:'档案室',x:14,n:7},
+  {id:'promo',label:'宣传部',x:24,n:5},{id:'props',label:'道具仓库',x:34,n:4},
+  {id:'music',label:'音乐室',x:42,n:3},{id:'repair',label:'维修车间',x:58,n:6},
+  {id:'office',label:'主管办公室外',x:68,n:8},{id:'hall',label:'后台深处',x:78,n:10},
+  {id:'theater',label:'剧院大厅',x:88,n:11},{id:'security',label:'保安室',x:98,n:1,security:true}
  ];
  function ensureTapeRooms(){if(save.tapeRooms&&typeof save.tapeRooms==='object'&&!Array.isArray(save.tapeRooms))return;const ids=['lobby','music','props','promo','repair','archive'];save.tapeRooms={};const picks=[...ids].sort(()=>Math.random()-.5).slice(0,3);['tape1','tape2','tape3'].forEach((id,i)=>save.tapeRooms[id]=picks[i]);write();}
  function beginShift(night,callback){read();ensure();ensureTapeRooms();if(preShiftTimer){clearInterval(preShiftTimer);preShiftTimer=null;}shiftNight=Number(night)||1;onEnter=callback;nightStarted=false;activeRoom=null;currentPlace='corridor';lastElapsed=0;playerX=50;moveLeft=false;moveRight=false;exploreThreat=null;threatX=100;threatNextAt=0;threatWarningAt=0;threatCooldown=0;threatGraceUntil=Infinity;threatScareUntil=0;preShiftDeadline=Date.now()+45000;overlay.classList.add('active');overlay.querySelector('.rift-route-modal').hidden=true;showPlace('corridor');updatePreShiftCountdown();preShiftTimer=window.setInterval(updatePreShiftCountdown,200);const scene=overlay.querySelector('.rift-walk-scene');if(scene)scene.focus();return true;}
