@@ -62,3 +62,29 @@
 .rift-eleven-overlap b{position:absolute;width:34%;height:52%;border-radius:48% 48% 40% 40%;background:rgba(220,220,220,.22);border:5px solid rgba(240,240,240,.65);box-shadow:0 0 55px 22px rgba(255,255,255,.2)}
 .rift-eleven-overlap i{position:absolute;width:10%;height:35%;top:4%;left:42%;border-radius:50% 50% 0 0;border:3px solid #eee;border-bottom:0;transform:rotate(-9deg);opacity:.7}
 @keyframes riftEggFlash{0%,100%{opacity:.85}50%{opacity:.25}}
+
+.rift-explore-layout,.rift-room-list{display:none!important}
+.rift-walk-scene{height:clamp(240px,38vh,420px);border:1px solid rgba(180,135,88,.3);background:#050403;overflow:hidden;position:relative;box-shadow:inset 0 0 90px #000}
+.rift-scene-backdrop{position:absolute;inset:0;background:linear-gradient(180deg,#080706,#17100b 58%,#030303);overflow:hidden}
+.rift-scene-backdrop:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 11%,rgba(0,0,0,.4) 11.2% 11.8%),linear-gradient(90deg,rgba(0,0,0,.8),transparent 20% 80%,rgba(0,0,0,.8))}
+.rift-scene-curtain{position:absolute;inset:0 12% 28%;background:repeating-linear-gradient(90deg,#2b100c 0 9%,#130907 10% 13%);clip-path:polygon(0 0,100% 0,88% 100%,12% 100%);opacity:.8}
+.rift-scene-stage{position:absolute;left:18%;right:18%;bottom:22%;height:20%;background:linear-gradient(#3a2b1d,#0c0907);border-top:3px solid #6b4a2e;box-shadow:0 -10px 30px #a36b3322}
+.rift-scene-seats{position:absolute;bottom:0;left:5%;right:5%;height:22%;background:repeating-linear-gradient(90deg,transparent 0 8%,#160f0c 8.5% 11%,transparent 11.5% 15%);border-top:1px solid #473323}
+.rift-scene-light{position:absolute;top:-12%;left:45%;width:22%;height:75%;background:radial-gradient(ellipse at 50% 0,rgba(218,167,95,.28),transparent 68%);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%)}
+.rift-scene-title{position:absolute;left:5%;top:8%;font-size:clamp(19px,3vw,30px);letter-spacing:.2em;color:#ddc7a6;text-shadow:0 2px 12px #000}
+.rift-scene-subtitle{position:absolute;left:5%;top:23%;font-size:12px;color:#a18b70;letter-spacing:.08em}
+.rift-scene-hotspots{position:absolute;left:5%;right:5%;bottom:7%;display:flex;gap:9px;flex-wrap:wrap;align-items:end}
+.rift-walk-action,.rift-walk-door{border:1px solid #806044;background:rgba(15,10,7,.9);color:#e0c8a5;padding:11px 15px;font:13px "Noto Serif SC",serif;cursor:pointer}
+.rift-walk-action.primary{background:#624126;border-color:#b28a5d}
+.rift-corridor-doors{display:flex;gap:6px;flex-wrap:wrap}
+.rift-walk-door{font-size:11px;padding:8px 10px}
+.rift-room-view{margin-top:12px;padding:14px 18px;min-height:110px}
+.rift-room-heading{font-size:18px}
+.rift-room-desc{margin:6px 0 10px;font-size:12px}
+.rift-room-items{display:flex;flex-wrap:wrap;gap:7px}
+.rift-room-items .rift-find-item{padding:8px 10px}
+.rift-explore-status{display:flex;flex-direction:column;gap:5px}
+.rift-countdown{font:13px "Courier New",monospace;color:#e0b57e}
+.rift-collect-status{font:10px "Courier New",monospace;color:#8f7a63}
+#rift-exploration .rift-enter-office{display:none}
+@media(max-width:700px){.rift-walk-scene{height:38vh;min-height:240px}.rift-scene-hotspots{left:3%;right:3%;gap:5px}.rift-walk-action{padding:9px 10px;font-size:11px}.rift-corridor-doors{max-height:70px;overflow:auto}.rift-room-view{padding:12px}}
