@@ -187,3 +187,7 @@
  .rift-explore-actions{gap:6px}
  .rift-explore-actions button{padding:8px 9px}
 }
+
+/* Pre-shift map identity and 45-second handoff */
+.rift-map-topline .rift-current-location{font:12px "Noto Sans SC",sans-serif;color:#c5d8c5;letter-spacing:.1em;text-shadow:0 0 8px #8aaa8a55}
+.rift-countdown{color:#d1dfce;font-weight:bold}
