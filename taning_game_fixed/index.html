@@ -1068,7 +1068,7 @@
   });
   // Developer-only test bridge. All overrides live in memory and never alter NIGHT_SETTINGS.
   window.RIFT_TEST_BRIDGE = {
-    unlockAllNights: () => { try { localStorage.setItem('riftAsh.highestNight','6'); highestNight=6; menuCont.classList.remove('disabled'); menuCont.innerText='继续（第 5 夜）'; menuCont.onclick=function(){ mainMenu.style.display='none'; gameEl.style.display='block'; initAudio(); startNight(5); }; menuNightSix.style.display='block'; menuCustomNight.style.display='block'; return true; } catch(e) { console.warn('Could not unlock nights:',e); return false; } },
+    unlockAllNights: () => { try { localStorage.setItem('riftAsh.highestNight','6'); highestNight=6; menuCont.classList.remove('disabled'); menuCont.innerText='继续（第 5 夜）'; menuCont.onclick=function(){ launchNightThroughBackstage(5); }; menuNightSix.style.display='block'; menuCustomNight.style.display='block'; return true; } catch(e) { console.warn('Could not unlock nights:',e); return false; } },
     triggerSpecialTime: id => {
       if(!S.running||!activeNightSettings||!Array.isArray(activeNightSettings.specialTimes))return false;
       const event=activeNightSettings.specialTimes.find(item=>item.id===id);
@@ -1390,17 +1390,45 @@
   btnReturnMenu.onclick = function() { location.reload(); };
   window.addEventListener('rift:return-to-menu', () => location.reload());
 
+  // One guarded entry path for Continue/New Game. A broken exploration overlay must never strand the player.
+  function launchNightThroughBackstage(night) {
+    let launched = false;
+    let fallbackTimer = null;
+    const launch = () => {
+      if (launched) return;
+      launched = true;
+      if (fallbackTimer) clearTimeout(fallbackTimer);
+      const exploration = document.getElementById('rift-exploration');
+      if (exploration) exploration.classList.remove('active');
+      mainMenu.style.display = 'none';
+      gameEl.style.display = 'block';
+      initAudio();
+      startNight(night);
+    };
+    if (window.RIFT_LORE_SYSTEM && typeof window.RIFT_LORE_SYSTEM.beginShift === 'function') {
+      try {
+        const started = window.RIFT_LORE_SYSTEM.beginShift(night, launch);
+        if (started !== false) {
+          // beginShift owns the 45-second countdown; this is only a last-resort deadlock guard.
+          fallbackTimer = window.setTimeout(launch, 47000);
+          return true;
+        }
+      } catch (error) {
+        console.error('[Rift Ash] Backstage entry failed; starting night directly:', error);
+      }
+    }
+    launch();
+    return true;
+  }
+
   if (highestNight > 1) {
     menuCont.classList.remove('disabled');
     const continueNight = Math.min(highestNight, 5);
     menuCont.innerText = `继续（第 ${continueNight} 夜）`;
-    menuCont.onclick = function() {
-      if(window.RIFT_LORE_SYSTEM){window.RIFT_LORE_SYSTEM.beginShift(continueNight,()=>{mainMenu.style.display='none';gameEl.style.display='block';initAudio();startNight(continueNight);});return;}
-      mainMenu.style.display = 'none'; gameEl.style.display = 'block'; initAudio(); startNight(continueNight);
-    };
+    menuCont.onclick = function() { launchNightThroughBackstage(continueNight); };
   }
 
-  menuNew.onclick = function() { if(window.RIFT_LORE_SYSTEM){window.RIFT_LORE_SYSTEM.beginShift(1,()=>{mainMenu.style.display='none';gameEl.style.display='block';initAudio();startNight(1);});return;} mainMenu.style.display = 'none'; gameEl.style.display = 'block'; initAudio(); startNight(1); };
+  menuNew.onclick = function() { launchNightThroughBackstage(1); };
 
   const menuNightSix = document.getElementById('menu-night-six');
   const menuCustomNight = document.getElementById('menu-custom-night');
