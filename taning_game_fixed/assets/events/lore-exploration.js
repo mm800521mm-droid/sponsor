@@ -41,7 +41,7 @@
  function read(){try{const v=JSON.parse(localStorage.getItem(SAVE)||'{}');save={...save,...v};}catch(_){} try{save.branch=localStorage.getItem(BRANCH)||save.branch||null;}catch(_){}}
  function write(){try{localStorage.setItem(SAVE,JSON.stringify(save));if(save.branch)localStorage.setItem(BRANCH,save.branch);}catch(_){}}
  function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
- let overlay,activeRoom=null,onEnter=null,shiftNight=1,currentPlace='theater',nightStarted=false,lastElapsed=0,playerX=12,moveLeft=false,moveRight=false,nearbyAction=null,walkFrame=0,exploreThreat=null,threatX=100,threatNextAt=0,threatWarningAt=0,threatCooldown=0,threatLastUpdate=0,threatGraceUntil=0,threatScareUntil=0,threatFacing=1;
+ let overlay,activeRoom=null,onEnter=null,shiftNight=1,currentPlace='corridor',nightStarted=false,lastElapsed=0,playerX=50,moveLeft=false,moveRight=false,nearbyAction=null,walkFrame=0,exploreThreat=null,threatX=100,threatNextAt=0,threatWarningAt=0,threatCooldown=0,threatLastUpdate=0,threatGraceUntil=0,threatScareUntil=0,threatFacing=1,preShiftDeadline=0,preShiftTimer=null;
  const mapNodes=[
   {n:1,id:'theater',label:'剧院大厅',x:50,y:84.5,kind:'place'},
   {n:2,id:'corridor',label:'后台走廊',x:50,y:44.8,kind:'place'},
@@ -61,15 +61,17 @@
  function ensure(){
   if(overlay)return;
   overlay=document.createElement('section');overlay.id='rift-exploration';
-  overlay.innerHTML='<div class="rift-explore-shell"><header><div class="rift-eyebrow">RIFT ASH · BACKSTAGE ACCESS</div><h1>裂隙余烬 / 后台总站</h1><p class="rift-explore-lead">选择地图上的编号区域进入。只有进入房间后，才会显示房间说明与可调查档案。</p></header><div class="rift-map-frame"><div class="rift-map-topline"><span>后台总站 · 区域结构图</span><span>MAP 01—14</span></div><div class="rift-walk-scene" data-place="theater" aria-label="后台区域地图"><div class="rift-map-board"><svg class="rift-map-lines" viewBox="0 0 400 390" preserveAspectRatio="none" aria-hidden="true"><g><path d="M200 330 V380 M200 330 H45 V230 H45 V95 H125 V55 H200 V55 H275 V95 H355 V230 H355 V330 H200 V175 M200 175 V55 M200 175 H105 V230 H105 V330 M200 175 H295 V230 H295 V330 M105 230 H45 M295 230 H355 M45 330 H105 M295 330 H355"/></g></svg><div class="rift-map-nodes"></div></div></div><main class="rift-room-view"><div class="rift-room-heading">剧院大厅</div><div class="rift-room-desc">选择地图上的区域开始探索。</div><div class="rift-room-items"></div></main><footer><div class="rift-explore-status"><span class="rift-countdown">夜班倒计时：等待开始</span><span class="rift-collect-status"></span></div><div class="rift-explore-actions"><button class="rift-codex-open">档案 / 分 P</button><button class="rift-map-return" type="button">返回地图</button></div></footer></div><div class="rift-modal" hidden></div>';
+  overlay.innerHTML='<div class="rift-explore-shell"><header><div class="rift-eyebrow">RIFT ASH · BACKSTAGE ACCESS</div><h1>裂隙余烬 / 后台总站</h1><p class="rift-explore-lead">选择地图上的编号区域进入。只有进入房间后，才会显示房间说明与可调查档案。</p></header><div class="rift-map-frame"><div class="rift-map-topline"><span class="rift-current-location">后台走廊</span><span>MAP 01—14</span></div><div class="rift-walk-scene" data-place="theater" aria-label="后台区域地图"><div class="rift-map-board"><svg class="rift-map-lines" viewBox="0 0 400 390" preserveAspectRatio="none" aria-hidden="true"><g><path d="M200 330 V380 M200 330 H45 V230 H45 V95 H125 V55 H200 V55 H275 V95 H355 V230 H355 V330 H200 V175 M200 175 V55 M200 175 H105 V230 H105 V330 M200 175 H295 V230 H295 V330 M105 230 H45 M295 230 H355 M45 330 H105 M295 330 H355"/></g></svg><div class="rift-map-nodes"></div></div></div><main class="rift-room-view"><div class="rift-room-heading">剧院大厅</div><div class="rift-room-desc">选择地图上的区域开始探索。</div><div class="rift-room-items"></div></main><footer><div class="rift-explore-status"><span class="rift-countdown">夜班倒计时：等待开始</span><span class="rift-collect-status"></span></div><div class="rift-explore-actions"><button class="rift-codex-open">档案 / 分 P</button><button class="rift-map-return" type="button">返回地图</button></div></footer></div><div class="rift-modal" hidden></div>';
   document.body.appendChild(overlay);
   overlay.querySelector('.rift-codex-open').addEventListener('click',showCodex);
-  overlay.querySelector('.rift-map-return').addEventListener('click',()=>showPlace('theater'));
+  overlay.querySelector('.rift-map-return').addEventListener('click',()=>showPlace('corridor'));
   overlay.querySelector('.rift-modal').addEventListener('click',e=>{if(e.target.classList.contains('rift-modal'))e.currentTarget.hidden=true;});
   renderMap();
  }
  function ensureTapeRooms(){if(Array.isArray(save.tapeRooms))return;const ids=['lobby','music','props','promo','repair','archive'];save.tapeRooms={};const picks=[...ids].sort(()=>Math.random()-.5).slice(0,3);['tape1','tape2','tape3'].forEach((id,i)=>save.tapeRooms[id]=picks[i]);write();}
- function beginShift(night,callback){read();ensure();ensureTapeRooms();shiftNight=night;onEnter=callback;nightStarted=false;activeRoom=null;currentPlace='theater';lastElapsed=0;playerX=12;exploreThreat=null;threatX=100;threatNextAt=0;threatWarningAt=0;threatCooldown=0;threatGraceUntil=performance.now()+45000;threatScareUntil=0;overlay.classList.add('active');showPlace('theater');if(!nightStarted){nightStarted=true;const cb=onEnter;onEnter=null;if(cb)cb();}return true;}
+ function beginShift(night,callback){read();ensure();ensureTapeRooms();if(preShiftTimer){clearInterval(preShiftTimer);preShiftTimer=null;}shiftNight=night;onEnter=callback;nightStarted=false;activeRoom=null;currentPlace='corridor';lastElapsed=0;playerX=50;exploreThreat=null;threatX=100;threatNextAt=0;threatWarningAt=0;threatCooldown=0;threatGraceUntil=Infinity;threatScareUntil=0;preShiftDeadline=Date.now()+45000;overlay.classList.add('active');showPlace('corridor');updatePreShiftCountdown();preShiftTimer=window.setInterval(updatePreShiftCountdown,200);return true;}
+ function updatePreShiftCountdown(){if(!overlay||!overlay.classList.contains('active')||nightStarted)return;const remain=Math.max(0,Math.ceil((preShiftDeadline-Date.now())/1000));const clock=overlay.querySelector('.rift-countdown');if(clock)clock.textContent='进入保安室倒计时：00:'+String(remain).padStart(2,'0');if(remain<=0)enterSecurity();}
+ function enterSecurity(){if(nightStarted)return;nightStarted=true;if(preShiftTimer){clearInterval(preShiftTimer);preShiftTimer=null;}const clock=overlay&&overlay.querySelector('.rift-countdown');if(clock)clock.textContent='正在进入保安室…';if(overlay)overlay.classList.remove('active');const cb=onEnter;onEnter=null;if(typeof cb==='function')cb();}
  function renderMap(){
   const host=overlay.querySelector('.rift-map-nodes');if(!host)return;
   host.innerHTML=mapNodes.map(p=>'<button type="button" class="rift-map-node '+(p.n===1?'is-entry':'')+(p.n===14?' is-danger':'')+(p.kind==='locked'?' is-locked':'')+'" data-map-node="'+p.n+'" style="left:'+p.x+'%;top:'+p.y+'%" aria-label="'+p.n+' '+esc(p.label)+'"><span>'+p.n+'</span></button>').join('');
@@ -77,8 +79,9 @@
  }
  function updateMapSelection(n){overlay.querySelectorAll('.rift-map-node').forEach(b=>b.classList.toggle('is-active',Number(b.dataset.mapNode)===n));}
  function showPlace(place){
-  currentPlace=place;activeRoom=null;const p=mapNodes.find(x=>x.id===place);updateMapSelection(p?p.n:1);
+  currentPlace=place;activeRoom=null;const p=mapNodes.find(x=>x.id===place);updateMapSelection(p?p.n:2);
   const title=place==='theater'?'剧院大厅':place==='corridor'?'后台走廊':'保安室';
+  const locationLabel=overlay.querySelector('.rift-current-location');if(locationLabel)locationLabel.textContent=title;
   const desc=place==='theater'?'舞台上落满灰尘。旧海报与合照记录着剧团曾经的模样。':place==='corridor'?'后台的主通道连接各个工作区域。选择周围的编号房间进入调查。':'监控室位于后台总站上层。夜班岗位入口在这里。';
   overlay.querySelector('.rift-room-heading').textContent=title;
   overlay.querySelector('.rift-room-desc').textContent=desc;
@@ -93,6 +96,7 @@
  function selectRoom(id){
   const r=rooms.find(x=>x.id===id);if(!r)return;
   activeRoom=id;currentPlace='room';const p=mapNodes.find(x=>x.id===id);updateMapSelection(p?p.n:0);
+  const locationLabel=overlay.querySelector('.rift-current-location');if(locationLabel)locationLabel.textContent=r.name;
   overlay.querySelector('.rift-room-heading').textContent=r.name;
   overlay.querySelector('.rift-room-desc').textContent=r.desc;
   const ids=r.items.filter(item=>item.startsWith('fragment')||entries[item]||item==='photo');renderRoomItems(ids);
@@ -108,6 +112,7 @@
    updateMapSelection(n);overlay.querySelector('.rift-map-return').style.display='inline-block';return;
   }
   if(p.kind==='room'){selectRoom(p.id);return;}
+  if(p.id==='security'){showPlace('security');enterSecurity();return;}
   showPlace(p.id);
  }
  function interact(){}
