@@ -51,3 +51,5 @@
 @media(max-width:700px){.rift-explore-shell{padding:22px 14px}.rift-explore-layout{grid-template-columns:1fr}.rift-room-list{grid-template-columns:repeat(2,1fr)}.rift-room-view{padding:18px;min-height:260px}.rift-explore-shell footer{align-items:flex-start;flex-direction:column}.rift-explore-actions{width:100%}.rift-explore-actions button{flex:1;padding:11px 8px}.rift-ending-inner p{font-size:13px;line-height:1.9}}
 
 #rift-branch-choice{position:fixed;inset:0;z-index:100080}
+
+.scene-cam14.rift-last-room-active::after{display:none!important}
