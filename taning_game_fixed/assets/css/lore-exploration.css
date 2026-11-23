@@ -116,3 +116,18 @@
 .rift-walk-scene[data-place="security"] .rift-world-backdrop{background:repeating-linear-gradient(90deg,#080807 0 17%,#3b3022 17.5% 18%,#0a0908 18.5% 36%)}
 @media(min-width:701px){.rift-walk-controls{opacity:.3}.rift-walk-controls:hover{opacity:1}}
 @media(max-width:700px){.rift-walk-scene{height:65vh;min-height:340px}.rift-walk-controls button{width:62px;height:58px}.rift-walk-player{width:7%}}
+
+.rift-explore-threat{position:absolute;z-index:6;bottom:13%;width:8%;height:46%;min-width:42px;max-width:90px;opacity:0;pointer-events:none;transition:left 3.6s ease,opacity .8s;filter:drop-shadow(0 0 13px rgba(100,0,0,.35))}
+.rift-threat-silhouette{position:absolute;inset:0;background:linear-gradient(90deg,#050404,#18100e 45%,#050404);clip-path:polygon(35% 0,65% 0,76% 17%,100% 32%,83% 40%,88% 100%,12% 100%,17% 40%,0 32%,24% 17%);border:1px solid #2a1714}
+.rift-threat-silhouette i{position:absolute;left:25%;top:10%;width:50%;height:24%;border-radius:45%;background:#080505;box-shadow:inset 0 0 10px #310909}
+.rift-threat-silhouette i:after{content:"";position:absolute;left:20%;right:20%;top:48%;height:2px;background:#5b1512;box-shadow:0 0 5px #8c1d19}
+.rift-threat-silhouette b{position:absolute;left:12%;right:12%;top:36%;height:60%;background:linear-gradient(90deg,#080605,#211310,#080605);clip-path:polygon(20% 0,80% 0,100% 100%,0 100%)}
+.rift-explore-threat.approaching{animation:riftThreatFlicker 1.4s steps(2,end) infinite}
+@keyframes riftThreatFlicker{0%,80%,100%{filter:brightness(.5)}85%{filter:brightness(1.35)}}
+.rift-threat-warning{position:absolute;z-index:9;top:5%;right:4%;color:#a52b25;font:10px monospace;letter-spacing:.18em;opacity:0;pointer-events:none;text-shadow:0 0 5px #6a100d}
+.rift-threat-warning.visible{opacity:.46;animation:riftWarningPulse 2.8s ease-in-out infinite}
+@keyframes riftWarningPulse{0%,100%{opacity:.18}50%{opacity:.5}}
+.rift-explore-scare{position:absolute;z-index:20;inset:0;background:#050303;opacity:0;pointer-events:none;display:grid;place-items:center}
+.rift-explore-scare.active{opacity:1;animation:riftScareFlash .85s steps(2,end)}
+.rift-scare-shape{width:58%;height:94%;background:radial-gradient(ellipse at 50% 34%,#4b1712 0 7%,#0b0706 23%,transparent 24%),linear-gradient(90deg,transparent 5%,#160b09 28%,#080505 50%,#160b09 72%,transparent 95%);clip-path:polygon(35% 0,65% 0,75% 20%,100% 43%,83% 100%,17% 100%,0 43%,25% 20%);filter:drop-shadow(0 0 20px #761a13)}
+@keyframes riftScareFlash{0%{opacity:0;transform:scale(.7)}15%,55%{opacity:1;transform:scale(1.18)}100%{opacity:0;transform:scale(1.5)}}
