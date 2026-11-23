@@ -49,3 +49,5 @@
 .rift-feed-label{position:absolute;top:7%;left:6%;font:11px "Courier New",monospace;color:#9a866b;letter-spacing:.2em}
 .rift-lock-hotspot{position:absolute;top:68%;padding:10px 18px;background:#17110dcc;border:1px solid #92704a;color:#d8c19e;cursor:pointer;font:12px "Courier New",monospace}
 @media(max-width:700px){.rift-explore-shell{padding:22px 14px}.rift-explore-layout{grid-template-columns:1fr}.rift-room-list{grid-template-columns:repeat(2,1fr)}.rift-room-view{padding:18px;min-height:260px}.rift-explore-shell footer{align-items:flex-start;flex-direction:column}.rift-explore-actions{width:100%}.rift-explore-actions button{flex:1;padding:11px 8px}.rift-ending-inner p{font-size:13px;line-height:1.9}}
+
+#rift-branch-choice{position:fixed;inset:0;z-index:100080}
