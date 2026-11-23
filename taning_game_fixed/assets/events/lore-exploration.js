@@ -41,7 +41,7 @@
  function read(){try{const v=JSON.parse(localStorage.getItem(SAVE)||'{}');save={...save,...v};}catch(_){} try{save.branch=localStorage.getItem(BRANCH)||save.branch||null;}catch(_){}}
  function write(){try{localStorage.setItem(SAVE,JSON.stringify(save));if(save.branch)localStorage.setItem(BRANCH,save.branch);}catch(_){}}
  function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
- let overlay,activeRoom=null,onEnter=null,shiftNight=1,currentPlace='corridor',nightStarted=false,lastElapsed=0,playerX=50,moveLeft=false,moveRight=false,nearbyAction=null,walkFrame=0,exploreThreat=null,threatX=100,threatNextAt=0,threatWarningAt=0,threatCooldown=0,threatLastUpdate=0,threatGraceUntil=0,threatScareUntil=0,threatFacing=1,preShiftDeadline=0,preShiftTimer=null;
+ let overlay,activeRoom=null,onEnter=null,shiftNight=1,currentPlace='corridor',currentMapNode=2,nightStarted=false,lastElapsed=0,playerX=50,moveLeft=false,moveRight=false,nearbyAction=null,walkFrame=0,exploreThreat=null,threatX=100,threatNextAt=0,threatWarningAt=0,threatCooldown=0,threatLastUpdate=0,threatGraceUntil=0,threatScareUntil=0,threatFacing=1,preShiftDeadline=0,preShiftTimer=null;
  const mapNodes=[
   {n:1,id:'security',label:'保安室',x:50,y:84.5,kind:'place'},
   {n:2,id:'corridor',label:'后台走廊',x:50,y:44.8,kind:'place'},
@@ -78,7 +78,7 @@
   {id:'theater',label:'剧院大厅',x:88,n:11},{id:'security',label:'保安室',x:98,n:1,security:true}
  ];
  function ensureTapeRooms(){if(save.tapeRooms&&typeof save.tapeRooms==='object'&&!Array.isArray(save.tapeRooms))return;const ids=['lobby','music','props','promo','repair','archive'];save.tapeRooms={};const picks=[...ids].sort(()=>Math.random()-.5).slice(0,3);['tape1','tape2','tape3'].forEach((id,i)=>save.tapeRooms[id]=picks[i]);write();}
- function beginShift(night,callback){read();ensure();ensureTapeRooms();if(preShiftTimer){clearInterval(preShiftTimer);preShiftTimer=null;}shiftNight=Number(night)||1;onEnter=callback;nightStarted=false;activeRoom=null;currentPlace='corridor';lastElapsed=0;playerX=50;moveLeft=false;moveRight=false;exploreThreat=null;threatX=100;threatNextAt=0;threatWarningAt=0;threatCooldown=0;threatGraceUntil=Infinity;threatScareUntil=0;preShiftDeadline=Date.now()+45000;overlay.classList.add('active');overlay.querySelector('.rift-route-modal').hidden=true;showPlace('corridor');updatePreShiftCountdown();preShiftTimer=window.setInterval(updatePreShiftCountdown,200);const scene=overlay.querySelector('.rift-walk-scene');if(scene)scene.focus();return true;}
+ function beginShift(night,callback){read();ensure();ensureTapeRooms();if(preShiftTimer){clearInterval(preShiftTimer);preShiftTimer=null;}shiftNight=Number(night)||1;onEnter=callback;nightStarted=false;activeRoom=null;currentPlace='corridor';currentMapNode=2;lastElapsed=0;playerX=50;moveLeft=false;moveRight=false;exploreThreat=null;threatX=100;threatNextAt=0;threatWarningAt=0;threatCooldown=0;threatGraceUntil=Infinity;threatScareUntil=0;preShiftDeadline=Date.now()+45000;overlay.classList.add('active');overlay.querySelector('.rift-route-modal').hidden=true;showPlace('corridor');updatePreShiftCountdown();preShiftTimer=window.setInterval(updatePreShiftCountdown,200);const scene=overlay.querySelector('.rift-walk-scene');if(scene)scene.focus();return true;}
  function updatePreShiftCountdown(){if(!overlay||!overlay.classList.contains('active')||nightStarted)return;const remain=Math.max(0,Math.ceil((preShiftDeadline-Date.now())/1000));const clock=overlay.querySelector('.rift-countdown');if(clock)clock.textContent='进入保安室倒计时：00:'+String(remain).padStart(2,'0');if(remain<=0)enterSecurity();}
  function enterSecurity(){if(nightStarted)return;nightStarted=true;if(preShiftTimer){clearInterval(preShiftTimer);preShiftTimer=null;}const clock=overlay&&overlay.querySelector('.rift-countdown');if(clock)clock.textContent='正在进入保安室…';if(overlay)overlay.classList.remove('active');const cb=onEnter;onEnter=null;if(typeof cb==='function')cb();}
  function renderMap(){
@@ -169,10 +169,13 @@
   const player=overlay.querySelector('.rift-walk-player');if(player)player.style.display='none';
   const hint=overlay.querySelector('.rift-walk-interact');if(hint)hint.textContent='已进入'+r.name+' · 按 E 或点击“返回走廊”离开';
  }
- function leaveRoom(){if(!activeRoom)return;activeRoom=null;currentPlace='corridor';showPlace('corridor');}
+ function leaveRoom(){if(!activeRoom)return;activeRoom=null;currentMapNode=2;currentPlace='corridor';showPlace('corridor');}
  function openMapNode(n){
   const p=mapNodes.find(x=>x.n===n);if(!p||nightStarted)return;
+  const links={1:[2,7,8,14],2:[1,3,4,11],3:[2,6,8],4:[2,5,7],5:[4,7,12],6:[3,8,13],7:[1,4,5],8:[1,3,6],9:[11,12],10:[11,13],11:[2,9,10],12:[5,9],13:[6,10],14:[1]};
+  if(n!==currentMapNode&&!(links[currentMapNode]||[]).includes(n)){const hint=overlay.querySelector('.rift-map-instructions');if(hint)hint.textContent='路线未连接：请先进入与当前位置相连的房间。';return;}
   if(p.kind==='locked'){const hint=overlay.querySelector('.rift-map-instructions');if(hint)hint.textContent=p.label+'：目前封锁，暂不可进入。';return;}
+  currentMapNode=n;
   if(p.id==='security'){showPlace('security');enterSecurity();return;}
   if(p.id==='corridor'){activeRoom=null;showPlace('corridor');return;}
   if(p.id==='theater'){showPlace('theater');return;}
