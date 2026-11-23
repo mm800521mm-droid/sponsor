@@ -11,7 +11,7 @@
   root.classList.remove('show','rift-clock-flip','rift-night-clear');clock.textContent='7 AM';sub.textContent='';
   void root.offsetWidth;root.classList.add('show','rift-clock-flip');await wait(1050);
   clock.textContent='8 AM';root.classList.add('rift-night-clear');sub.textContent='NIGHT '+night+' COMPLETE';await wait(2300);
-  if(next>MAX||typeof startNight!=='function'){sub.textContent='ALL AVAILABLE NIGHTS COMPLETE';await wait(2600);root.classList.remove('show','rift-clock-flip','rift-night-clear');window.dispatchEvent(new CustomEvent('rift:return-to-menu'));return;}
+  if(next>MAX||typeof startNight!=='function'){root.classList.remove('show','rift-clock-flip','rift-night-clear');if(window.RIFT_LORE_SYSTEM&&typeof window.RIFT_LORE_SYSTEM.showEnding==='function'){await window.RIFT_LORE_SYSTEM.showEnding();}else{sub.textContent='ALL AVAILABLE NIGHTS COMPLETE';await wait(2600);}window.dispatchEvent(new CustomEvent('rift:return-to-menu'));return;}
   root.classList.remove('show','rift-clock-flip','rift-night-clear');
   let card=document.getElementById('rift-next-night-card');
   if(!card){card=document.createElement('div');card.id='rift-next-night-card';card.innerHTML='<div class="rift-next-night-kicker">SHIFT CONTINUES</div><div class="rift-next-night-number"></div>';document.body.appendChild(card);}
@@ -23,7 +23,7 @@
    message.classList.remove('active');void message.offsetWidth;message.classList.add('active');
    await wait(4200);message.classList.remove('active');await wait(250);
   }
-  startNight(next);
+  if(next<6&&window.RIFT_LORE_SYSTEM){window.RIFT_LORE_SYSTEM.beginShift(next,()=>startNight(next));}else{startNight(next);}
  }
  window.RIFT_NIGHT_TRANSITIONS=Object.freeze({getHighestNight,completeNight});
 })();
