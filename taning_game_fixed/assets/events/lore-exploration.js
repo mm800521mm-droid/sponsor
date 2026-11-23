@@ -107,7 +107,7 @@
  }
  function movePlayer(){
   if(currentPlace!=='corridor'||activeRoom||(!moveLeft&&!moveRight))return;
-  const step=1.15;
+  const step=0.55;
   if(moveLeft)playerX=Math.max(3,playerX-step);
   if(moveRight)playerX=Math.min(97,playerX+step);
   paintPlayer();
