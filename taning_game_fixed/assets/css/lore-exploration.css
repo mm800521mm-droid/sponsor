@@ -53,3 +53,12 @@
 #rift-branch-choice{position:fixed;inset:0;z-index:100080}
 
 .scene-cam14.rift-last-room-active::after{display:none!important}
+
+.rift-monitor-easter-egg{position:absolute;inset:0;z-index:18;pointer-events:none;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);animation:riftEggFlash .12s steps(2,end) infinite}
+.rift-monitor-easter-egg.rift-kids-look{gap:7%;background:rgba(0,0,0,.68);filter:grayscale(1)}
+.rift-kids-look i{display:block;position:relative;width:7%;height:28%;margin-top:12%;background:#050505;border-radius:45% 45% 12% 12%;box-shadow:0 0 10px #ddd}
+.rift-kids-look i:before{content:"";position:absolute;left:5%;top:-38%;width:90%;aspect-ratio:1;border-radius:50%;background:#050505;box-shadow:inset 5px 0 0 rgba(255,255,255,.12)}
+.rift-monitor-easter-egg.rift-eleven-overlap{background:rgba(0,0,0,.72);filter:grayscale(1) contrast(1.8)}
+.rift-eleven-overlap b{position:absolute;width:34%;height:52%;border-radius:48% 48% 40% 40%;background:rgba(220,220,220,.22);border:5px solid rgba(240,240,240,.65);box-shadow:0 0 55px 22px rgba(255,255,255,.2)}
+.rift-eleven-overlap i{position:absolute;width:10%;height:35%;top:4%;left:42%;border-radius:50% 50% 0 0;border:3px solid #eee;border-bottom:0;transform:rotate(-9deg);opacity:.7}
+@keyframes riftEggFlash{0%,100%{opacity:.85}50%{opacity:.25}}
