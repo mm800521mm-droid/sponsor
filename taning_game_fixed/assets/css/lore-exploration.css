@@ -1,0 +1,51 @@
+#rift-exploration{position:fixed;inset:0;z-index:100050;display:none;overflow:auto;background:radial-gradient(ellipse at 50% 18%,rgba(89,48,30,.24),transparent 48%),linear-gradient(135deg,#090807,#17110e 55%,#050505);color:#d7c5aa;font-family:Georgia,"Noto Serif SC",serif}
+#rift-exploration.active{display:block}
+#rift-exploration:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.2;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.035) 4px)}
+.rift-explore-shell{position:relative;max-width:1120px;margin:0 auto;padding:34px 28px 28px;min-height:100%;display:flex;flex-direction:column}
+.rift-eyebrow{font:11px/1.4 "Courier New",monospace;letter-spacing:.24em;color:#a77d54}
+.rift-explore-shell header h1{font-size:clamp(28px,4vw,46px);font-weight:400;letter-spacing:.12em;margin:10px 0}
+.rift-explore-lead{color:#958675;font-size:14px;line-height:1.8;margin:0 0 22px}
+.rift-explore-layout{display:grid;grid-template-columns:minmax(210px,280px) 1fr;gap:20px;flex:1;min-height:390px}
+.rift-room-list,.rift-room-view{border:1px solid rgba(173,132,91,.24);background:rgba(0,0,0,.42);box-shadow:0 15px 40px #0008}
+.rift-room-list{padding:12px;display:grid;grid-template-columns:1fr 1fr;align-content:start;gap:7px}
+.rift-room-list button{border:1px solid transparent;background:rgba(92,66,45,.16);color:#b9a58a;text-align:left;padding:11px 9px;cursor:pointer;font:13px "Noto Serif SC",serif}
+.rift-room-list button span{display:block;color:#755b43;font:10px "Courier New",monospace;margin-bottom:5px}
+.rift-room-list button.active,.rift-room-list button:hover{border-color:#8f6946;background:rgba(135,88,52,.25);color:#f0ddbd}
+.rift-room-view{padding:26px;min-width:0}
+.rift-room-heading{font-size:25px;letter-spacing:.1em;color:#e2ceb0}
+.rift-room-desc{margin:12px 0 26px;color:#9e8e7b;line-height:1.9;font-size:14px}
+.rift-room-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.rift-find-item{display:flex;align-items:center;gap:12px;text-align:left;background:rgba(108,76,48,.17);border:1px solid rgba(166,124,77,.34);padding:13px;color:#e0c9a8;cursor:pointer}
+.rift-find-item:hover{background:rgba(131,91,55,.32);border-color:#a87a4e}
+.rift-find-item.found{opacity:.65}
+.rift-item-mark{width:30px;height:30px;display:grid;place-items:center;border:1px solid #8a6748;border-radius:50%;font:16px Georgia;color:#d1ad7e}
+.rift-find-item b,.rift-find-item small{display:block}.rift-find-item b{font-size:13px;font-weight:400}.rift-find-item small{margin-top:5px;color:#897764;font-size:11px}
+.rift-empty-room{color:#75695c;font-size:13px;padding:15px}
+.rift-explore-shell footer{display:flex;justify-content:space-between;align-items:center;gap:15px;padding-top:20px}
+.rift-explore-status{font:11px "Courier New",monospace;color:#8f7a63}
+.rift-explore-actions{display:flex;gap:10px}
+.rift-explore-actions button,.rift-document button,.rift-codex button,.rift-ending-inner button{padding:12px 20px;border:1px solid #9b774f;background:#17110d;color:#e7d2b1;cursor:pointer;font:13px "Noto Serif SC",serif;letter-spacing:.08em}
+.rift-explore-actions .rift-enter-office{background:#65442b;border-color:#b18a5c}
+.rift-modal{position:fixed;inset:0;z-index:3;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.82)}
+.rift-modal[hidden]{display:none}
+.rift-document,.rift-codex{width:min(650px,94vw);max-height:86vh;overflow:auto;padding:30px;background:linear-gradient(145deg,#211812,#090807);border:1px solid #76563a;box-shadow:0 20px 90px #000}
+.rift-document h2,.rift-codex h2{font-size:25px;font-weight:400;color:#e5d2b5;margin:12px 0 20px}
+.rift-document p,.rift-codex p{font-size:14px;line-height:2;color:#b7a58e;white-space:pre-line}
+.rift-document small{display:block;color:#907657;line-height:1.8;margin-top:16px}
+.rift-choice-stack{display:grid;gap:10px;margin:20px 0}
+.rift-choice-stack button{width:100%;text-align:left}
+.rift-codex-tabs{display:grid;gap:8px;margin:20px 0;padding:14px;border:1px solid #654b34;color:#c8ad8c;font-size:13px}
+.rift-codex h3{font-size:15px;font-weight:400;color:#c5a77f;border-bottom:1px solid #59412e;padding-bottom:8px;margin-top:25px}
+.rift-codex article{padding:12px 0;border-bottom:1px solid #3d2d20}
+.rift-codex article small,.rift-codex article b{display:block}.rift-codex article small{color:#876a4b;font-size:10px}.rift-codex article b{font-size:14px;color:#d8c3a2;margin-top:4px;font-weight:400}.rift-codex article p{margin:6px 0}
+#rift-story-ending{position:fixed;inset:0;z-index:100060;background:#000;color:#d9d1c7;display:grid;place-items:center;padding:28px}
+.rift-ending-inner{width:min(760px,92vw);text-align:center}
+.rift-ending-inner h1{font-size:clamp(25px,4vw,40px);font-weight:400;letter-spacing:.12em;margin:25px 0}
+.rift-ending-inner p{font-size:15px;line-height:2.2;color:#b8b0a6;text-align:left}
+.rift-ending-inner button{margin-top:25px}
+.rift-last-room-feed{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 55%,#33271b,#070707 72%);display:grid;place-items:center;overflow:hidden}
+.rift-feed-door{position:absolute;width:34%;height:82%;top:8%;background:linear-gradient(90deg,#17120e,#4a3928 45%,#100c09);border:5px solid #241b13;box-shadow:0 0 30px #000}
+.rift-feed-lock{position:absolute;width:28px;height:48px;top:47%;left:calc(50% + 12%);border:4px solid #8d7657;background:#30261b;box-shadow:0 0 12px #a27b4c}
+.rift-feed-label{position:absolute;top:7%;left:6%;font:11px "Courier New",monospace;color:#9a866b;letter-spacing:.2em}
+.rift-lock-hotspot{position:absolute;top:68%;padding:10px 18px;background:#17110dcc;border:1px solid #92704a;color:#d8c19e;cursor:pointer;font:12px "Courier New",monospace}
+@media(max-width:700px){.rift-explore-shell{padding:22px 14px}.rift-explore-layout{grid-template-columns:1fr}.rift-room-list{grid-template-columns:repeat(2,1fr)}.rift-room-view{padding:18px;min-height:260px}.rift-explore-shell footer{align-items:flex-start;flex-direction:column}.rift-explore-actions{width:100%}.rift-explore-actions button{flex:1;padding:11px 8px}.rift-ending-inner p{font-size:13px;line-height:1.9}}
