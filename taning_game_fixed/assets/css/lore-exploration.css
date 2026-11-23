@@ -281,3 +281,71 @@
  .rift-map-board:before{height:16%}
  .rift-map-node{font-size:11px}
 }
+
+
+/* Walkable FNAF backstage mode — replaces the overhead map as the primary play view */
+#rift-exploration{background:radial-gradient(ellipse at 50% 30%,#24120d 0, #0b0806 58%,#030303 100%)!important;color:#d9c4a4!important}
+#rift-exploration .rift-explore-shell{max-width:1120px!important;min-height:100%;justify-content:center;gap:12px;padding:clamp(12px,3vh,28px) clamp(10px,3vw,30px)!important}
+#rift-exploration .rift-stage-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+#rift-exploration .rift-current-location{font:clamp(18px,2.3vw,27px) "Noto Serif SC",serif;color:#e2c9a6;letter-spacing:.14em;margin-top:6px}
+#rift-exploration .rift-stage-top-actions{display:flex;gap:8px}
+#rift-exploration .rift-stage-top-actions button,#rift-exploration .rift-route-head button{border:1px solid #715238;background:#130d09;color:#d9c3a1;padding:9px 13px;cursor:pointer;font:12px "Noto Serif SC",serif}
+#rift-exploration .rift-map-frame{width:100%;max-width:1040px;margin:0 auto;padding:0;border:1px solid #46301f;background:#050403;box-shadow:0 15px 50px #000d}
+#rift-exploration .rift-map-topline{height:34px;padding:8px 14px;color:#b79a75;border-bottom:1px solid #39281c}
+#rift-exploration .rift-scene-hint{font:11px "Noto Serif SC",serif;color:#8d7961;letter-spacing:.04em}
+#rift-exploration .rift-walk-scene{height:clamp(330px,62vh,650px)!important;min-height:330px!important;aspect-ratio:auto!important;max-width:none!important;width:100%!important;margin:0!important;border:0!important;background:#080604!important;overflow:hidden;position:relative}
+#rift-exploration .rift-scene-backdrop{position:absolute;inset:0;background:linear-gradient(180deg,#090706 0 8%,#160b08 9% 62%,#0a0806 63% 100%)}
+#rift-exploration .rift-scene-curtain{inset:0 9% 30%;opacity:.94;background:repeating-linear-gradient(90deg,#35150f 0 11%,#160907 11.5% 15%,#2b110d 15.5% 25%,#100807 25.5% 29%);clip-path:none;border-left:10px solid #100a07;border-right:10px solid #100a07;box-shadow:inset 0 0 50px #000}
+#rift-exploration .rift-scene-light{top:0;left:35%;width:30%;height:72%;background:radial-gradient(ellipse at 50% 0,rgba(215,160,94,.24),transparent 68%);clip-path:polygon(43% 0,57% 0,100% 100%,0 100%)}
+#rift-exploration .rift-scene-stage{left:0;right:0;top:53%;bottom:auto;height:17%;background:linear-gradient(180deg,#7a5737 0,#4c3422 10%,#24180f 83%,#0c0806 100%);border-top:4px solid #9b7147;border-bottom:2px solid #543820;box-shadow:0 10px 30px #000}
+#rift-exploration .rift-scene-seats{left:0;right:0;bottom:0;height:31%;background:repeating-linear-gradient(90deg,#090706 0 9%,#17100b 9.5% 11%,#080605 11.5% 19%);border-top:1px solid #46301e}
+#rift-exploration .rift-scene-wall{position:absolute;left:0;top:36%;width:17%;height:44%;background:linear-gradient(90deg,#080605,#21160e,#080605);border:3px solid #4b3423;box-shadow:inset 0 0 35px #000}
+#rift-exploration .rift-scene-counter{position:absolute;left:17%;right:0;top:53%;height:14%;background:linear-gradient(180deg,#795638,#503720 16%,#1b120b 90%);border-top:4px solid #9a7047;border-bottom:2px solid #543a25;box-shadow:0 6px 25px #000}
+#rift-exploration .rift-world-name{position:absolute;left:4%;top:5%;font:11px "Courier New",monospace;letter-spacing:.3em;color:#c3a47a;opacity:.55}
+#rift-exploration .rift-walk-doors{position:absolute;inset:0;z-index:3}
+#rift-exploration .rift-world-door{position:absolute;bottom:16%;height:46%;width:7%;min-width:36px;max-width:76px;transform:translateX(-50%);border:2px solid #47301f;background:linear-gradient(90deg,#090706,#2b1c11 45%,#080605);box-shadow:0 0 18px #000,inset 0 0 14px #000;cursor:pointer;padding:0}
+#rift-exploration .rift-world-door:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,#b27c4222,transparent)}
+#rift-exploration .rift-world-door span{position:absolute;left:50%;bottom:-23px;transform:translateX(-50%);white-space:nowrap;padding:3px 6px;background:#080604cc;color:#b89a72;font:10px "Noto Serif SC",serif;border:1px solid #46301f}
+#rift-exploration .rift-world-door.nearby{border-color:#c69b68;box-shadow:0 0 18px #c08a4c66,inset 0 0 20px #a46e3b44}
+#rift-exploration .rift-world-door.security-door{height:58%;width:10%;max-width:100px;border-color:#94704a;background:linear-gradient(90deg,#0a0806,#49331f,#0a0806)}
+#rift-exploration .rift-walk-player{z-index:6;left:50%;bottom:12%;width:4.2%;height:32%;min-width:28px;max-width:52px;transition:left .04s linear;filter:drop-shadow(0 2px 12px #000)}
+#rift-exploration .rift-walk-player i{background:linear-gradient(90deg,#080707,#514438,#080707);border-color:#816b54}
+#rift-exploration .rift-walk-player b{background:linear-gradient(90deg,#090807,#33261b,#090807);border-color:#72583d}
+#rift-exploration .rift-walk-interact{z-index:8;left:50%;bottom:7%;transform:translateX(-50%);width:max-content;max-width:80%;padding:7px 12px;background:#080605c9;border:1px solid #5a4029;color:#e1c49a;font:12px "Noto Serif SC",serif;text-align:center}
+#rift-exploration .rift-walk-controls{left:14px;right:14px;bottom:12px;z-index:10;display:flex;gap:7px;justify-content:flex-start;pointer-events:none}
+#rift-exploration .rift-walk-controls button{pointer-events:auto;width:52px;height:44px;border:1px solid #82603d;background:#100b08e8;color:#e2c69f;cursor:pointer;touch-action:none}
+#rift-exploration .rift-walk-controls button[data-walk="interact"]{margin-left:auto}
+#rift-exploration .rift-room-view{display:block!important;width:100%;max-width:1040px;margin:0 auto!important;padding:12px 16px!important;border:1px solid #60432b;background:linear-gradient(145deg,#1c130d,#080706);min-height:0}
+#rift-exploration .rift-room-view[hidden]{display:none!important}
+#rift-exploration .rift-room-heading{font-size:18px;color:#e2c9a6}
+#rift-exploration .rift-room-desc{margin:5px 0 8px;color:#b39b7c;font-size:12px}
+#rift-exploration .rift-room-items{display:flex;gap:8px;flex-wrap:wrap}
+#rift-exploration .rift-find-item{padding:8px 10px;background:#21170f;border-color:#674a2e}
+#rift-exploration footer{width:100%;max-width:1040px;margin:0 auto;padding-top:2px;display:flex;align-items:center;justify-content:space-between}
+#rift-exploration .rift-countdown{font:12px "Courier New",monospace;color:#e4b978}
+#rift-exploration .rift-explore-actions button{border:1px solid #8c6843;background:#17100b;color:#e8d2b0;padding:9px 13px}
+#rift-exploration .rift-map-return[hidden]{display:none!important}
+#rift-exploration .rift-route-modal{position:fixed;inset:0;z-index:30;background:#000d;display:grid;place-items:center;padding:18px}
+#rift-exploration .rift-route-modal[hidden]{display:none}
+#rift-exploration .rift-route-card{width:min(600px,94vw);padding:18px;background:#100c08;border:1px solid #76563a;box-shadow:0 20px 70px #000}
+#rift-exploration .rift-route-head{display:flex;align-items:center;justify-content:space-between;color:#e2c9a6;margin-bottom:12px}
+#rift-exploration .rift-route-card .rift-map-board{position:relative;width:100%;aspect-ratio:400/390;background:repeating-linear-gradient(90deg,#160c09 0 10%,#0a0706 11% 14%);border:1px solid #4a3423}
+#rift-exploration .rift-route-card .rift-map-lines path{stroke:#765638;stroke-width:4}
+#rift-exploration .rift-route-card .rift-map-node{background:#160f0a;color:#c4a77e;border-color:#705034}
+#rift-exploration .rift-route-card .rift-map-node.is-entry{background:#63472c;color:#fff0d8}
+#rift-exploration .rift-route-card p{font:12px/1.8 "Noto Serif SC",serif;color:#bba486;margin:12px 0 0}
+#rift-exploration .rift-walk-scene[data-place="music"] .rift-scene-curtain,
+#rift-exploration .rift-walk-scene[data-place="props"] .rift-scene-curtain,
+#rift-exploration .rift-walk-scene[data-place="archive"] .rift-scene-curtain{filter:brightness(.65) sepia(.25)}
+#rift-exploration .rift-walk-scene[data-place="security"] .rift-scene-curtain{background:repeating-linear-gradient(90deg,#080807 0 17%,#30271c 17.5% 19%,#090807 19.5% 36%)}
+@media(max-width:700px){
+ #rift-exploration .rift-explore-shell{padding:calc(env(safe-area-inset-top) + 10px) 8px 10px!important;gap:8px}
+ #rift-exploration .rift-walk-scene{height:62vh!important;min-height:320px!important}
+ #rift-exploration .rift-world-door{width:8%;min-width:25px;height:42%}
+ #rift-exploration .rift-world-door span{font-size:8px}
+ #rift-exploration .rift-walk-player{width:7%;min-width:24px}
+ #rift-exploration .rift-walk-controls button{width:48px;height:46px}
+ #rift-exploration .rift-current-location{font-size:18px}
+ #rift-exploration .rift-stage-top-actions button{padding:7px 8px;font-size:10px}
+ #rift-exploration footer{gap:8px}
+}
