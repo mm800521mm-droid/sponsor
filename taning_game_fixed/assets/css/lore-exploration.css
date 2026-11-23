@@ -1,4 +1,4 @@
-#rift-exploration{position:fixed;inset:0;z-index:100050;display:none;overflow:auto;background:radial-gradient(ellipse at 50% 18%,rgba(89,48,30,.24),transparent 48%),linear-gradient(135deg,#090807,#17110e 55%,#050505);color:#d7c5aa;font-family:Georgia,"Noto Serif SC",serif}
+#rift-exploration{position:fixed;inset:0;z-index:9000;display:none;overflow:auto;background:radial-gradient(ellipse at 50% 18%,rgba(89,48,30,.24),transparent 48%),linear-gradient(135deg,#090807,#17110e 55%,#050505);color:#d7c5aa;font-family:Georgia,"Noto Serif SC",serif}
 #rift-exploration.active{display:block}
 #rift-exploration:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.2;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.035) 4px)}
 .rift-explore-shell{position:relative;max-width:1120px;margin:0 auto;padding:34px 28px 28px;min-height:100%;display:flex;flex-direction:column}
