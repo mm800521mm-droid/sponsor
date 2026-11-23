@@ -349,3 +349,32 @@
  #rift-exploration .rift-stage-top-actions button{padding:7px 8px;font-size:10px}
  #rift-exploration footer{gap:8px}
 }
+
+
+/* Main exploration view: connected numbered backstage map, matching the supplied reference */
+#rift-exploration .rift-map-frame{padding:10px 12px 12px!important}
+#rift-exploration .rift-primary-map{position:relative!important;display:block!important;width:min(100%,620px)!important;aspect-ratio:400/390!important;margin:0 auto!important;overflow:hidden;background:
+ repeating-linear-gradient(0deg,transparent 0 11px,rgba(205,155,105,.035) 12px),
+ repeating-linear-gradient(90deg,transparent 0 11px,rgba(205,155,105,.035) 12px),
+ linear-gradient(180deg,#1a0d09,#080605 75%)!important;border:1px solid #4a3425!important}
+#rift-exploration .rift-primary-map .rift-map-lines{z-index:1}
+#rift-exploration .rift-primary-map .rift-map-lines path{stroke:#76583e!important;stroke-width:4!important;opacity:.9!important}
+#rift-exploration .rift-primary-map .rift-map-node{width:12%;height:11%;min-width:0;min-height:0;max-width:none;max-height:none;padding:0;z-index:2;font-size:clamp(11px,1.4vw,15px)}
+#rift-exploration .rift-primary-map .rift-map-node small{position:absolute;left:50%;top:calc(100% + 3px);transform:translateX(-50%);white-space:nowrap;font:clamp(7px,.8vw,9px) "Noto Serif SC",serif;color:#d1b58f;background:#0b0806d9;padding:2px 4px;opacity:0;pointer-events:none}
+#rift-exploration .rift-primary-map .rift-map-node:hover small,#rift-exploration .rift-primary-map .rift-map-node.is-current small{opacity:1}
+#rift-exploration .rift-primary-map .rift-map-node[data-map-node="2"]{width:48%;height:13%;max-width:none}
+#rift-exploration .rift-primary-map .rift-map-node[data-map-node="3"],#rift-exploration .rift-primary-map .rift-map-node[data-map-node="4"]{width:11%;height:24%}
+#rift-exploration .rift-primary-map .rift-map-node[data-map-node="1"]{width:24%;height:12%;background:linear-gradient(180deg,#62472f,#25180f)!important;border-color:#b28a5c!important;color:#fff0d8!important}
+#rift-exploration .rift-primary-map .rift-map-node[data-map-node="14"]{width:26%;height:7%}
+#rift-exploration .rift-primary-map .rift-map-node.is-current{outline:2px solid #d0a878;outline-offset:2px;box-shadow:0 0 20px #d0a87888,inset 0 0 16px #d0a87855!important}
+#rift-exploration .rift-primary-map .rift-map-node.is-locked{opacity:.62}
+#rift-exploration .rift-map-instructions{width:min(100%,620px);margin:10px auto 0;color:#b59b7b;font:12px/1.7 "Noto Serif SC",serif}
+#rift-exploration .rift-room-view[hidden]{display:none!important}
+#rift-exploration .rift-room-view{margin-top:10px!important}
+#rift-exploration .rift-stage-top{align-items:flex-start}
+#rift-exploration .rift-current-location{font-size:clamp(18px,2vw,24px)!important}
+@media(max-width:600px){
+ #rift-exploration .rift-primary-map{width:100%!important}
+ #rift-exploration .rift-primary-map .rift-map-node small{font-size:7px}
+ #rift-exploration .rift-map-frame{padding:6px!important}
+}
