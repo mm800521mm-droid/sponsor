@@ -43,7 +43,7 @@
  function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
  let overlay,activeRoom=null,onEnter=null,shiftNight=1,currentPlace='corridor',nightStarted=false,lastElapsed=0,playerX=50,moveLeft=false,moveRight=false,nearbyAction=null,walkFrame=0,exploreThreat=null,threatX=100,threatNextAt=0,threatWarningAt=0,threatCooldown=0,threatLastUpdate=0,threatGraceUntil=0,threatScareUntil=0,threatFacing=1,preShiftDeadline=0,preShiftTimer=null;
  const mapNodes=[
-  {n:1,id:'theater',label:'剧院大厅',x:50,y:84.5,kind:'place'},
+  {n:1,id:'security',label:'保安室',x:50,y:84.5,kind:'place'},
   {n:2,id:'corridor',label:'后台走廊',x:50,y:44.8,kind:'place'},
   {n:3,id:'music',label:'音乐室',x:74,y:59,kind:'room'},
   {n:4,id:'props',label:'道具仓库',x:26,y:59,kind:'room'},
@@ -53,7 +53,7 @@
   {n:8,id:'office',label:'主管办公室外',x:88,y:84.5,kind:'room'},
   {n:9,id:'lobby',label:'后台入口',x:30,y:15,kind:'room'},
   {n:10,id:'hall',label:'后台深处',x:70,y:15,kind:'room'},
-  {n:11,id:'security',label:'保安室',x:50,y:15,kind:'place'},
+  {n:11,id:'theater',label:'剧院大厅',x:50,y:15,kind:'place'},
   {n:12,id:'westWing',label:'西侧封存区',x:12,y:24,kind:'locked'},
   {n:13,id:'eastWing',label:'东侧封存区',x:88,y:24,kind:'locked'},
   {n:14,id:'lastRoom',label:'最后的房间',x:50,y:97,kind:'locked'}
