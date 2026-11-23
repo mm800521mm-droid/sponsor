@@ -61,14 +61,14 @@
  function ensure(){
   if(overlay)return;
   overlay=document.createElement('section');overlay.id='rift-exploration';
-  overlay.innerHTML='<div class="rift-explore-shell"><div class="rift-stage-top"><div><span class="rift-eyebrow">RIFT ASH · BACKSTAGE ACCESS</span><div class="rift-current-location">后台走廊</div></div><div class="rift-stage-top-actions"><button class="rift-open-map" type="button">地图 / 01—14</button><button class="rift-codex-open" type="button">档案 / 分 P</button></div></div><div class="rift-map-frame"><div class="rift-map-topline"><span class="rift-scene-label">后台走廊</span><span class="rift-scene-hint">A / D 或 ← / → 移动 · E 互动</span></div><div class="rift-walk-scene" data-place="corridor" tabindex="0" aria-label="后台走廊探索场景"><div class="rift-scene-backdrop"><div class="rift-scene-curtain"></div><div class="rift-scene-light"></div><div class="rift-scene-stage"></div><div class="rift-scene-seats"></div><div class="rift-scene-wall"></div><div class="rift-scene-counter"></div><div class="rift-world-name">BACKSTAGE · CORRIDOR</div></div><div class="rift-walk-doors"></div><div class="rift-walk-player" aria-label="玩家"><i></i><b></b></div><div class="rift-room-caption" hidden><b></b><span></span></div><div class="rift-walk-interact">沿走廊移动，靠近门后按 E</div><div class="rift-walk-controls"><button type="button" data-walk="left" aria-label="向左">◀</button><button type="button" data-walk="right" aria-label="向右">▶</button><button type="button" data-walk="interact">E</button></div><div class="rift-walk-vignette"></div></div></div><main class="rift-room-view" hidden><div class="rift-room-heading"></div><div class="rift-room-desc"></div><div class="rift-room-items"></div></main><footer><div class="rift-explore-status"><span class="rift-countdown">进入保安室倒计时：00:45</span><span class="rift-collect-status"></span></div><div class="rift-explore-actions"><button class="rift-map-return" type="button" hidden>返回走廊</button></div></footer></div><div class="rift-modal" hidden></div><div class="rift-route-modal" hidden><div class="rift-route-card"><div class="rift-route-head"><b>后台区域路线图</b><button type="button" class="rift-route-close">关闭</button></div><div class="rift-map-board"><svg class="rift-map-lines" viewBox="0 0 400 390" preserveAspectRatio="none" aria-hidden="true"><g><path d="M200 330 V380 M200 330 H45 V230 H45 V95 H125 V55 H200 V55 H275 V95 H355 V230 H355 V330 H200 V175 M200 175 V55 M200 175 H105 V230 H105 V330 M200 175 H295 V230 H295 V330 M105 230 H45 M295 230 H355 M45 330 H105 M295 330 H355"/></g></svg><div class="rift-map-nodes"></div></div><p>2 号是出生点。靠近对应房门后按 E 进入；1 号为保安室，进入后立即开始当前夜晚。</p></div></div>';
+  overlay.innerHTML='<div class="rift-explore-shell"><div class="rift-stage-top"><div><span class="rift-eyebrow">RIFT ASH · BACKSTAGE ACCESS</span><div class="rift-current-location">后台走廊</div></div><div class="rift-stage-top-actions"><button class="rift-open-map" type="button">地图 / 01—14</button><button class="rift-codex-open" type="button">档案 / 分 P</button></div></div><div class="rift-map-frame"><div class="rift-map-topline"><span class="rift-scene-label">后台走廊</span><span class="rift-scene-hint">A / D 或 ← / → 移动 · E 互动</span></div><div class="rift-map-board rift-primary-map"><svg class="rift-map-lines" viewBox="0 0 400 390" preserveAspectRatio="none" aria-hidden="true"><g><path d="M200 330 V380 M200 330 H45 V230 H45 V95 H125 V55 H200 V55 H275 V95 H355 V230 H355 V330 H200 V175 M200 175 V55 M200 175 H105 V230 H105 V330 M200 175 H295 V230 H295 V330 M105 230 H45 M295 230 H355 M45 330 H105 M295 330 H355"/></g></svg><div class="rift-map-nodes"></div></div><div class="rift-map-instructions">选择与当前位置相连的房间编号进入调查。2 号为出生点，1 号为保安室。</div></div><main class="rift-room-view" hidden><div class="rift-room-heading"></div><div class="rift-room-desc"></div><div class="rift-room-items"></div></main><footer><div class="rift-explore-status"><span class="rift-countdown">进入保安室倒计时：00:45</span><span class="rift-collect-status"></span></div><div class="rift-explore-actions"><button class="rift-map-return" type="button" hidden>返回走廊</button></div></footer></div><div class="rift-modal" hidden></div><div class="rift-route-modal" hidden><div class="rift-route-card"><div class="rift-route-head"><b>后台区域路线图</b><button type="button" class="rift-route-close">关闭</button></div><div class="rift-map-board"><svg class="rift-map-lines" viewBox="0 0 400 390" preserveAspectRatio="none" aria-hidden="true"><g><path d="M200 330 V380 M200 330 H45 V230 H45 V95 H125 V55 H200 V55 H275 V95 H355 V230 H355 V330 H200 V175 M200 175 V55 M200 175 H105 V230 H105 V330 M200 175 H295 V230 H295 V330 M105 230 H45 M295 230 H355 M45 330 H105 M295 330 H355"/></g></svg><div class="rift-map-nodes"></div></div><p>2 号是出生点。靠近对应房门后按 E 进入；1 号为保安室，进入后立即开始当前夜晚。</p></div></div>';
   document.body.appendChild(overlay);
   overlay.querySelector('.rift-codex-open').addEventListener('click',showCodex);
   overlay.querySelector('.rift-map-return').addEventListener('click',()=>leaveRoom());
   overlay.querySelector('.rift-modal').addEventListener('click',e=>{if(e.target.classList.contains('rift-modal'))e.currentTarget.hidden=true;});
   overlay.querySelector('.rift-open-map').addEventListener('click',()=>{const m=overlay.querySelector('.rift-route-modal');m.hidden=false;});
   overlay.querySelector('.rift-route-close').addEventListener('click',()=>{overlay.querySelector('.rift-route-modal').hidden=true;});
-  renderMap();bindWalkControls();renderWalkDoors();renderStatus();
+  renderMap();renderStatus();
  }
  const walkDoors=[
   {id:'lobby',label:'后台入口',x:4,n:9},{id:'archive',label:'档案室',x:14,n:7},
@@ -83,8 +83,8 @@
  function enterSecurity(){if(nightStarted)return;nightStarted=true;if(preShiftTimer){clearInterval(preShiftTimer);preShiftTimer=null;}const clock=overlay&&overlay.querySelector('.rift-countdown');if(clock)clock.textContent='正在进入保安室…';if(overlay)overlay.classList.remove('active');const cb=onEnter;onEnter=null;if(typeof cb==='function')cb();}
  function renderMap(){
   const host=overlay.querySelector('.rift-map-nodes');if(!host)return;
-  host.innerHTML=mapNodes.map(p=>'<button type="button" class="rift-map-node '+(p.n===2?'is-entry':'')+(p.n===14?' is-danger':'')+(p.kind==='locked'?' is-locked':'')+'" data-map-node="'+p.n+'" style="left:'+p.x+'%;top:'+p.y+'%" aria-label="'+p.n+' '+esc(p.label)+'"><span>'+p.n+'</span></button>').join('');
-  host.querySelectorAll('[data-map-node]').forEach(btn=>btn.addEventListener('click',()=>{const p=mapNodes.find(x=>x.n===Number(btn.dataset.mapNode));const hint=overlay.querySelector('.rift-route-card p');if(hint&&p)hint.textContent=p.n===1?'1 号保安室：靠近保安室入口后按 E，立即开始当前夜晚。':p.n===2?'2 号后台走廊：探索出生点。':p.kind==='locked'?p.label+'：目前封锁。':'目标：'+p.label+'。请在走廊中移动到对应房门附近，按 E 进入。';}));
+  host.innerHTML=mapNodes.map(p=>'<button type="button" class="rift-map-node '+(p.n===2?'is-entry':'')+(p.n===1?' is-security':'')+(p.n===14?' is-danger':'')+(p.kind==='locked'?' is-locked':'')+'" data-map-node="'+p.n+'" style="left:'+p.x+'%;top:'+p.y+'%" aria-label="'+p.n+' '+esc(p.label)+'"><span>'+p.n+'</span><small>'+esc(p.label)+'</small></button>').join('');
+  host.querySelectorAll('[data-map-node]').forEach(btn=>btn.addEventListener('click',()=>openMapNode(Number(btn.dataset.mapNode))));
  }
  function renderWalkDoors(){
   const host=overlay.querySelector('.rift-walk-doors');if(!host)return;
@@ -143,6 +143,7 @@
   const title=place==='theater'?'剧院大厅':place==='corridor'?'后台走廊':'保安室';
   const label=overlay.querySelector('.rift-current-location');if(label)label.textContent=title;
   const top=overlay.querySelector('.rift-scene-label');if(top)top.textContent=title;
+  overlay.querySelectorAll('.rift-map-node').forEach(node=>node.classList.toggle('is-current',Number(node.dataset.mapNode)===(place==='corridor'?2:place==='security'?1:mapNodes.find(p=>p.id===place)?.n)));
   const scene=overlay.querySelector('.rift-walk-scene');if(scene){scene.dataset.place=place;scene.classList.remove('is-room');}
   const caption=overlay.querySelector('.rift-walk-interact');if(caption)caption.textContent=place==='corridor'?'A / D 或方向键移动，靠近房门后按 E':title;const roomCaption=overlay.querySelector('.rift-room-caption');if(roomCaption)roomCaption.hidden=true;
   const panel=overlay.querySelector('.rift-room-view');if(panel)panel.hidden=true;
@@ -157,6 +158,7 @@
   activeRoom=id;currentPlace='room';
   const label=overlay.querySelector('.rift-current-location');if(label)label.textContent=r.name;
   const top=overlay.querySelector('.rift-scene-label');if(top)top.textContent=r.name;
+  overlay.querySelectorAll('.rift-map-node').forEach(node=>node.classList.toggle('is-current',Number(node.dataset.mapNode)===mapNodes.find(p=>p.id===id)?.n));
   const scene=overlay.querySelector('.rift-walk-scene');if(scene){scene.dataset.place=id;scene.classList.add('is-room');}
   const title=overlay.querySelector('.rift-room-heading');if(title)title.textContent=r.name;
   const desc=overlay.querySelector('.rift-room-desc');if(desc)desc.textContent=r.desc;const roomCaption=overlay.querySelector('.rift-room-caption');if(roomCaption){roomCaption.querySelector('b').textContent=r.name;roomCaption.querySelector('span').textContent=r.desc;roomCaption.hidden=false;}
@@ -169,9 +171,12 @@
  }
  function leaveRoom(){if(!activeRoom)return;activeRoom=null;currentPlace='corridor';showPlace('corridor');}
  function openMapNode(n){
-  const p=mapNodes.find(x=>x.n===n);if(!p)return;
-  if(p.kind==='locked'){const hint=overlay.querySelector('.rift-route-card p');if(hint)hint.textContent=p.label+'：目前封锁，暂不可进入。';return;}
-  const hint=overlay.querySelector('.rift-route-card p');if(hint)hint.textContent=p.n===1?'1 号保安室：靠近保安室入口后按 E，立即开始当前夜晚。':'2 号是出生点；其他房间请在走廊中靠近门口后按 E。';
+  const p=mapNodes.find(x=>x.n===n);if(!p||nightStarted)return;
+  if(p.kind==='locked'){const hint=overlay.querySelector('.rift-map-instructions');if(hint)hint.textContent=p.label+'：目前封锁，暂不可进入。';return;}
+  if(p.id==='security'){showPlace('security');enterSecurity();return;}
+  if(p.id==='corridor'){activeRoom=null;showPlace('corridor');return;}
+  if(p.id==='theater'){showPlace('theater');return;}
+  selectRoom(p.id);
  }
  function collect(id){if(save.found.includes(id)){showEntry(id);return;}save.found.push(id);if(id.startsWith('fragment')){const count=fragments.filter(f=>save.found.includes(f.id)).length;if(count===5&&!save.gallery.includes('wen独白'))save.gallery.push('wen独白');}write();renderStatus();if(activeRoom)selectRoom(activeRoom);else showPlace(currentPlace);showEntry(id);}
  function showEntry(id){const entry=entries[id]||fragments.find(f=>f.id===id);if(!entry)return;modal('<div class="rift-document"><div class="rift-eyebrow">'+esc(entry.kind||'独立档案')+'</div><h2>'+esc(entry.title)+'</h2><p>'+esc(entry.text)+'</p><button class="rift-modal-close">收好</button></div>');}
